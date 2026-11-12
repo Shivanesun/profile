@@ -236,6 +236,14 @@ body.playing{overflow:hidden}
 @media (max-width:600px){.mapw{overflow-x:auto;margin:0 -12px;padding:0 12px}#map{min-width:640px}.swipe{display:block;font-family:var(--hand);font-weight:700;font-size:18px;color:var(--blue);text-align:center}.gtb,.policy-short,.stks{grid-template-columns:1fr}.stks{gap:46px;margin-top:36px}.pops{position:absolute;top:-40px;right:6px}.stk{padding-top:24px}.reps{grid-template-columns:1fr 1fr}.journey{grid-template-columns:1fr}.proof{grid-template-columns:1fr 1fr}.mgrid{grid-template-columns:1fr}.roles{grid-template-columns:1fr 1fr}.top .wrap{gap:8px}.tb{gap:6px}.btn{padding:5px 9px;font-size:12.5px}.rc{padding:6px 10px 6px 6px;gap:8px}.rc .av{width:56px;height:56px}.rc .tx b{font-size:15px}.rc .tx span{display:none}.rc .go{padding:3px 8px;font-size:13px}.ten .row{grid-template-columns:repeat(5,1fr)}.talk{padding:22px}.talk .note{margin-left:0}.board{padding:12px}.hero h1{font-size:36px}.sh h2{font-size:26px}.sh .note{display:none}.tb .btn small{display:none}.logo{font-size:21px}.mh h2{font-size:22px}.modal{padding:16px 14px}.dsh .kpis{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:900px){.policy-short{grid-template-columns:1fr 1fr}.dsh .kpis{grid-template-columns:repeat(3,1fr)}.dsh .grid{grid-template-columns:1fr}.pmap,.mgrid,.pfeat,.sys{grid-template-columns:1fr}.stks{grid-template-columns:1fr 1fr}.ten .row{grid-template-columns:repeat(5,1fr)}.ten .grp{display:none}.proof,.journey{grid-template-columns:1fr 1fr}.journey:before{display:none}.jump{display:none}.hero{grid-template-columns:1fr}.doodle{text-align:left}}
 @media (max-width:600px){.stks,.policy-short,.journey,.gtb{grid-template-columns:1fr!important}.stks{gap:48px!important}}
+/* phone: the journey runs down, so the line runs down too, one coloured segment from each dot to the next */
+@media (max-width:600px){
+ .journey:before{display:none}
+ .stop{padding:0 0 0 40px;min-height:34px}
+ .stop:before{z-index:1}
+ .stop:not(:last-child):after{content:"";position:absolute;left:10px;width:11px;top:12px;bottom:-26px;border:2px solid var(--ink);border-radius:4px;background:var(--sB)}
+ .stop:nth-child(2):after{background:var(--sG)}.stop:nth-child(3):after{background:var(--sY)}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 .prq{margin:14px 0 12px;font-family:var(--hand);font-weight:700;font-size:26px;line-height:1.1;color:var(--blue)}
 .prg{display:grid;grid-template-columns:1.3fr .9fr .8fr;gap:14px;align-items:center}
