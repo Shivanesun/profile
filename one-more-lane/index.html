@@ -74,7 +74,16 @@ button{color:var(--ink);font-family:var(--body)}
 .news{display:flex;align-items:center;gap:10px;border:2.5px solid var(--ink);border-radius:10px;background:var(--sY);padding:6px 10px;min-height:42px}
 .news b{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;background:var(--ink);color:#fff;padding:3px 7px;border-radius:5px;flex:none}
 .news span{font-family:var(--display);font-weight:700;font-size:15.5px;line-height:1.15}
-.turnbadge{position:absolute;top:16px;left:18px;font-family:var(--display);font-weight:800;font-size:15px;background:var(--paper);border:2.5px solid var(--ink);border-radius:10px;padding:3px 10px;box-shadow:3px 3px 0 var(--ink)}
+.dots{display:flex;gap:3px;margin-top:4px}
+.dots i{width:9px;height:9px;border:1.5px solid var(--ink);border-radius:50%;background:#fff}
+.dots i.past{background:var(--ink)}.dots i.now{background:var(--accent)}
+.endrow{flex-direction:column;align-items:stretch}
+.go{font-size:15px}
+.later{position:absolute;top:16px;left:18px;z-index:5;max-width:330px;font-size:13px;background:var(--paper);border:2.5px solid var(--ink);border-radius:12px;padding:8px 12px;box-shadow:4px 4px 0 var(--ink);cursor:pointer;animation:fi .25s ease-out both}
+.later h4{margin:0 0 4px;font-family:var(--display);font-weight:800;font-size:16px}
+.later .row{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12px}
+.later .row b.good{color:var(--green)}.later .row b.bad{color:var(--red)}
+.later .why{margin-top:5px;font-family:var(--hand);font-weight:700;font-size:17px;line-height:1.1;color:var(--blue)}
 
 .right{display:flex;flex-direction:column;gap:10px;min-height:0}
 .adv{display:flex;gap:8px;align-items:flex-start}
@@ -91,9 +100,9 @@ button{color:var(--ink);font-family:var(--body)}
 @keyframes talk{to{transform:scaleY(2.2)}}
 .eye{animation:blink 4s infinite;transform-box:fill-box;transform-origin:center}
 @keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
-.spark{flex:1;min-height:90px;display:flex;flex-direction:column}
-.spark .k{font-family:var(--hand);font-weight:700;font-size:19px}
-.spark svg{flex:1;width:100%;min-height:70px}
+.spark{flex:1;min-height:190px;display:flex;flex-direction:column}
+.spark .k{font-family:var(--hand);font-weight:700;font-size:19px;line-height:1.05}
+.spark svg{flex:1;width:100%;min-height:150px}
 
 /* overlays */
 .ov{position:fixed;inset:0;background:rgba(20,22,31,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
@@ -161,7 +170,7 @@ button{color:var(--ink);font-family:var(--body)}
   <header class="top">
     <div class="title"><h1><i class="homespace" aria-hidden="true"></i><span>One More Lane</span></h1></div><button class="infob infogo" id="infoTop" type="button" aria-label="How it works">i</button><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button>
     <div class="meters">
-      <div class="meter"><div class="k">Turn</div><div class="v" id="mTurn">1 of 12</div></div>
+      <div class="meter"><div class="k">Time · 6 years</div><div class="v" id="mTurn" style="font-size:18px">Year 1 · Jan–Jun</div><div class="dots" id="mDots"></div></div>
       <div class="meter"><div class="k">Money</div><div class="v" id="mMoney">₹1000 Cr</div></div>
       <div class="meter"><div class="k">Approval</div><div class="v" id="mAppr">60%</div><div class="bar"><i id="mApprBar" style="width:60%"></i></div></div>
       <div class="meter commute"><div class="k">Average commute </div><div class="crow"><div class="v" id="mComm">51 min</div><span class="delta" id="mDelta"></span></div><div class="goalbar"><i id="mGoalBar"></i><span class="flag">40</span></div><div class="gl" id="mGoalTxt" hidden></div></div>
@@ -176,7 +185,7 @@ button{color:var(--ink);font-family:var(--body)}
 
     <section class="panel stage">
       <div class="scene" id="scene"></div>
-      <div class="turnbadge" id="yearBadge">Year 1</div>
+      <div class="later" id="later" hidden></div>
       <div class="news"><b>CITY NEWS</b><span id="news">You have just been sworn in as mayor. The main road is jammed.</span></div>
     </section>
 
@@ -189,7 +198,7 @@ button{color:var(--ink);font-family:var(--body)}
         <div class="face" id="facePl"></div>
         <div style="flex:1;min-width:0"><div class="who">Lakshmi Menon</div><div class="role">City planner</div><div class="bubble" id="sayPl"></div></div>
       </div>
-      <div class="panel spark"><div class="k">Commute</div><svg id="spark" viewBox="0 0 240 110" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="panel spark"><div class="k">Average commute: get it below 40 ↓</div><svg id="spark" viewBox="0 0 260 200" preserveAspectRatio="xMidYMid meet"></svg></div>
     </section>
   </main>
 </div>
@@ -242,7 +251,7 @@ const MOVES={
  flyover:{cost:400,once:false,g:'road',name:'Build a flyover',hint:'Big relief'},
  lane:{cost:50,once:true,g:'pt',name:'Bus lane',hint:'Worse for a while, then better'},
  buses:{cost:80,once:false,g:'pt',name:'More buses',hint:'Shorter waits'},
- metro:{cost:500,once:true,g:'pt',name:'Metro extension',hint:'Opens after 4 turns'},
+ metro:{cost:500,once:true,g:'pt',name:'Metro extension',hint:'Opens after 2 years'},
  feeder:{cost:30,once:true,g:'lm',name:'Feeder minibuses and shared autos',hint:'From homes to stops'},
  foot:{cost:20,once:true,g:'lm',name:'Footpaths and safe crossings',hint:'Walk to the stop'},
  cycle:{cost:15,once:true,g:'lm',name:'Cycle lanes',hint:'Ride to the stop'},
@@ -354,16 +363,21 @@ function renderMoves(){
     ${done?'<span class="tick">✓</span>':(!M.once&&S.count[k]?`<span class="cnt">×${S.count[k]}</span>`:'')}</button>`;}
  }
  $('moves').innerHTML=h;
- $('picked').textContent=picked.length+' of 2 picked';
+ $('picked').textContent=S.turn===0&&!picked.length?'Pick up to 2 moves above, then press the button.':picked.length+' of 2 picked';
+ $('go').textContent=picked.length?'Do '+(picked.length>1?'these 2':'this 1')+' → next 6 months':'Wait 6 months (save money)';
  $('moves').querySelectorAll('.mv').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
   if(picked.includes(k))picked=picked.filter(x=>x!==k);else if(canPick(S,k,picked))picked.push(k);
-  hideTip();renderMoves();if(coachOn&&picked.length)showTip($('go'),'then end your turn');});
+  hideTip();renderMoves();if(coachOn&&picked.length)showTip($('go'),'then press this button');});
 }
+// turn t (0-based) is one half-year
+const period=t=>'Year '+(Math.floor(t/2)+1)+' · '+(t%2?'Jul–Dec':'Jan–Jun');
 
 /* ---------- meters ---------- */
 function renderMeters(){
  const c=calc(S);
- $('mTurn').textContent=Math.min(S.turn+1,TURNS)+' of '+TURNS;
+ const now=Math.min(S.turn,TURNS-1);
+ $('mTurn').textContent=period(now);
+ $('mDots').innerHTML=Array.from({length:TURNS},(_,i)=>`<i class="${i<S.turn?'past':i===now?'now':''}"></i>`).join('');
  $('mMoney').textContent='₹'+Math.round(S.money)+' Cr';
  $('mAppr').textContent=Math.round(S.approval)+'%';
  $('mApprBar').style.width=S.approval+'%';$('mApprBar').classList.toggle('low',S.approval<25);
@@ -373,11 +387,17 @@ function renderMeters(){
  const prog=Math.max(0,Math.min(1,(c0.commute-c.commute)/(c0.commute-TARGET)));$('mGoalBar').style.width=(prog*100)+'%';
  
  v.className='v '+(c.commute<=TARGET?'good':'bad');
- $('yearBadge').textContent='Year '+(Math.floor(Math.min(S.turn,TURNS-1)/2)+1)+(S.turn%2?', second half':', first half');
- // spark
- const pts=[c0.commute,...S.hist.map(h=>h.commute)];const W=240,H=110,mx=Math.max(90,...pts),mn=20;
- const X=i=>8+i*(W-16)/TURNS, Y=v=>H-8-(v-mn)/(mx-mn)*(H-16);
- let sp=`<line x1="0" x2="${W}" y1="${Y(TARGET)}" y2="${Y(TARGET)}" stroke="#2F5BFF" stroke-width="1.5" stroke-dasharray="4 4"/><text x="${W-4}" y="${Y(TARGET)-4}" text-anchor="end" font-size="11" fill="#2F5BFF" font-family="Caveat" font-weight="700">goal</text>`;
+ // spark: minutes up the side, years along the bottom, green below the goal, red above
+ const pts=[c0.commute,...S.hist.map(h=>h.commute)];const W=260,H=200,mn=20,mx=Math.ceil(Math.max(80,...pts)/20)*20;
+ const L0=30,R0=W-6,T0=16,B0=H-30;
+ const X=i=>L0+i*(R0-L0)/TURNS, Y=v=>B0-(v-mn)/(mx-mn)*(B0-T0);
+ let sp=`<rect x="${L0}" y="${T0}" width="${R0-L0}" height="${Y(TARGET)-T0}" fill="#FFE3E3"/><rect x="${L0}" y="${Y(TARGET)}" width="${R0-L0}" height="${B0-Y(TARGET)}" fill="#E3F7DA"/>`;
+ for(let v=mn;v<=mx;v+=20)sp+=`<text x="${L0-5}" y="${Y(v)+4}" text-anchor="end" font-size="10" font-family="IBM Plex Mono" fill="#575E6E">${v}</text>`;
+ sp+=`<text x="${L0-5}" y="8" text-anchor="end" font-size="9" font-family="IBM Plex Mono" fill="#575E6E">min</text>`;
+ for(let y=0;y<TURNS/2;y++)sp+=`<text x="${X(2*y+1)}" y="${B0+13}" text-anchor="middle" font-size="10" font-family="IBM Plex Mono" fill="#575E6E" opacity="${2*y<=S.turn?1:.35}">Y${y+1}</text>`;
+ sp+=`<text x="${(L0+R0)/2}" y="${H-3}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono" fill="#575E6E">years</text>`;
+ sp+=`<path d="M${L0} ${T0}V${B0}H${R0}" fill="none" stroke="#14161F" stroke-width="1.5"/>`;
+ sp+=`<line x1="${L0}" x2="${R0}" y1="${Y(TARGET)}" y2="${Y(TARGET)}" stroke="#2E9E5B" stroke-width="2"/><text x="${L0+4}" y="${Y(TARGET)+13}" font-size="10.5" fill="#2E9E5B" font-weight="700">Goal: 40 min</text>`;
  sp+=`<polyline fill="none" stroke="#14161F" stroke-width="2.5" stroke-linejoin="round" points="${pts.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`;
  pts.forEach((v,i)=>sp+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" fill="${v<=TARGET?'#B6EFA0':'#FFB8D4'}" stroke="#14161F" stroke-width="1.5"/>`);
  $('spark').innerHTML=sp;
@@ -404,7 +424,7 @@ function sceneStatic(){
  // metro
  if(S.metroT>0||S.metro){const y=196;s+=`<path d="M30 ${y} H${SW-30}" stroke="#14161F" stroke-width="6" ${S.metro?'':'stroke-dasharray="14 10" opacity=".45"'}/>`;
   for(let x=80;x<SW-40;x+=110)s+=`<path d="M${x} ${y} v${roadTop-y}" stroke="#14161F" stroke-width="5" ${S.metro?'':'opacity=".45"'}/>`;
-  if(!S.metro)s+=`<text x="300" y="${y-10}" font-family="Caveat" font-weight="700" font-size="19">metro being built, ${S.metroT} turn${S.metroT>1?'s':''} to go</text>`;}
+  if(!S.metro)s+=`<text x="300" y="${y-10}" font-family="Caveat" font-weight="700" font-size="19">metro being built, ${S.metroT*6} months to go</text>`;}
  // flyover
  if(S.flyover){s+=`<path d="M230 ${roadTop+roadH/2} q160 -120 320 0" fill="none" stroke="#14161F" stroke-width="${10+4*S.flyover}" opacity=".85"/><path d="M230 ${roadTop+roadH/2} q160 -120 320 0" fill="none" stroke="#D9DDE3" stroke-width="${6+4*S.flyover}"/>`}
  // footpath top
@@ -493,10 +513,34 @@ function react(moves,before,after){
 $('go').onclick=()=>{
  if(S.over)return;hideTip();coachOn=false;
  const before=calc(S);const mv=picked.slice();picked=[];
+ const m0=S.money,a0=S.approval,metroBefore=S.metro,roadBefore=S.road;
  step(S,mv);const after=calc(S);
  renderMoves();renderMeters();sceneStatic();react(mv,before,after);
+ showLater(mv,before.commute,after.commute,S.money-m0,a0,S.metro&&!metroBefore,roadBefore);
  if(S.over)setTimeout(showResult,1500);
 };
+
+/* ---------- "6 months later" card ---------- */
+let laterT;
+function showLater(mv,c1,c2,dm,a0,metroOpened,roadBefore){
+ const a=Math.round(c1),b=Math.round(c2),down=b<a,up=b>a;
+ let why;
+ if(metroOpened)why='The metro opened! Many drivers switch to it.';
+ else if(mv.includes('lane'))why='The bus lane took space from cars, so it hurts at first.';
+ else if(mv.some(m=>MOVES[m].g==='road'))why=down?'More road moved cars faster, for now.':'The new road space filled up with new drivers.';
+ else if(roadBefore&&up)why='The extra road space keeps filling with new drivers.';
+ else if(down)why='More people are leaving the car for the bus.';
+ else if(up)why='The city grows every year, so standing still slips back.';
+ else why='Little changed this time.';
+ const el=$('later');
+ el.innerHTML=`<h4>6 months later…</h4>
+  <div class="row"><span>Commute</span><b class="${down?'good':up?'bad':''}">${a} → ${b} min ${down?'▼':up?'▲':''}</b></div>
+  <div class="row"><span>Money</span><b class="${dm>=0?'good':'bad'}">${dm>=0?'+':'−'}₹${Math.abs(Math.round(dm))} Cr</b></div>
+  <div class="row"><span>Approval</span><b class="${S.approval>=a0?'good':'bad'}">${Math.round(a0)}% → ${Math.round(S.approval)}%</b></div>
+  <div class="why">${why}</div>`;
+ el.hidden=false;clearTimeout(laterT);laterT=setTimeout(()=>el.hidden=true,6000);
+ el.onclick=()=>el.hidden=true;
+}
 
 /* ---------- coach tip ---------- */
 let tipEl=null;
@@ -633,7 +677,7 @@ function confetti(){const cv=$('confetti'),x=cv.getContext('2d');cv.width=innerW
  (function a(){x.clearRect(0,0,cv.width,cv.height);p.forEach(q=>{q.y+=q.v;q.r+=.1;x.save();x.translate(q.x,q.y);x.rotate(q.r);x.fillStyle=q.c;x.fillRect(-q.w/2,-3,q.w,6);x.restore()});if(++f<220)requestAnimationFrame(a);else x.clearRect(0,0,cv.width,cv.height)})()}
 
 /* ---------- start ---------- */
-function reset(){S=init();c0={commute:calc(S).commute,cars:calc(S).cars};picked=[];renderMoves();renderMeters();sceneStatic();
+function reset(){S=init();$('later').hidden=true;c0={commute:calc(S).commute,cars:calc(S).cars};picked=[];renderMoves();renderMeters();sceneStatic();
  $('news').textContent='You have just been sworn in as mayor. The main road is jammed every morning.';}
 reset();
 $('start').onclick=()=>{$('intro').classList.remove('on');
@@ -712,29 +756,29 @@ const GW=(()=>{const M=k=>'.mv[data-k="'+k+'"]',S=[];
 const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));
 add('.meter.commute','Your goal: bring the average commute down from 51 to 40 minutes by year 6.');
 add('#advEng','Ravi wants to widen the road. It feels right, but every new lane pulls in new cars and the jam comes back. We will give people another way to travel instead.');
-add(M('lane'),'Turn 1. Start with a bus lane. It is cheap and it moves buses past the jam. It gets worse for a while, then better.',{click:true});
+add(M('lane'),'Year 1, Jan–Jun. Start with a bus lane. It is cheap and it moves buses past the jam. It gets worse for a while, then better.',{click:true});
 add(M('buses'),'Now add more buses, so the lane has something to carry.',{click:true});
-add('#go','End the turn.',{click:true});
+add('#go','Press the button to run the next 6 months.',{click:true});
 add('#mComm','The commute got a little worse. A new bus lane always hurts for a while. Stay calm and keep going.',{wait:1200});
-add(M('feeder'),'Turn 2. Buses only help if people can reach the stops. Add feeder minibuses and shared autos.',{click:true});
+add(M('feeder'),'Year 1, Jul–Dec. Buses only help if people can reach the stops. Add feeder minibuses and shared autos.',{click:true});
 add(M('foot'),'And footpaths with safe crossings.',{click:true});
-add('#go','End the turn.',{click:true});
-add(M('lights'),'Turn 3. Now make it work for everyone. Street lights and safe stops, so women ride at night.',{click:true,wait:900});
+add('#go','Press the button to run the next 6 months.',{click:true});
+add(M('lights'),'Year 2, Jan–Jun. Now make it work for everyone. Street lights and safe stops, so women ride at night.',{click:true,wait:900});
 add(M('passes'),'Cheap passes for students and daily workers.',{click:true});
-add('#go','End the turn.',{click:true});
-add(M('buses'),'Turn 4. More riders now, so add more buses.',{click:true,wait:900});
+add('#go','Press the button to run the next 6 months.',{click:true});
+add(M('buses'),'Year 2, Jul–Dec. More riders now, so add more buses.',{click:true,wait:900});
 add(M('ramps'),'And ramps with low floor buses for elders and wheelchair users.',{click:true});
-add('#go','End the turn.',{click:true});
-add(M('metro'),'Turn 5. You have saved enough for the metro extension. It opens after 4 turns.',{click:true,wait:900});
-add('#go','End the turn.',{click:true});
-add(M('cycle'),'Turn 6. Cycle lanes to the stops finish the last mile.',{click:true,wait:900});
+add('#go','Press the button to run the next 6 months.',{click:true});
+add(M('metro'),'Year 3, Jan–Jun. You have saved enough for the metro extension. It opens after 2 years.',{click:true,wait:900});
+add('#go','Press the button to run the next 6 months.',{click:true});
+add(M('cycle'),'Year 3, Jul–Dec. Cycle lanes to the stops finish the last mile.',{click:true,wait:900});
 add(M('buses'),'Plus a few more buses.',{click:true});
-add('#go','End the turn.',{click:true});
-add('#go','Turn 7. Nothing new is needed. Let the system work.',{click:true,wait:900});
-add(M('buses'),'Turn 8. The metro is about to open. Top up the buses one last time.',{click:true,wait:900});
-add('#go','End the turn.',{click:true});
+add('#go','Press the button to run the next 6 months.',{click:true});
+add('#go','Year 4, Jan–Jun. Nothing new is needed. Let the system work.',{click:true,wait:900});
+add(M('buses'),'Year 4, Jul–Dec. The metro is about to open. Top up the buses one last time.',{click:true,wait:900});
+add('#go','Press the button to run the next 6 months.',{click:true});
 add('#spark','See the line? Worse first, then falling fast. That is a loop breaking.',{wait:900});
-for(const n of [9,10,11,12])add('#go','Turn '+n+'. Just end the turn.',{click:true,wait:600});
+for(const n of [9,10,11,12])add('#go',period(n-1).replace(' ·',',')+'. Just press the button.',{click:true,wait:600});
 add('#breakBtn','You won. Tap here to see the loop you broke.',{click:true,wait:1800});
 add('#map','Public transport, the last mile and access for all. All 3 cuts together are what broke the loop.',{wait:900,last:true});
 return S})();
@@ -807,8 +851,8 @@ addEventListener('resize',place);addEventListener('scroll',place,true);
 .irl-li .liico{display:grid;place-items:center;width:26px;height:26px;border:2px solid #14161F;border-radius:7px;background:#A9D8FF;font-weight:800}
 @media (max-width:700px){#infoOv .ig{grid-template-columns:1fr}#infoOv{align-items:flex-start}}
 </style>
-<div id="infoOv" hidden><div class="icard"><h2>How it works</h2><div class="ig"><div class="ib"><b>Your goal</b>Bring the average commute down from 51 to 40 minutes by the end of year 6.</div><div class="ib"><b>Turns</b>12 turns of 6 months each. Pick up to 2 moves a turn, then end the turn.</div><div class="ib"><b>Money</b>₹1000 Cr to start, plus ₹50 Cr every turn.</div><div class="ib"><b>Approval</b>If approval falls below 10%, the city votes you out.</div></div><div class="ibtns"><button id="infoClose" type="button">Got it</button><button class="alt" id="tourBtn" type="button">Show me around</button></div></div></div>
-<script>const TOUR=(()=>{const S=[];const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));add('.meter.commute','Your goal. Bring the commute down to 40 minutes.');add('#moves','Your moves: roads, public transport, the last mile and access for all. Tap up to 2 each turn.');add('.stage','Your city. Watch how people travel as your moves land.');add('#advEng','Your advisers. They will not always agree.');add('#go','End the turn when you are ready. 12 turns in all.');S[S.length-1].last=true;return S})();window.GW_STARTBTN="start";</script>
+<div id="infoOv" hidden><div class="icard"><h2>How it works</h2><div class="ig"><div class="ib"><b>Your goal</b>Bring the average commute down from 51 to 40 minutes by the end of year 6.</div><div class="ib"><b>Time</b>6 years, played 6 months at a time. Pick up to 2 moves, then press the button to run the next 6 months.</div><div class="ib"><b>Money</b>₹1000 Cr to start, plus ₹50 Cr every 6 months.</div><div class="ib"><b>Approval</b>If approval falls below 10%, the city votes you out.</div></div><div class="ibtns"><button id="infoClose" type="button">Got it</button><button class="alt" id="tourBtn" type="button">Show me around</button></div></div></div>
+<script>const TOUR=(()=>{const S=[];const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));add('.meter.commute','Your goal. Bring the commute down to 40 minutes.');add('#moves','Your moves: roads, public transport, the last mile and access for all. Tap up to 2 each turn.');add('.stage','Your city. Watch how people travel as your moves land.');add('#advEng','Your advisers. They will not always agree.');add('#go','When you are ready, press this to run the next 6 months. 6 years in all.');S[S.length-1].last=true;return S})();window.GW_STARTBTN="start";</script>
 <script id="infojs">(function(){const g=id=>document.getElementById(id);const o=g('infoOv');if(!o)return;
 document.querySelectorAll('.infogo').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();o.hidden=false}));
 g('infoClose').onclick=()=>{o.hidden=true};g('tourBtn').onclick=()=>{o.hidden=true;window.gwTour()};
