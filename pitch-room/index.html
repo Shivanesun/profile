@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Pitch Room</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Caveat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a fund's pitch room on a whiteboard. Left: mandate, questions, evidence ladder, decision. Centre: the founder on stage with a Business Model Canvas of assumption stickies. Right: the live assumption map, the senior partner and the notes. Single deliberate light look. */
+:root{
+  color-scheme: light;
+  --bg:#E9EDF2; --paper:#FFFFFF; --ink:#14161F; --muted:#575E6E; --line:#D3D9E2; --line2:#B9C1CD;
+  --accent:#FF9F1C; --blue:#2F5BFF; --ok:#16884A; --danger:#D93D42; --amber:#B07A00;
+  --sY:#FFE66D; --sB:#A9D8FF; --sG:#B6EFA0; --sP:#FFB8D4;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace; --hand:'Caveat',cursive;
+}
+*{box-sizing:border-box}
+button{color:var(--ink);font-family:var(--body)}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:14.5px;line-height:1.45}
+.app{min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
+  background-color:var(--bg);background-image:radial-gradient(color-mix(in srgb,var(--ink) 13%,transparent) 1px,transparent 1px);background-size:22px 22px}
+.wrap{max-width:1480px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(28px,3.6vw,42px);line-height:1;letter-spacing:-.02em}
+h1 span{background:var(--sY);padding:0 8px;border:2.5px solid var(--ink);border-radius:6px;box-shadow:4px 4px 0 var(--ink);display:inline-block;transform:rotate(-1.5deg)}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.hbtn{min-height:40px;padding:0 16px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:600 14px var(--body);cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.hbtn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.label{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+
+.main{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,2fr) minmax(0,1.05fr);gap:14px;align-items:stretch}
+@media (min-width:1101px){.main{height:calc(100vh - 110px);min-height:600px}.col,.boardwrap{min-height:0;overflow:hidden}}
+@media (max-width:1100px){.main{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.boardwrap{grid-column:1 / -1;order:-1}}
+@media (max-width:760px){.main{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:12px 13px;display:flex;flex-direction:column;gap:8px;box-shadow:3px 3px 0 var(--ink)}
+.card p{margin:0}
+.col>.card:last-child{flex:1;min-height:0}
+
+/* left */
+.qrows{display:flex;flex-direction:column;gap:7px}
+.qrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px}
+.qrow b{display:block;font-size:13px;line-height:1.1}
+.qrow small{color:var(--muted);font-size:11.5px}
+.mini{width:30px;height:30px;border-radius:50%;border:2px solid var(--ink);overflow:hidden;background:var(--paper)}
+.mini svg{display:block;width:100%;height:100%}
+.coins{display:flex;gap:4px}
+.coin{width:20px;height:20px;border-radius:50%;border:2px solid var(--ink);background:var(--accent);display:flex;align-items:center;justify-content:center;font:700 10px var(--mono)}
+.coin.used{background:var(--paper);opacity:.45}
+.ladder{display:flex;flex-direction:column;gap:6px}
+.rung{display:grid;grid-template-columns:66px minmax(0,1fr);gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+.rung b{display:block;color:var(--ink);font-size:13px}
+.chipS{display:inline-flex;align-items:center;justify-content:center;padding:4px 0;border-radius:6px;border:2px solid var(--ink);font:700 10.5px var(--mono);letter-spacing:.06em;color:var(--ink)}
+.chipS.none{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn{min-height:46px;padding:0 18px;border-radius:12px;border:2.5px solid var(--ink);background:var(--accent);color:var(--ink);font:700 15px var(--body);cursor:pointer;box-shadow:3px 3px 0 var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.invest{display:flex;flex-direction:column;gap:7px}
+.ibtn{min-height:42px;padding:4px 12px;border-radius:11px;border:2.5px solid var(--ink);background:var(--paper);color:var(--ink);font:700 13.5px var(--body);cursor:pointer;box-shadow:2px 2px 0 var(--ink);display:flex;align-items:center;gap:8px;text-align:left}
+.ibtn i{flex:none;width:14px;height:14px;border-radius:3px;border:2px solid var(--ink)}
+.ibtn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+.ibtn:disabled{opacity:.42;cursor:default}
+.ibtn.confirm{background:var(--accent)}
+.toast{min-height:18px;font-size:12.5px;color:var(--danger);font-weight:600}
+.stkrow{margin-top:auto;display:flex;flex-wrap:wrap;gap:10px 8px;align-content:flex-end;padding-top:6px}
+.stk2{display:inline-block;font-family:var(--hand);font-size:18px;font-weight:700;padding:3px 11px;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+@media (min-width:1101px) and (max-height:860px){.stkrow{display:none}.rung span:last-child{font-size:0}.rung span:last-child b{font-size:12.5px}.ibtn{min-height:38px}.card{padding:10px 12px;gap:6px}}
+.stamp2{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--danger);border:3px double var(--danger);box-shadow:none;background:transparent}
+
+/* board */
+.boardwrap{position:relative;display:flex;flex-direction:column;gap:10px;min-width:0}
+.boardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:8px 10px;box-shadow:3px 3px 0 var(--ink)}
+.ftabs{display:flex;gap:6px;flex-wrap:wrap}
+.ftab{min-height:38px;padding:0 12px 0 4px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:700 13px var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.ftab .mini{width:28px;height:28px;border-width:1.5px}
+@media (min-width:1101px) and (max-width:1420px){.ftab .tick{display:none}}
+.ftab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.ftab .tick{font:700 10px var(--mono);letter-spacing:.06em;opacity:.7}
+.stage{flex:1;min-height:0;position:relative;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:9px;box-shadow:4px 4px 0 var(--ink);overflow:hidden}
+.fhead{display:flex;gap:12px;align-items:center}
+.fav{width:66px;height:66px}
+.who{flex:1;min-width:0}
+.who h3{margin:0;font-family:var(--display);font-weight:800;font-size:24px;line-height:1}
+.who p{margin:2px 0 0;font-size:13px;color:var(--muted);line-height:1.25}
+.headline{flex:none;display:flex;flex-direction:column;align-items:flex-end;padding:6px 12px;border-radius:12px;border:2px solid var(--ink);background:var(--fc);box-shadow:3px 3px 0 var(--ink);transform:rotate(1.5deg)}
+.headline b{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.headline small{font-size:11.5px;font-weight:600}
+.fbub{position:relative;margin-left:22px;padding:8px 12px;border-radius:12px;background:#F6F7F9;border:2px solid var(--ink);min-height:62px;display:flex;flex-direction:column;gap:2px}
+.fbub::before{content:"";position:absolute;left:14px;top:-9px;width:14px;height:14px;background:#F6F7F9;border-left:2px solid var(--ink);border-top:2px solid var(--ink);transform:rotate(45deg)}
+.fbub p{margin:0;font-size:14.5px;font-weight:600;line-height:1.35}
+.fbub.ans{background:#FFFBEA}.fbub.ans::before{background:#FFFBEA}
+.bmc{flex:1;min-height:0;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:minmax(0,1fr) minmax(0,1fr) minmax(0,.85fr);border:2px solid var(--ink);border-radius:10px;background:#fff}
+.blk{border:1px solid var(--line2);padding:5px 6px;display:flex;flex-direction:column;gap:4px;min-width:0;min-height:0}
+.blk .bl{font:700 8.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.blk .plain{font-family:var(--hand);font-size:16px;line-height:1.05;color:#6A7180}
+.sn{position:relative;align-self:stretch;text-align:left;padding:6px 7px 7px;border:none;border-radius:3px;font-family:var(--hand);font-size:17px;font-weight:700;line-height:1.02;color:var(--ink);box-shadow:1.5px 2.5px 0 rgba(20,22,31,.22);transform:rotate(-1.2deg);cursor:pointer;transition:transform .15s}
+.sn:hover:not(:disabled){transform:rotate(0) scale(1.04)}
+.sn:disabled{cursor:default}
+.sn.spent{opacity:.5}
+.sn .q{display:block;margin-top:3px;font:700 8.5px var(--mono);letter-spacing:.06em;color:var(--muted)}
+.sn .badge{position:absolute;top:-9px;right:4px;padding:1px 6px;border-radius:999px;border:1.5px solid var(--ink);font:700 9px var(--mono);letter-spacing:.06em;transform:rotate(3deg);color:var(--ink)}
+.badge.S{background:var(--ok);border-color:var(--ok);color:#fff}.badge.W{background:var(--sY)}.badge.N{background:var(--danger);border-color:var(--danger);color:#fff}
+.sn.flip{animation:flipin .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes flipin{0%{transform:rotateY(90deg) rotate(-1.2deg)}100%{transform:rotateY(0) rotate(-1.2deg)}}
+@media (max-width:640px){.bmc{grid-template-rows:auto auto auto}.bmc-x{.blk{padding:4px 3px;min-height:70px}.blk .bl{font-size:7px;letter-spacing:0}.sn{font-size:13.5px;padding:4px 4px 5px}.sn .q{display:none}.blk .plain{font-size:13px}.headline b{font-size:22px}.fhead{flex-wrap:wrap}}
+.ffoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ffoot .hint{flex:1;min-width:150px;font-family:var(--hand);font-size:18px;color:var(--blue);line-height:1.05}
+.ffoot .btn{min-height:40px;font-size:14px}
+.coach{outline:3px solid var(--blue)!important;outline-offset:3px;animation:coach 1s ease-in-out infinite}
+@keyframes coach{0%,100%{box-shadow:0 0 0 0 rgba(47,91,255,.55)}50%{box-shadow:0 0 0 10px rgba(47,91,255,0)}}
+.coach::after{content:"TAP HERE";position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);padding:2px 8px;border-radius:999px;background:var(--blue);color:#fff;font:700 10px var(--mono);letter-spacing:.12em;white-space:nowrap;pointer-events:none;z-index:5}
+.stampP{position:absolute;left:50%;top:50%;z-index:9;transform:translate(-50%,-50%) rotate(-8deg);padding:10px 26px;border:5px double currentColor;border-radius:12px;background:rgba(255,255,255,.88);font-family:var(--display);font-weight:800;font-size:clamp(40px,6vw,70px);letter-spacing:.05em;pointer-events:none;white-space:nowrap;animation:bstamp .55s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes bstamp{0%{transform:translate(-50%,-50%) rotate(-8deg) scale(3);opacity:0}100%{transform:translate(-50%,-50%) rotate(-8deg) scale(1);opacity:1}}
+
+/* right */
+.amapwrap{padding:0 0 0 18px}
+.amap{position:relative;aspect-ratio:1.5/1;border:2.5px solid var(--ink);border-radius:2px;
+  background-color:#fff;background-image:linear-gradient(90deg,transparent calc(33.33% - .5px),var(--line) calc(33.33% - .5px),var(--line) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),var(--line) calc(66.66% - .5px),var(--line) calc(66.66% + .5px),transparent calc(66.66% + .5px)),linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 100%,100% 20%}
+.amap .dz{position:absolute;left:0;top:0;width:66.66%;height:40%;background:color-mix(in srgb,var(--sP) 55%,transparent);border-right:2px dashed var(--danger);border-bottom:2px dashed var(--danger)}
+.amap .dzl{position:absolute;left:6px;top:2px;font-family:var(--hand);font-size:17px;font-weight:700;color:var(--danger);line-height:1}
+.dzkey{display:flex;align-items:center;gap:6px;margin-top:4px;font-family:var(--hand);font-size:17px;font-weight:700;color:var(--danger);line-height:1}.dzkey i{width:16px;height:12px;background:color-mix(in srgb,var(--sP) 70%,transparent);border:2px dashed var(--danger)}
+.amap .ay{position:absolute;left:-15px;top:50%;transform:translate(-50%,-50%) rotate(-90deg);font:600 9.5px var(--mono);letter-spacing:.1em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.amap .empty{position:absolute;left:50%;top:72%;transform:translate(-50%,-50%);font-family:var(--hand);font-size:16px;color:#9AA2B1;white-space:nowrap}
+.ticks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));text-align:center;font:600 9.5px var(--mono);letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-top:3px}
+.ap{position:absolute;transform:translate(-50%,50%);display:flex;align-items:center;gap:3px;padding:1px 6px 1px 1px;border:1.5px solid var(--ink);border-radius:999px;box-shadow:1px 1px 0 var(--ink);font:600 10.5px var(--body);white-space:nowrap;z-index:2;animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
+.ap i{flex:none;width:15px;height:15px;border-radius:50%;background:var(--ink);color:#fff;font:700 8.5px var(--mono);font-style:normal;display:flex;align-items:center;justify-content:center}
+@keyframes pop{0%{transform:translate(-50%,50%) scale(.2);opacity:0}100%{transform:translate(-50%,50%) scale(1);opacity:1}}
+.advice{display:flex;gap:12px;align-items:flex-start;padding:11px;border-radius:14px;background:var(--sY);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);transform:rotate(-.4deg)}
+.advice.urgent{background:var(--sP);animation:urg 1.1s ease-in-out infinite}
+@keyframes urg{0%,100%{box-shadow:3px 3px 0 var(--ink),0 0 0 0 rgba(217,61,66,.5)}50%{box-shadow:3px 3px 0 var(--ink),0 0 0 9px rgba(217,61,66,0)}}
+.advice p{margin:0;font-size:13.5px;font-weight:600;line-height:1.38}
+.av{flex:none;width:58px;height:58px;border-radius:50%;border:2.5px solid var(--ink);background:var(--paper);overflow:hidden;animation:bob 3.2s ease-in-out infinite}
+.av.big{width:96px;height:96px}
+.av svg{display:block;width:100%;height:100%}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 4.4s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.mouth{transform-box:fill-box;transform-origin:center}
+.talking .mouth{animation:talk .16s ease-in-out infinite alternate}
+@keyframes talk{from{transform:scaleY(1)}to{transform:scaleY(3)}}
+.talking .head{animation:nod .5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 90%}
+@keyframes nod{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+.log{display:flex;flex-direction:column;gap:6px;overflow:hidden;font-family:var(--mono);font-size:11.5px;line-height:1.4;flex:1;min-height:0;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.log div{padding-left:8px;border-left:2.5px solid var(--line2);color:var(--muted)}
+.log div:first-child{color:var(--ink)}
+.log div.good{border-left-color:var(--ok)} .log div.bad{border-left-color:var(--danger)} .log div.weak{border-left-color:#F5B800}
+
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:30;background:rgba(233,237,242,.82);backdrop-filter:blur(5px);overflow:auto;display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.panel{width:100%;max-width:760px;background:var(--paper);border:2.5px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);padding:clamp(18px,2.6vw,26px);display:flex;flex-direction:column;gap:14px;animation:rise .45s cubic-bezier(.2,1.2,.4,1);margin:auto 0}
+@keyframes rise{from{transform:translateY(20px);opacity:.3}to{transform:none;opacity:1}}
+.panel h2{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(28px,3.4vw,40px);line-height:1}
+.panel.brief{max-width:1120px;gap:14px}
+.bhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.bgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px}
+@media (max-width:900px){.bgrid{grid-template-columns:minmax(0,1fr)}}
+.bcol{display:flex;flex-direction:column;gap:12px;min-width:0}
+.guide{display:flex;gap:14px;align-items:flex-start}
+.bubble{position:relative;flex:1;min-width:0;padding:12px 14px;border-radius:14px;background:var(--sY);border:2px solid var(--ink);display:flex;flex-direction:column;gap:4px}
+.bubble::before{content:"";position:absolute;left:-10px;top:26px;width:16px;height:16px;background:var(--sY);border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+.bubble p{margin:0;font-size:15px;min-height:7em}
+.tips{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tips li{padding:9px 11px;border-radius:12px;border:2px solid var(--ink);font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.tips li b{color:var(--ink);font-size:14px}
+@media (max-width:640px){.tips{grid-template-columns:1fr}.guide{flex-direction:column}.bubble::before{display:none}}
+.fcards{display:flex;flex-direction:column;gap:8px}
+.fcard{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border:2px solid var(--ink);border-radius:12px;background:#FBFCFD}
+.fcard .mini{width:48px;height:48px}
+.fcard b{display:block;font-family:var(--display);font-weight:800;font-size:17px;line-height:1.05}
+.fcard small{color:var(--muted);font-size:12.5px;line-height:1.25;display:block}
+.fcard .hl{padding:3px 9px;border:2px solid var(--ink);border-radius:8px;font:800 16px var(--display);transform:rotate(2deg);white-space:nowrap}
+.mapdemo{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;padding:10px;border:2px solid var(--ink);border-radius:12px}
+.mapdemo p{margin:0;font-size:13px;color:var(--muted)}
+.mapdemo p b{color:var(--ink)}
+@media (max-width:480px){.mapdemo{grid-template-columns:minmax(0,1fr)}}
+.flyer{position:fixed;z-index:60;border-radius:50%;overflow:hidden;pointer-events:none;border:2.5px solid var(--ink);background:var(--paper)}
+.flyer svg{display:block;width:100%;height:100%}
+.result{max-width:1200px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px}
+.result .rc{display:flex;flex-direction:column;gap:11px;min-width:0}
+@media (max-width:900px){.result{grid-template-columns:minmax(0,1fr)}}
+.band{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;border:2.5px solid var(--ink);font-family:var(--display);font-weight:800;font-size:30px;line-height:1}
+.band.win{background:var(--sG)} .band.lose{background:var(--sP)} .band.mid{background:var(--sY)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{padding:9px 10px;border-radius:12px;border:2px solid var(--ink);display:flex;flex-direction:column}
+.kpi .v{font-family:var(--display);font-weight:800;font-size:23px;line-height:1.05}
+.kpi small{font-size:11.5px;color:var(--muted)}
+.rank{display:flex;flex-direction:column;gap:7px;padding:12px;border-radius:12px;border:2px solid var(--ink)}
+.scrow{display:grid;grid-template-columns:92px minmax(0,1fr) 64px;gap:8px;align-items:center;font-size:12.5px}
+.scrow b{font-size:13px}
+.bar{height:14px;border-radius:4px;background:#EEF0F4;border:1.5px solid var(--ink);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .6s}
+.scrow .v{font:600 11.5px var(--mono);text-align:right}
+.crown{font:700 9.5px var(--mono);letter-spacing:.06em;padding:1px 6px;border-radius:999px;background:var(--sY);border:1.5px solid var(--ink);margin-left:4px}
+.evrow{display:grid;grid-template-columns:100px minmax(0,1fr) 66px;gap:8px;align-items:center;font-size:12.5px;padding-top:6px;border-top:1px solid var(--line)}
+.evrow:first-of-type{border-top:none;padding-top:0}
+.evrow b{font-size:13px}.evrow b .crown{display:table;margin:3px 0 0}
+.evrow .t{font-family:var(--hand);font-size:17px;line-height:1.05}
+.evrow .t small{display:block;font:600 10px var(--mono);letter-spacing:.04em;color:var(--muted)}
+.quote{font-family:var(--display);font-weight:800;font-size:25px;line-height:1.1;margin:0}
+.quote span{background:var(--sG);padding:0 6px;border:2px solid var(--ink);border-radius:4px}
+.credit{font-size:11.5px;color:var(--muted);margin:0}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:25}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app" id="app">
+<div class="wrap">
+  <header>
+    <h1><i class="homespace" aria-hidden="true"></i><span>The Pitch Room</span></h1>
+    <div class="hbtns"><button type="button" class="hbtn" id="help">Briefing</button><button type="button" class="hbtn" id="restart">Restart</button><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button></div>
+  </header>
+
+  <div class="main">
+    <div class="col">
+      <div class="card">
+        <span class="label">Your mandate</span>
+        <p>You are a partner at <b>Banyan Ventures</b>. 3 founders want <b>₹10 Cr</b>. You can back exactly 1.</p>
+      </div>
+      <div class="card">
+        <span class="label">Your questions, 2 per founder</span>
+        <div class="qrows" id="qrows"></div>
+      </div>
+      <div class="card">
+        <span class="label">What an answer is worth</span>
+        <div class="ladder">
+          <div class="rung"><span class="chipS" style="background:var(--sG)">STRONG</span><span><b>People paid or committed</b>Orders, contracts, working at scale</span></div>
+          <div class="rung"><span class="chipS" style="background:var(--sY)">WEAK</span><span><b>People said they liked it</b>Sign ups, praise, warm meetings</span></div>
+          <div class="rung"><span class="chipS none">NONE</span><span><b>Nothing yet</b>A belief, not a fact</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="label">Your decision</span>
+        <div class="invest" id="invest"></div>
+        <p class="toast" id="toast" aria-live="polite"></p>
+        <div class="stkrow" aria-hidden="true"><span class="stk2" style="background:var(--sB);transform:rotate(-3deg)">Ask for proof</span><span class="stk2 stamp2" style="transform:rotate(-6deg)">TERM SHEET</span></div>
+      </div>
+    </div>
+
+    <section class="boardwrap" aria-label="Pitches">
+      <div class="boardhead"><div class="ftabs" role="tablist" id="ftabs"></div><span class="label" id="phase"></span></div>
+      <div class="stage" id="stage"></div>
+    </section>
+
+    <div class="col">
+      <div class="card">
+        <span class="label">Assumption map, filled in as you ask</span>
+        <div class="amapwrap"><div class="amap" id="amap"></div><div class="ticks"><span>No evidence</span><span>Weak</span><span>Strong</span></div><div class="dzkey"><i></i>Danger zone: important, but unproven</div></div>
+      </div>
+      <div class="advice" id="advice">
+        <div class="av" id="advAv"></div>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="label">Dev Khanna, senior partner</span><p id="adviceText"></p></div>
+      </div>
+      <div class="card">
+        <span class="label">Notes from the room</span>
+        <div class="log" id="log" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="intro" hidden>
+  <div class="panel brief" role="dialog" aria-modal="true" aria-labelledby="iTitle">
+    <div class="bhead"><div><span class="label">Your briefing</span><h2 id="iTitle">Welcome to The Pitch Room</h2></div><button type="button" class="btn" id="iStart">Start the pitches</button><button class="btn walkgo" id="walkIntro" type="button" style="background:#B6EFA0">Walk with me</button></div>
+    <div class="bgrid">
+      <div class="bcol">
+        <div class="guide"><div class="av big" id="iAv"></div><div class="bubble"><span class="label">Dev Khanna, senior partner</span><p id="iText"></p></div></div>
+        <ul class="tips">
+          <li><b>3 founders, ₹10 Cr</b>Each wants the whole cheque. You can back only 1.</li>
+          <li><b>2 questions each</b>Tap a sticky on a founder's canvas to ask: what is your evidence for this?</li>
+          <li><b>Weigh the answer</b>Strong means people paid or committed. Weak means they said they liked it.</li>
+          <li><b>Then decide</b>When you have heard all 3 pitches, invest from the panel on the left.</li>
+        </ul>
+      </div>
+      <div class="bcol">
+        <span class="label">Today's founders, as pitched</span>
+        <div class="fcards" id="fcards"></div>
+        <div class="mapdemo">
+          <svg viewBox="0 0 150 100" width="150" height="100" aria-hidden="true" style="display:block">
+            <rect x="14" y="4" width="132" height="80" style="fill:#fff;stroke:#14161F;stroke-width:2"/>
+            <rect x="15" y="5" width="87" height="32" style="fill:#FFB8D4;opacity:.6"/>
+            <path d="M102 5V37H15" style="fill:none;stroke:#D93D42;stroke-width:1.5;stroke-dasharray:3 2"/>
+            <path d="M58 4V84M102 4V84" style="stroke:#D3D9E2;stroke-width:1"/>
+            <text x="20" y="20" style="font:700 13px Caveat,cursive;fill:#D93D42">danger zone</text>
+            <rect x="30" y="24" width="22" height="9" rx="4" style="fill:#FFE66D;stroke:#14161F;stroke-width:1"/>
+            <rect x="112" y="16" width="22" height="9" rx="4" style="fill:#B6EFA0;stroke:#14161F;stroke-width:1"/>
+            <rect x="66" y="62" width="22" height="9" rx="4" style="fill:#A9D8FF;stroke:#14161F;stroke-width:1"/>
+            <text x="7" y="44" transform="rotate(-90 7 44)" text-anchor="middle" style="font:600 7px IBM Plex Mono,monospace;fill:#575E6E">IMPORTANCE</text>
+            <text x="80" y="96" text-anchor="middle" style="font:600 7px IBM Plex Mono,monospace;fill:#575E6E">NONE · WEAK · STRONG</text>
+          </svg>
+          <p><b>The assumption map.</b> Every answer lands here by how much the business needs it to be true, and how strong the proof is. Top left is the <b>danger zone</b>: important and unproven.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="panel result" role="dialog" aria-modal="true" aria-labelledby="rTitle">
+    <div class="rc">
+      <div class="band" id="rBand"></div>
+      <h2 id="rTitle"></h2>
+      <p id="rText" style="margin:0;font-size:14.5px"></p>
+      <div class="kpis" id="rKpis"></div>
+      <p class="quote">Ask about the <span>riskiest</span> assumption, not the most interesting one.</p>
+      <p style="margin:0;font-size:13.5px">A big projection is a claim. Find the assumption that kills the business if it is wrong, then ask for proof. The strongest proof is what people pay for or commit to, not what they say.</p>
+      <p class="credit">Methods: Business Model Canvas and Testing Business Ideas, by Strategyzer.</p>
+    </div>
+    <div class="rc">
+      <div class="rank"><span class="label">What the pitches said: headline projections</span><div id="rHype" style="display:flex;flex-direction:column;gap:7px"></div></div>
+      <div class="rank"><span class="label">What the evidence said: the assumption each business lives or dies on</span><div id="rEv" style="display:flex;flex-direction:column;gap:7px"></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="again">Play again</button></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ENGINE START */
+var ENGINE = (function(){
+  var WEAKNESS = { S: 0, W: 0.6, N: 1 };
+  var FOUNDERS = [
+    { id: 'A', name: 'Kabir Rao', first: 'Kabir', co: 'StyleMuse', idea: 'An AI stylist app for young shoppers', col: '#FFB8D4', proj: 500, projLabel: 'revenue in 3 years', ask: '₹10 Cr for 8%', outcome: 'lose', value: 0,
+      pitch: 'StyleMuse is an AI stylist in every pocket. 4.2 lakh people are already waiting. We will be the biggest fashion brand in India by 2029.',
+      plain: { ka: 'Train the AI, grow the community', kr: 'Style AI, 2 lakh looks', cr: 'In app chat stylist', cost: 'Cloud, ads, AI engineers' },
+      asm: [
+        { id: 'a1', block: 'vp', t: 'Our AI picks outfits people love', short: 'AI styling', imp: 3, ev: 'S', ans: 'We ran a blind test with 500 users. They chose our AI\'s outfits over a human stylist\'s 7 times in 10.' },
+        { id: 'a2', block: 'cs', t: 'Lakhs of young shoppers want an AI stylist', short: 'Waitlist', imp: 3, ev: 'W', ans: '4.2 lakh people joined our waitlist in 6 weeks! It was free to join and we ran a giveaway, but the love is real.' },
+        { id: 'a3', block: 'ch', t: 'Influencers will bring users for free', short: 'Influencers', imp: 2, ev: 'W', ans: '12 big fashion influencers saw the demo and said they adore it. They have promised to post when we launch.' },
+        { id: 'a4', block: 'rev', t: 'Users will pay ₹299 a month', short: 'Pays ₹299', imp: 5, ev: 'N', ans: 'Honestly? We have not asked anyone to pay yet. We did not want to slow the growth. When they see the magic, they will pay.' },
+        { id: 'a5', block: 'kp', t: 'Fashion labels will pay us 15% commission', short: 'Brand fees', imp: 3, ev: 'W', ans: '3 big labels said a 15% commission sounds very interesting. Nothing is signed yet, but the meetings were warm.' }
+      ] },
+    { id: 'B', name: 'Meena Pillai', first: 'Meena', co: 'ChillRoute', idea: 'Cold chain delivery for small dairies', col: '#B6EFA0', proj: 18, projLabel: 'revenue in 3 years', ask: '₹10 Cr for 25%', outcome: 'win', value: 38,
+      pitch: 'We keep milk cold from the small dairy to the shop, so nothing spoils on the way. It is not glamorous. It works.',
+      plain: { kp: 'Van lessors, dairy cooperatives', ka: 'Route planning, cold delivery', vp: 'Fresh milk, nothing spoilt', cr: 'Named driver, daily call' },
+      asm: [
+        { id: 'b1', block: 'cs', t: 'Small dairies lose milk to heat in transit', short: 'Milk loss', imp: 4, ev: 'S', ans: 'We logged 40 dairies last summer. They lose about 6% of their milk on hot days. 22 of them now pay us to stop that.' },
+        { id: 'b2', block: 'rev', t: 'Dairies will pay ₹1.80 a litre', short: '₹1.80 a litre', imp: 5, ev: 'S', ans: '22 dairies pay ₹1.80 a litre today. 19 of them have signed 12 month contracts, and 6 more are on a paid trial.' },
+        { id: 'b3', block: 'kr', t: 'Our vans hold 4°C for 6 hours', short: 'Vans at 4°C', imp: 3, ev: 'S', ans: 'We have run 3 vans for 5 months. The temperature logs show 4°C or colder on 98% of trips.' },
+        { id: 'b4', block: 'cost', t: 'A van breaks even when it is 60% full', short: 'Van profit', imp: 4, ev: 'S', ans: 'Our vans run 72% full on average, and every van made a small profit last quarter. The accounts are in the data room.' },
+        { id: 'b5', block: 'ch', t: 'Cooperatives will refer dairies to us', short: 'Referrals', imp: 2, ev: 'W', ans: '2 cooperative chairmen said they would mention us at their meetings. No referrals have come through yet.' }
+      ] },
+    { id: 'C', name: 'Nisha Varghese', first: 'Nisha', co: 'ShopLedger', idea: 'A stock and credit app for kirana shops', col: '#A9D8FF', proj: 120, projLabel: 'revenue in 3 years', ask: '₹10 Cr for 15%', outcome: 'mid', value: 11,
+      pitch: 'ShopLedger runs the kirana shop\'s stock and credit book. Then we lend to the shop when it needs cash. That is where the real money is.',
+      plain: { ka: 'App, credit scoring', cs: 'Kirana shops in small towns', cr: 'Hindi and Tamil support line', cost: 'Engineers, support staff' },
+      asm: [
+        { id: 'c1', block: 'vp', t: 'Shops want a digital stock and credit book', short: 'App fee', imp: 3, ev: 'S', ans: '340 shops pay ₹149 a month for the app today, and 8 in 10 of them renew every month.' },
+        { id: 'c2', block: 'rev', t: 'Shops will borrow through us, we earn 2% a loan', short: 'Loan fees', imp: 5, ev: 'N', ans: 'The lending is the big prize. We have not lent a single rupee yet, though. Our bank partner is still deciding.' },
+        { id: 'c3', block: 'kp', t: 'A bank will fund the loans', short: 'Bank funds', imp: 4, ev: 'W', ans: 'We had 2 very good meetings with Sahyog Bank. They really like our data. There is no term sheet yet.' },
+        { id: 'c4', block: 'ch', t: 'Shops spread it by word of mouth', short: 'Word of mouth', imp: 3, ev: 'S', ans: '8 in 10 of our shops came through another shop owner. It costs us just ₹40 to sign up a shop.' },
+        { id: 'c5', block: 'kr', t: 'Our data can tell who will repay', short: 'Credit model', imp: 3, ev: 'W', ans: 'We tested our model on 6 months of shop sales and it looked sharp. A credit expert called it very promising.' }
+      ] }
+  ];
+  var QPER = 2;
+  var ALL = [];
+  FOUNDERS.forEach(function(F){ F.asm.forEach(function(a){ a.fid = F.id; ALL.push(a); }); });
+  function byId(id){ for (var i = 0; i < FOUNDERS.length; i++) if (FOUNDERS[i].id === id) return FOUNDERS[i]; return null; }
+  function asmById(id){ for (var i = 0; i < ALL.length; i++) if (ALL[i].id === id) return ALL[i]; return null; }
+  function risk(a){ return a.imp * WEAKNESS[a.ev]; }
+  function riskiest(){ return ALL.slice().sort(function(x, y){ return risk(y) - risk(x) || y.imp - x.imp; }).slice(0, 3).map(function(a){ return a.id; }); }
+  function critical(fid){ var F = byId(fid); return F.asm.slice().sort(function(x, y){ return y.imp - x.imp; })[0]; }
+  function newGame(){
+    var st = { active: 'A', heard: {}, left: {}, asked: [], over: null, pick: null };
+    FOUNDERS.forEach(function(F){ st.heard[F.id] = false; st.left[F.id] = QPER; });
+    st.heard.A = true;
+    return st;
+  }
+  function visit(st, id){ if (!byId(id)) return 'Unknown founder.'; st.active = id; st.heard[id] = true; return ''; }
+  function allHeard(st){ return FOUNDERS.every(function(F){ return st.heard[F.id]; }); }
+  function isAsked(st, aid){ return st.asked.indexOf(aid) >= 0; }
+  function ask(st, aid){
+    var a = asmById(aid); if (!a) return 'Unknown assumption.';
+    if (st.over) return 'The decision is already made.';
+    if (isAsked(st, aid)) return 'You already asked about that.';
+    if (st.left[a.fid] <= 0) return 'No questions left for ' + byId(a.fid).first + '.';
+    st.left[a.fid]--; st.asked.push(aid); return '';
+  }
+  function riskAsked(st){ var r = riskiest(); return st.asked.filter(function(id){ return r.indexOf(id) >= 0; }).length; }
+  function invest(st, fid){
+    if (st.over) return 'The decision is already made.';
+    if (!byId(fid)) return 'Unknown founder.';
+    if (!allHeard(st)) return 'Hear all 3 pitches before you decide.';
+    st.pick = fid; st.over = byId(fid).outcome; return '';
+  }
+  function result(st){ var F = byId(st.pick); return { key: st.over, value: F ? F.value : 0, riskAsked: riskAsked(st), used: st.asked.length, total: FOUNDERS.length * QPER }; }
+  return { FOUNDERS: FOUNDERS, ALL: ALL, QPER: QPER, WEAKNESS: WEAKNESS, byId: byId, asmById: asmById, risk: risk, riskiest: riskiest, critical: critical, newGame: newGame, visit: visit, allHeard: allHeard, isAsked: isAsked, ask: ask, riskAsked: riskAsked, invest: invest, result: result };
+})();
+/* ENGINE END */
+
+(function(){
+  var E = ENGINE, st, log = [], tut = 0, started = false, lastSaid = '', timers = {}, flipId = null, pending = null, fLine = {};
+  var $ = function(id){ return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var EVN = { S: 'STRONG', W: 'WEAK', N: 'NONE' }, EVW = { S: 'strong evidence', W: 'weak evidence', N: 'no evidence' };
+  var BLOCKS = [['kp', 'Key partners', '1 / 1 / 3 / 3', 'var(--sB)'], ['ka', 'Key activities', '1 / 3 / 2 / 5', 'var(--sB)'], ['kr', 'Key resources', '2 / 3 / 3 / 5', 'var(--sB)'], ['vp', 'Value proposition', '1 / 5 / 3 / 7', 'var(--sY)'], ['cr', 'Relationships', '1 / 7 / 2 / 9', 'var(--sP)'], ['ch', 'Channels', '2 / 7 / 3 / 9', 'var(--sP)'], ['cs', 'Customer segments', '1 / 9 / 3 / 11', 'var(--sP)'], ['cost', 'Cost structure', '3 / 1 / 4 / 6', 'var(--sG)'], ['rev', 'Revenue streams', '3 / 6 / 4 / 11', 'var(--sG)']];
+
+  function body(fill, extra){ return '<path d="M8 82Q12 58 40 56Q68 58 72 82Z" style="fill:' + fill + ';stroke:#14161F;stroke-width:1.4"/>' + (extra || ''); }
+  function face(skin, mouthCol){
+    return '<ellipse cx="40" cy="38" rx="14" ry="16" style="fill:' + skin + ';stroke:#14161F;stroke-width:1.2"/>' +
+      '<ellipse class="eye" cx="34" cy="38" rx="1.9" ry="2" style="fill:#14161F"/><ellipse class="eye" cx="46" cy="38" rx="1.9" ry="2" style="fill:#14161F"/>' +
+      '<path d="M39.5 40L38 45H41" style="fill:none;stroke:rgba(20,22,31,.35);stroke-width:1.1;stroke-linecap:round"/>';
+  }
+  function mouth(){ return '<path d="M34 49Q40 52 46 49" style="fill:none;stroke:#14161F;stroke-width:1.2;stroke-linecap:round"/><ellipse class="mouth" cx="40" cy="50" rx="3.2" ry=".8" style="fill:#7A2E22"/>'; }
+  function partnerSVG(){
+    return '<svg viewBox="0 0 80 80" aria-hidden="true">' + body('#2B2F3E',
+      '<path d="M31 56L40 72L49 56Z" style="fill:#FFFFFF;stroke:#14161F;stroke-width:1"/><path d="M40 59L37.5 62L40 74L42.5 62Z" style="fill:#FF9F1C;stroke:#14161F;stroke-width:.8"/><path d="M31 56L36 76M49 56L44 76" style="stroke:#14161F;stroke-width:1.2"/><path d="M54 63l5 0l-1 4l-3 0z" style="fill:#FFE66D;stroke:#14161F;stroke-width:.8"/>') +
+      '<rect x="35" y="50" width="10" height="8" style="fill:#B98A64"/><g class="head">' + face('#CF9B74') +
+      '<path d="M26 34Q25 20 40 19Q55 20 54 34Q52 27 46 26Q38 28 30 26Q27 28 26 34Z" style="fill:#C9CCD4;stroke:#14161F;stroke-width:1"/>' +
+      '<path d="M31 34.5L36.5 33.5M43.5 33.5L49 34.5" style="stroke:#6B6E78;stroke-width:1.8;stroke-linecap:round"/>' +
+      '<circle cx="34" cy="38" r="4.3" style="fill:none;stroke:#14161F;stroke-width:1.1"/><circle cx="46" cy="38" r="4.3" style="fill:none;stroke:#14161F;stroke-width:1.1"/><path d="M38.3 38H41.7" style="stroke:#14161F;stroke-width:1.1"/>' +
+      '<path d="M34.5 46.5Q40 44.5 45.5 46.5Q40 48 34.5 46.5Z" style="fill:#9EA1AA"/>' + mouth() + '</g></svg>';
+  }
+  function founderSVG(id){
+    var s = '<svg viewBox="0 0 80 80" aria-hidden="true">';
+    if (id === 'A'){
+      s += body('#1E1E24', '<rect x="32" y="51" width="16" height="9" rx="4" style="fill:#2C2C35;stroke:#14161F;stroke-width:1"/>') + '<g class="head">' + face('#C68E64') +
+        '<path d="M26 34Q23 18 37 15Q48 11 56 20Q55 27 54 34Q52 25 44 24Q34 26 28 26Q27 29 26 34Z" style="fill:#1F1A18;stroke:#14161F;stroke-width:1"/>' +
+        '<path d="M29 22.5h8.5v3.2h-8.5zM42 22.5h8.5v3.2h-8.5z" style="fill:#14161F"/><path d="M37.5 24h4.5" style="stroke:#14161F;stroke-width:1.2"/>' +
+        '<path d="M31 34L36.5 33M43.5 33L49 34" style="stroke:#1F1A18;stroke-width:1.8;stroke-linecap:round"/>' +
+        '<path d="M34 48.5Q41 53 47 47.5" style="fill:none;stroke:#14161F;stroke-width:1.2;stroke-linecap:round"/><ellipse class="mouth" cx="40.5" cy="50" rx="3.2" ry=".8" style="fill:#7A2E22"/></g>';
+    } else if (id === 'B'){
+      s += body('#2E9E6B', '<path d="M34 56L40 66L46 56" style="fill:#F3E7C9;stroke:#14161F;stroke-width:1"/><path d="M40 66V80" style="stroke:#14161F;stroke-width:1"/>') + '<rect x="35" y="50" width="10" height="8" style="fill:#7E5034"/><g class="head">' +
+        '<circle cx="40" cy="18" r="6.5" style="fill:#191512;stroke:#14161F;stroke-width:1"/>' + face('#8D5A3B') +
+        '<path d="M26 37Q24 21 40 21Q56 21 54 37Q52 28 40 27Q28 28 26 37Z" style="fill:#191512;stroke:#14161F;stroke-width:1"/>' +
+        '<circle cx="40" cy="31.5" r="1.1" style="fill:#D93D42"/><circle cx="26" cy="43" r="1.7" style="fill:#FFC93C;stroke:#14161F;stroke-width:.6"/><circle cx="54" cy="43" r="1.7" style="fill:#FFC93C;stroke:#14161F;stroke-width:.6"/>' +
+        '<path d="M31 34L36 33.4M44 33.4L49 34" style="stroke:#191512;stroke-width:1.5;stroke-linecap:round"/>' + mouth() + '</g>';
+    } else {
+      s += body('#2F5BFF', '<path d="M32 56L40 68L48 56Z" style="fill:#FFFFFF;stroke:#14161F;stroke-width:1"/><path d="M32 56L37 77M48 56L43 77" style="stroke:#14161F;stroke-width:1.2"/>') + '<rect x="35" y="50" width="10" height="8" style="fill:#9C6A47"/><g class="head">' + face('#B57E57') +
+        '<path d="M24 46Q21 20 40 20Q59 20 56 46Q54 41 54 34Q50 26 40 27Q30 26 26 34Q26 41 24 46Z" style="fill:#2B1D16;stroke:#14161F;stroke-width:1"/>' +
+        '<circle cx="34" cy="38" r="4.3" style="fill:rgba(255,255,255,.25);stroke:#14161F;stroke-width:1.3"/><circle cx="46" cy="38" r="4.3" style="fill:rgba(255,255,255,.25);stroke:#14161F;stroke-width:1.3"/><path d="M38.3 38H41.7" style="stroke:#14161F;stroke-width:1.2"/>' +
+        '<path d="M31 32.5L36.5 31.8M43.5 31.8L49 32.5" style="stroke:#2B1D16;stroke-width:1.6;stroke-linecap:round"/>' + mouth() + '</g>';
+    }
+    return s + '</svg>';
+  }
+
+  function fmtCr(n){ return '₹' + n + ' Cr'; }
+  function say(el, av, text, force){
+    var key = el.id;
+    if (key === 'adviceText'){ if (!force && text === lastSaid) return; lastSaid = text; }
+    clearInterval(timers[key]);
+    if (reduce){ el.textContent = text; if (av) av.classList.remove('talking'); return; }
+    var i = 0; el.textContent = ''; if (av) av.classList.add('talking');
+    timers[key] = setInterval(function(){ i += 2; el.textContent = text.slice(0, i); if (i >= text.length){ clearInterval(timers[key]); if (av) av.classList.remove('talking'); } }, 22);
+  }
+
+  function render(typeFounder){
+    var F = E.byId(st.active), all = E.allHeard(st);
+    // left: questions
+    $('qrows').innerHTML = E.FOUNDERS.map(function(G){
+      var c = ''; for (var i = 0; i < E.QPER; i++) c += '<span class="coin' + (i >= st.left[G.id] ? ' used' : '') + '">?</span>';
+      return '<div class="qrow"><span class="mini" style="background:' + G.col + '">' + founderSVG(G.id) + '</span><span><b>' + G.co + '</b><small>' + (st.heard[G.id] ? 'Pitch heard' : 'Not heard yet') + '</small></span><span class="coins" aria-label="' + st.left[G.id] + ' questions left">' + c + '</span></div>';
+    }).join('');
+    $('invest').innerHTML = E.FOUNDERS.map(function(G){
+      return '<button type="button" class="ibtn' + (pending === G.id ? ' confirm' : '') + '" data-inv="' + G.id + '"' + (!all || st.over ? ' disabled' : '') + '><i style="background:' + G.col + '"></i>' + (pending === G.id ? 'Tap again to invest in ' + G.co : 'Invest ₹10 Cr in ' + G.co) + '</button>';
+    }).join('');
+    if (!all && !st.over && !$('toast').dataset.err) $('toast').textContent = 'Unlocks when you have heard all 3 pitches.';
+    else if (!$('toast').dataset.err) $('toast').textContent = '';
+    // tabs
+    $('ftabs').innerHTML = E.FOUNDERS.map(function(G, i){
+      return '<button type="button" class="ftab" role="tab" data-f="' + G.id + '" aria-selected="' + (G.id === st.active) + '"><span class="mini" style="background:' + G.col + '">' + founderSVG(G.id) + '</span>' + G.co + '<span class="tick">' + (st.heard[G.id] ? (E.QPER - st.left[G.id]) + ' of 2' : 'pitch ' + (i + 1)) + '</span></button>';
+    }).join('');
+    var idx = E.FOUNDERS.indexOf(F);
+    $('phase').textContent = all ? 'Decide on the left' : 'Pitch ' + (idx + 1) + ' of 3';
+    // stage
+    var asked = function(a){ return E.isAsked(st, a.id); };
+    var h = '<div class="fhead"><div class="av fav" id="fAv" style="background:' + F.col + '">' + founderSVG(F.id) + '</div><div class="who"><span class="label">' + F.name + ', founder · asks ' + F.ask + '</span><h3>' + F.co + '</h3><p>' + F.idea + '</p></div>' +
+      '<div class="headline" style="--fc:' + F.col + '"><span class="label" style="color:var(--ink)">Headline projection</span><b>' + fmtCr(F.proj) + '</b><small>' + F.projLabel + '</small></div></div>';
+    h += '<div class="fbub' + (fLine[F.id] && fLine[F.id].q ? ' ans' : '') + '"><span class="label" id="fbQ"></span><p id="fbT" aria-live="polite"></p></div>';
+    h += '<div class="bmc" role="group" aria-label="Business Model Canvas for ' + F.co + '">';
+    BLOCKS.forEach(function(B){
+      var a = F.asm.filter(function(x){ return x.block === B[0]; })[0], inner = '';
+      if (a){
+        var done = asked(a), noLeft = st.left[F.id] <= 0;
+        inner = '<button type="button" class="sn' + (done ? '' : noLeft ? ' spent' : '') + (flipId === a.id ? ' flip' : '') + (tut === 1 && a.id === 'a2' ? ' coach' : '') + '" data-a="' + a.id + '" style="background:' + B[3] + '"' + (done || noLeft || st.over ? ' disabled' : '') + ' aria-label="' + a.t + (done ? ', ' + EVW[a.ev] : ', ask for evidence') + '">' + a.t +
+          (done ? '<span class="badge ' + a.ev + '">' + EVN[a.ev] + '</span>' : '<span class="q">' + (noLeft ? 'NO QUESTIONS LEFT' : 'ASK FOR EVIDENCE') + '</span>') + '</button>';
+      } else inner = '<span class="plain">' + (F.plain[B[0]] || '') + '</span>';
+      h += '<div class="blk" style="grid-area:' + B[2] + '"><span class="bl">' + B[1] + '</span>' + inner + '</div>';
+    });
+    h += '</div>';
+    var nx = E.FOUNDERS[(idx + 1) % 3];
+    h += '<div class="ffoot"><span class="label">Questions left</span><span class="coins">' + (function(){ var c = ''; for (var i = 0; i < E.QPER; i++) c += '<span class="coin' + (i >= st.left[F.id] ? ' used' : '') + '">?</span>'; return c; })() + '</span>' +
+      '<span class="hint">' + (st.left[F.id] > 0 ? 'Tap a sticky to ask: what is your evidence for this?' : 'You have used both questions for ' + F.first + '.') + '</span>' +
+      '<button type="button" class="btn ghost" id="next" data-f="' + nx.id + '">' + (idx === 2 ? 'Back to ' + nx.co : 'Next pitch: ' + nx.co) + '</button></div>';
+    var old = document.querySelector('#stage .stampP');
+    $('stage').innerHTML = h; if (old) $('stage').appendChild(old);
+    flipId = null;
+    var L = fLine[F.id] || { q: '', t: F.pitch };
+    $('fbQ').textContent = L.q ? 'You asked: what is your evidence for "' + L.short + '"?' : 'The pitch';
+    if (typeFounder) say($('fbT'), $('fAv'), L.t, true); else $('fbT').textContent = L.t;
+    drawMap();
+    $('log').innerHTML = log.slice(-8).reverse().map(function(e){ return '<div class="' + (e.c || '') + '">' + e.t + '</div>'; }).join('');
+    advise();
+  }
+
+  function drawMap(){
+    var h = '<div class="dz"></div><span class="ay">Importance</span>';
+    var X = { N: 16.67, W: 50, S: 83.33 }, buckets = {};
+    st.asked.forEach(function(id){ var a = E.asmById(id), k = a.ev + a.imp; (buckets[k] = buckets[k] || []).push(a); });
+    Object.keys(buckets).forEach(function(k){
+      var arr = buckets[k], n = arr.length;
+      arr.forEach(function(a, i){
+        var F = E.byId(a.fid), off = (i - (n - 1) / 2);
+        h += '<span class="ap" style="left:calc(' + X[a.ev] + '% + ' + (off * 8) + 'px);bottom:calc(' + ((a.imp - .5) * 20) + '% + ' + (off * 17) + 'px);background:' + F.col + '" title="' + F.co + ': ' + a.t + '"><i>' + F.first.charAt(0) + '</i>' + a.short + '</span>';
+      });
+    });
+    if (!st.asked.length) h += '<span class="empty">Ask a question to plot it</span>';
+    $('amap').innerHTML = h;
+  }
+
+  function advise(){
+    var t, urgent = false, n = st.asked.length, a4 = E.isAsked(st, 'a4');
+    if (tut === 1) t = 'Tap any sticky to ask Kabir for evidence. Start with the waitlist. 4.2 lakh sign ups, that is the exciting part.';
+    else if (st.over) t = st.over === 'win' ? 'ChillRoute? I would never have picked milk vans. Well asked.' : st.over === 'mid' ? 'Not Kabir, but not a disaster either. We shall see.' : 'Ah. I was so sure about Kabir.';
+    else if (E.allHeard(st)){ urgent = true; t = a4 ? 'So nobody has paid Kabir yet. Every great app gave it away at the start. ₹500 Cr against ₹18 Cr. Back Kabir, now.' : 'Decision time. ₹500 Cr against ₹18 Cr is not a hard choice. Back Kabir before another fund does.'; }
+    else if (st.active === 'A') t = a4 ? 'Payments are a detail for later. Look at that waitlist! Ask about the AI instead, that is the magic.' : st.left.A > 0 ? 'Ask him about the AI or the influencers. That is where the magic is.' : 'Wonderful, was it not? Let us hear the others, for form\'s sake.';
+    else if (st.active === 'B'){ urgent = n >= 3; t = 'Milk vans? Charming, but ₹18 Cr is a rounding error for us. Save your questions for something bigger.'; }
+    else { urgent = n >= 3; t = 'Ask Nisha about word of mouth. Growth is the interesting bit. Then let us get back to Kabir.'; }
+    $('advice').classList.toggle('urgent', urgent);
+    if ($('intro').hidden) say($('adviceText'), $('advAv'), t);
+  }
+
+  function err(m){ var el = $('toast'); el.textContent = m || ''; if (m) el.dataset.err = '1'; else delete el.dataset.err; }
+
+  function askQ(aid){
+    var why = E.ask(st, aid); if (why){ err(why); return; }
+    var a = E.asmById(aid), F = E.byId(a.fid);
+    fLine[F.id] = { q: 1, short: a.short, t: a.ans };
+    flipId = aid; if (tut === 1) tut = 0;
+    log.push({ t: F.first + ', ' + a.short + ': ' + EVW[a.ev] + '.', c: a.ev === 'S' ? 'good' : a.ev === 'W' ? 'weak' : 'bad' });
+    err(''); pending = null; render(true);
+  }
+  function visit(id){ if (id === st.active) return; var first = !st.heard[id]; E.visit(st, id); if (first) log.push({ t: E.byId(id).name + ' takes the stage.' }); if (E.allHeard(st) && first) log.push({ t: 'All 3 pitches heard. The decision is yours.' }); pending = null; err(''); render(true); }
+
+  function finish(){
+    var R = E.result(st), F = E.byId(st.pick), a4 = E.isAsked(st, 'a4');
+    var T = {
+      win: ['Ask the Right Question', 'win', 'Victory', 'You backed ChillRoute. The numbers were small, but dairies were already paying and signing contracts, and the vans made money. 3 years on, 140 dairies ride with Meena and your ₹10 Cr is worth ₹38 Cr.'],
+      mid: ['Half the Story', 'mid', 'Close, not quite', 'You backed ShopLedger. Shops really did pay for the app, but the lending that was meant to make the money never came. Sahyog Bank walked away. 3 years on, your ₹10 Cr is worth ₹11 Cr.' + (E.isAsked(st, 'c2') ? '' : ' You never asked Nisha whether a single loan had been made.')],
+      lose: ['The Waitlist Mirage', 'lose', 'Defeat', 'You backed StyleMuse. The waitlist was huge and the demo was lovely. When the paywall went up, fewer than 1 in 100 users paid. The ₹10 Cr burnt on ads and servers in 18 months.' + (a4 ? ' You even heard Kabir admit nobody had paid.' : ' You never asked Kabir whether anyone would pay.')]
+    }[R.key];
+    $('rBand').className = 'band ' + T[1]; $('rBand').textContent = T[2];
+    $('rTitle').textContent = T[0]; $('rText').textContent = T[3];
+    $('rKpis').innerHTML = [[fmtCr(R.value), 'Your ₹10 Cr after 3 years'], [R.riskAsked + ' of 3', 'Riskiest assumptions you asked about'], [R.used + ' of ' + R.total, 'Questions used']].map(function(k){ return '<div class="kpi"><span class="v">' + k[0] + '</span><small>' + k[1] + '</small></div>'; }).join('');
+    var byP = E.FOUNDERS.slice().sort(function(x, y){ return y.proj - x.proj; }), mx = byP[0].proj;
+    $('rHype').innerHTML = byP.map(function(G, i){ return '<div class="scrow"><b>' + G.co + (i === 0 ? '<span class="crown">TOP</span>' : '') + '</b><span class="bar"><i style="width:' + Math.max(5, G.proj / mx * 100).toFixed(0) + '%;background:' + G.col + '"></i></span><span class="v">' + fmtCr(G.proj) + '</span></div>'; }).join('');
+    var order = { S: 0, W: 1, N: 2 };
+    $('rEv').innerHTML = E.FOUNDERS.slice().sort(function(x, y){ return order[E.critical(x.id).ev] - order[E.critical(y.id).ev]; }).map(function(G){
+      var c = E.critical(G.id), asked = E.isAsked(st, c.id);
+      return '<div class="evrow"><b>' + G.co + (G.id === st.pick ? '<span class="crown" style="background:var(--sB)">YOURS</span>' : '') + '</b><span class="t">' + c.t + '<small>' + (asked ? 'YOU ASKED' : 'YOU DID NOT ASK') + '</small></span><span class="chipS' + (c.ev === 'N' ? ' none' : '') + '" style="' + (c.ev === 'S' ? 'background:var(--sG)' : c.ev === 'W' ? 'background:var(--sY)' : '') + '">' + EVN[c.ev] + '</span></div>';
+    }).join('');
+    var s = document.createElement('div'); s.className = 'stampP';
+    s.style.color = T[1] === 'win' ? 'var(--ok)' : T[1] === 'mid' ? 'var(--amber)' : 'var(--danger)';
+    s.textContent = T[1] === 'win' ? 'FUNDED' : T[1] === 'mid' ? 'STALLED' : 'BURNT';
+    if (st.active !== F.id){ E.visit(st, F.id); render(false); }
+    $('stage').appendChild(s);
+    if (T[1] === 'win' && !reduce) confetti();
+    setTimeout(function(){ $('overlay').hidden = false; $('overlay').scrollTop = 0; try { $('again').focus({ preventScroll: true }); } catch (e) {} }, reduce ? 300 : 2000);
+  }
+  function confetti(){
+    var c = document.createElement('canvas'); c.className = 'confetti'; c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+    var x = c.getContext('2d'), cols = ['#FFE66D', '#A9D8FF', '#B6EFA0', '#FFB8D4', '#FF9F1C'], ps = [];
+    for (var i = 0; i < 140; i++) ps.push({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, vy: 2 + Math.random() * 3, vx: Math.random() * 2 - 1, c: cols[i % 5], a: Math.random() * 6 });
+    var t0 = performance.now();
+    (function f(t){ x.clearRect(0, 0, c.width, c.height); ps.forEach(function(p){ p.y += p.vy; p.x += p.vx; p.a += .1; x.save(); x.translate(p.x, p.y); x.rotate(p.a); x.fillStyle = p.c; x.fillRect(-5, -3, 10, 6); x.restore(); }); if (t - t0 < 3200) requestAnimationFrame(f); else c.remove(); })(t0);
+  }
+
+  function showIntro(){
+    $('iAv').innerHTML = partnerSVG(); $('intro').hidden = false;
+    $('fcards').innerHTML = E.FOUNDERS.map(function(G){ return '<div class="fcard"><span class="mini" style="background:' + G.col + '">' + founderSVG(G.id) + '</span><span><b>' + G.co + '</b><small>' + G.name + '. ' + G.idea + '.</small></span><span class="hl" style="background:' + G.col + '">' + fmtCr(G.proj) + '</span></div>'; }).join('');
+    $('iTitle').textContent = started ? 'Your briefing' : 'Welcome to The Pitch Room';
+    $('iStart').textContent = started ? 'Back to the pitches' : 'Start the pitches';
+    say($('iText'), $('iAv'), started ? 'Remember: 2 questions per founder, ₹10 Cr, 1 startup. And between us, Kabir is the future.' : 'Welcome to Banyan Ventures. I am Dev Khanna, senior partner. 3 founders pitch for our ₹10 Cr today, and you will back just 1. You get 2 questions per founder, and every answer goes on the assumption map. Between us, wait till you meet Kabir. ₹500 Cr in 3 years!', true);
+    try { $('iStart').focus({ preventScroll: true }); } catch (e) {}
+  }
+  function start(){
+    clearInterval(timers.iText); $('iAv').classList.remove('talking');
+    if (started){ $('intro').hidden = true; lastSaid = ''; render(false); return; }
+    started = true; tut = 1;
+    var from = $('iAv').getBoundingClientRect(), target = $('advAv');
+    $('intro').hidden = true;
+    var to = target.getBoundingClientRect();
+    log.push({ t: 'Kabir Rao takes the stage.' });
+    if (reduce || !from.width || !to.width || !document.body.animate){ lastSaid = ''; render(true); return; }
+    render(true);
+    var fly = document.createElement('div'); fly.className = 'flyer'; fly.innerHTML = partnerSVG();
+    fly.style.left = from.left + 'px'; fly.style.top = from.top + 'px'; fly.style.width = from.width + 'px'; fly.style.height = from.height + 'px'; fly.style.transformOrigin = '0 0';
+    document.body.appendChild(fly); target.style.visibility = 'hidden';
+    var dx = to.left - from.left, dy = to.top - from.top, sc = to.width / from.width;
+    var an = fly.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + dx * .5 + 'px,' + (dy * .5 - 110) + 'px) scale(' + (1 + sc) / 2 + ') rotate(-8deg)', offset: .5 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')' }], { duration: 950, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    an.onfinish = function(){ fly.remove(); target.style.visibility = ''; lastSaid = ''; advise(); };
+  }
+  function reset(withIntro){
+    st = E.newGame(); log = [{ t: '3 founders, ₹10 Cr, 1 cheque.' }]; fLine = {}; pending = null; flipId = null; lastSaid = ''; tut = withIntro ? 0 : 1;
+    $('overlay').hidden = true; var old = document.querySelector('#stage .stampP'); if (old) old.remove();
+    $('advAv').innerHTML = partnerSVG(); err('');
+    if (withIntro){ started = false; render(false); showIntro(); }
+    else { log.push({ t: 'Kabir Rao takes the stage.' }); render(true); }
+  }
+
+  $('stage').addEventListener('click', function(e){
+    var s = e.target.closest('.sn'); if (s && !s.disabled){ askQ(s.dataset.a); return; }
+    var n = e.target.closest('#next'); if (n) visit(n.dataset.f);
+  });
+  $('ftabs').addEventListener('click', function(e){ var b = e.target.closest('.ftab'); if (b) visit(b.dataset.f); });
+  $('invest').addEventListener('click', function(e){
+    var b = e.target.closest('.ibtn'); if (!b || b.disabled) return;
+    var id = b.dataset.inv;
+    if (pending !== id){ pending = id; err(''); render(false); var nb = document.querySelector('[data-inv="' + id + '"]'); if (nb) nb.focus(); return; }
+    var why = E.invest(st, id); if (why){ err(why); return; }
+    pending = null; log.push({ t: 'Banyan Ventures invests ₹10 Cr in ' + E.byId(id).co + '.' }); render(false); finish();
+  });
+  $('help').addEventListener('click', showIntro);
+  $('restart').addEventListener('click', function(){ reset(false); });
+  $('again').addEventListener('click', function(){ reset(false); });
+  $('iStart').addEventListener('click', start);
+  document.addEventListener('keydown', function(e){ if (e.key !== 'Escape') return; if (!$('intro').hidden) start(); else if (!$('overlay').hidden) reset(false); else if (pending){ pending = null; render(false); } });
+  reset(true);
+})();
+</script>
+
+<style>
+[hidden]{display:none!important}
+</style>
+<style id="gwcss">
+[hidden]{display:none!important}
+.walkb{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;padding:6px 12px;border:2.5px solid #14161F;border-radius:12px;background:#B6EFA0;box-shadow:3px 3px 0 #14161F;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex:none}
+.walkb svg{width:18px;height:18px}
+.walkb:hover{transform:translate(-1px,-2px);box-shadow:5px 5px 0 #14161F}
+.walkb.bigw{font-size:18px;padding:10px 18px;border-width:3px;border-radius:14px;box-shadow:5px 5px 0 #14161F}
+.walkb.bigw svg{width:22px;height:22px}
+#gw{position:fixed;inset:0;z-index:100000;pointer-events:none}
+.gw-ring{position:fixed;border:3px dashed #FF9F1C;border-radius:14px;box-shadow:0 0 0 9999px rgba(20,22,31,.5);transition:all .35s ease;animation:gwp 1.4s ease-in-out infinite}
+@keyframes gwp{50%{border-color:#fff}}
+.gw-tip{position:fixed;width:min(340px,calc(100vw - 20px));background:#fff;color:#14161F;border:3px solid #14161F;border-radius:16px;box-shadow:5px 5px 0 #14161F;padding:12px 14px;pointer-events:auto;transition:top .35s,left .35s;font-family:'IBM Plex Sans',system-ui,sans-serif}
+.gw-k{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.1em;color:#2E9E5B}
+.gw-k svg{width:20px;height:20px}
+.gw-tip p{margin:6px 0 10px;font-size:14.5px;line-height:1.4}
+.gw-tip .tap{font-family:'Caveat',cursive;font-weight:700;font-size:19px;color:#2B59C3}
+.gw-b{display:flex;gap:8px;justify-content:flex-end}
+.gw-b button{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;border:2.5px solid #14161F;border-radius:10px;padding:5px 12px;cursor:pointer;background:#fff}
+.gw-b #gwNext{background:#FF9F1C}
+.gw-tip.gwnudge{animation:gwn .45s ease}
+@keyframes gwn{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.gw-tip .lock{display:block;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:#6B7280}
+@media (max-width:700px){
+ .walkb:not(.bigw){padding:5px 9px;font-size:12px}
+ .gw-tip p{font-size:14px}
+}
+</style>
+<style id="phonecss">
+@media (max-width:700px){
+ .wrap{padding:8px 10px 88px!important;gap:10px!important}
+ header{flex-wrap:wrap!important;gap:8px!important;align-items:center!important}
+ header h1{font-size:22px!important}
+ .hbtns{flex-wrap:wrap!important;gap:6px!important}
+ .hbtn{font-size:12px!important;padding:5px 9px!important;min-height:0!important}
+ .main{display:flex!important;flex-direction:column!important;gap:10px!important;height:auto!important;min-height:0!important}
+ .col{display:contents!important}
+ .boardwrap{overflow:visible!important;min-height:0!important}
+ .stkrow,.doodle,.stk{display:none!important}
+ .overlay{align-items:flex-start!important;overflow:auto!important;padding:8px!important;z-index:200!important}
+ .overlay>.panel{max-height:none!important;padding:14px!important}
+ .overlay h2{font-size:23px!important}
+ .fixbar{position:fixed!important;left:0;right:0;bottom:0;z-index:40;margin:0!important;border-radius:16px 16px 0 0!important;border-left:0!important;border-right:0!important;border-bottom:0!important;padding:8px 10px 10px!important;box-shadow:0 -4px 0 rgba(20,22,31,.2)!important;background:#fff!important}
+ .fixbar .btn{width:100%;min-height:46px}
+ .fixbar .toast{margin:4px 0 0!important;font-size:12px}
+}
+@media (max-width:700px){.boardwrap{order:1}.advice{order:2}.main>.col:first-child>.card:nth-child(4){order:3}.main>.col:last-child>.card:first-child{order:4}.main>.col:first-child>.card:nth-child(2){order:5}.main>.col:first-child>.card:nth-child(3){order:6}.main>.col:first-child>.card:nth-child(1){order:7}.main>.col:last-child>.card:last-child{order:8}}
+@media (max-width:700px){.ftabs{flex-wrap:wrap!important;gap:6px!important}.ftab{font-size:12px!important;padding:4px 8px!important}.fhead{flex-wrap:wrap!important}.headline{width:100%}
+ .bmc .blk .bl{font-size:9px!important;letter-spacing:.04em!important}
+ .bmc .sn{font-size:14px!important;padding:6px 7px!important;line-height:1.2!important}
+ .bmc .sn .q{display:block!important;font-size:9.5px!important}
+ .bmc .plain{font-size:12.5px!important}}
+</style>
+<div id="gw" hidden><div class="gw-ring" id="gwRing"></div><div class="gw-tip" id="gwTip"><div class="gw-k"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span id="gwK">WALK WITH ME</span> · <span id="gwN"></span></div><p id="gwT"></p><div class="gw-b"><button id="gwStop" type="button">Stop guide</button><button id="gwNext" type="button">Next</button></div></div></div>
+<script>
+
+const GW=(()=>{const Q=a=>'.sn[data-a="'+a+'"]',S=[];
+const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));
+add('.headline','You are a partner at a venture fund. 3 founders, ₹10 Cr, 1 cheque. First up is StyleMuse, projecting ₹500 Cr. Big numbers are easy to say.');
+add(Q('a4'),'You only get 2 questions per founder, so ask about the riskiest thing first. Will users really pay ₹299 a month?',{click:true});
+add('.fbub','Nobody has paid yet. That is a belief, not a fact. The whole business rests on it.',{wait:900});
+add(Q('a2'),'Now ask about that famous waitlist.',{click:true});
+add('#next','A free waitlist with a giveaway is weak evidence. Move to the next founder.',{click:true,wait:900});
+add(Q('b2'),'ChillRoute projects only ₹18 Cr. Do not judge yet. Ask about the money: will dairies pay?',{click:true});
+add('.fbub','22 dairies pay today and 19 have signed 12 month contracts. That is strong evidence.',{wait:900});
+add(Q('b4'),'Ask if the vans make money.',{click:true});
+add('#next','They run 72% full and every van made a profit. On to the last founder.',{click:true,wait:900});
+add(Q('c2'),'ShopLedger says lending is the big prize. Ask if they have lent anything yet.',{click:true});
+add('.fbub','Not a single rupee. Their biggest source of money is still a hope.',{wait:900});
+add(Q('c3'),'Ask about the bank that is meant to fund the loans.',{click:true});
+add('#amap','The assumption map shows it all. Important but unproven sits in the danger zone. StyleMuse and ShopLedger live there. ChillRoute does not.',{wait:900});
+add('.ibtn[data-inv="B"]','Back the founder with proof, not the biggest projection. Invest in ChillRoute.',{click:true});
+add('.ibtn[data-inv="B"]','Tap again to confirm.',{click:true});
+add('#overlay .panel','You asked the right questions and backed paying customers over a big headline.',{wait:2400,last:true});
+return S})();
+function GW_START(){document.getElementById('restart').click();document.getElementById('intro').hidden=true}
+
+</script>
+<script>
+(function(){
+const g=id=>document.getElementById(id);
+let I=-1,T=null,E=null,H=null,SEQ=0,LIST=null;const L=()=>LIST||GW;
+function find(st){return typeof st.sel==='function'?st.sel():document.querySelector(st.sel)}
+function vis(el){if(!el)return false;const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&!el.disabled&&!el.closest('[hidden]')}
+function place(){if(I<0||!E)return;if(!E.isConnected){const n=find(L()[I]);if(n)E=n;else return}const r=E.getBoundingClientRect(),pad=6,ring=g('gwRing'),tip=g('gwTip');
+ ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';ring.style.width=(r.width+pad*2)+'px';ring.style.height=(r.height+pad*2)+'px';
+ const tw=tip.offsetWidth,th=tip.offsetHeight,vw=innerWidth,vh=innerHeight;let top=r.bottom+14;if(top+th>vh-8)top=r.top-th-14;if(top<8)top=Math.max(8,Math.min(vh-th-8,r.top+12));
+ let left=r.left+r.width/2-tw/2;left=Math.max(10,Math.min(vw-tw-10,left));tip.style.top=top+'px';tip.style.left=left+'px'}
+function show(i){I=i;const st=L()[i],my=++SEQ;clearInterval(T);g('gw').hidden=true;let pre=false;
+ const t0=Date.now();T=setInterval(()=>{if(my!==SEQ)return;if(Date.now()-t0<(st.wait||0))return;if(st.pre&&!pre){pre=true;try{st.pre()}catch(e){}return}
+  const el=find(st);if(!vis(el))return;clearInterval(T);
+  E=el;g('gw').hidden=false;g('gwN').textContent='step '+(i+1)+' of '+L().length;g('gwT').innerHTML=(typeof st.t==='function'?st.t():st.t)+(st.click?' <span class="tap">tap the glowing spot</span>':'<span class="lock">READ, THEN PRESS NEXT</span>');
+  g('gwNext').style.display=st.click?'none':'';g('gwNext').textContent=st.last?(LIST?"Start playing":'Done'):'Next';
+  el.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(place,420);place();
+  if(st.click){H=ev=>{const cur=E&&E.isConnected?E:find(st);if(!cur||!(cur===ev.target||cur.contains(ev.target)))return;document.removeEventListener('click',H,true);H=null;g('gw').hidden=true;setTimeout(next,250)};document.addEventListener('click',H,true)}},150)}
+setInterval(()=>{if(I>=0&&E&&!E.isConnected)place()},300);
+function next(){if(I>=L().length-1){stop();return}show(I+1)}
+function stop(){LIST=null;const k=g('gwK');if(k)k.textContent='WALK WITH ME';SEQ++;clearInterval(T);if(H)document.removeEventListener('click',H,true);H=null;I=-1;E=null;g('gw').hidden=true}
+window.gwStop=stop;
+function curEl(){if(I<0)return null;const st=L()[I];if(E&&E.isConnected)return E;return find(st)}
+function allowed(t){if(!t||!t.closest)return true;if(t.closest('#gwTip,.walkgo,#homeTab'))return true;
+ const st=L()[I];if(!st||!st.click||g('gw').hidden)return false;const c=curEl();return !!c&&(c===t||c.contains(t))}
+function nudge(){const tip=g('gwTip');if(g('gw').hidden)return;tip.classList.remove('gwnudge');void tip.offsetWidth;tip.classList.add('gwnudge')}
+function block(ev){if(I<0)return;if(allowed(ev.target))return;ev.stopImmediatePropagation();ev.stopPropagation();
+ if(ev.cancelable&&!/^(touch|pointer)/.test(ev.type))ev.preventDefault();if(ev.type==='click')nudge()}
+['click','mousedown','mouseup','pointerdown','pointerup','touchstart','touchend','dblclick','contextmenu','change','input','submit'].forEach(t=>document.addEventListener(t,block,true));
+document.addEventListener('keydown',ev=>{if(I<0)return;if(ev.key==='Escape'){ev.stopImmediatePropagation();stop();return}if((ev.key==='Enter'||ev.key===' ')&&!allowed(ev.target)){ev.stopImmediatePropagation();ev.preventDefault()}},true);window.gwCur=()=>({i:I,click:!!(L()[I]&&L()[I].click),last:!!(L()[I]&&L()[I].last),shown:!g('gw').hidden,n:L().length});window.gwEl=window.__gwEl=()=>(E&&!E.isConnected?find(L()[I]):E);
+window.gwTour=function(){if(typeof TOUR==='undefined')return;stop();document.querySelectorAll('.ov.on,#infoOv').forEach(o=>{if(o.id==='infoOv')o.hidden=true});LIST=TOUR;g('gwK').textContent='QUICK TOUR';setTimeout(()=>show(0),250)};
+window.gwStart=function(){const io=g('infoOv');if(io)io.hidden=true;stop();try{GW_START()}catch(e){console.error(e)}setTimeout(()=>show(0),300)};
+g('gwNext').onclick=()=>{if(L()[I]&&L()[I].last){stop();return}next()};
+g('gwStop').onclick=stop;
+document.querySelectorAll('.walkgo').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();window.gwStart()}));
+addEventListener('resize',place);addEventListener('scroll',place,true);
+})();
+</script>
+<a id="homeTab" href="../" aria-label="Back to Shiva's home page"><svg viewBox="0 0 16 16" fill="none" stroke="#14161F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>Home</a>
+<style id="homecss">
+#homeTab{position:fixed;left:10px;top:10px;z-index:100001;display:inline-flex;align-items:center;gap:5px;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:0;text-transform:none;line-height:1;color:#14161F;text-decoration:none;background:#FF9F1C;border:2.5px solid #14161F;border-radius:10px;padding:5px 10px 5px 8px;box-shadow:2px 2px 0 #14161F;transform:none;rotate:0deg;writing-mode:horizontal-tb}
+#homeTab:hover,#homeTab:focus-visible{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #14161F}
+#homeTab svg{width:14px;height:14px}
+.homespace{display:inline-block;width:84px;height:24px;vertical-align:middle;flex:none;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;transform:none!important}
+.ov,.overlay{padding-top:56px!important}
+</style>
+<style id="cvfix">
+@media (max-width:700px){
+ .cvscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 8px;margin:0 -2px}
+ .cvscroll>.bmc{min-width:640px!important;width:640px!important}
+ .cvhint{display:block;font-family:'Caveat',cursive;font-weight:700;font-size:18px;color:#2F5BFF;margin:2px 0 0;text-align:right}
+}
+.cvhint{display:none}
+</style>
+<script id="cvfixjs">(function(){if(!matchMedia('(max-width:700px)').matches)return;
+function wrap(){document.querySelectorAll('.bmc').forEach(function(b){if(b.closest('.cvscroll')||b.closest('#bmcwrap'))return;var w=document.createElement('div');w.className='cvscroll';b.parentNode.insertBefore(w,b);w.appendChild(b);var h=document.createElement('span');h.className='cvhint';h.textContent='swipe to see the whole canvas \u2192';w.parentNode.insertBefore(h,w.nextSibling)})}
+wrap();new MutationObserver(wrap).observe(document.body,{childList:true,subtree:true});})();</script>
+
+</html>

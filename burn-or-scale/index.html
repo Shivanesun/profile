@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Burn or Scale</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Caveat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a founder's whiteboard. Left: runway and moves. Centre: the canvas, the assumption map and the test bench. Right: the cofounder, the risk meter and the evidence log. */
+:root{
+  color-scheme: light;
+  --bg:#E9EDF2; --paper:#FFFFFF; --ink:#14161F; --muted:#575E6E; --line:#D3D9E2; --line2:#B9C1CD;
+  --accent:#FF9F1C; --blue:#2F5BFF; --ok:#16884A; --danger:#D93D42; --amber:#B07A00;
+  --sY:#FFE66D; --sB:#A9D8FF; --sG:#B6EFA0; --sP:#FFB8D4;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace; --hand:'Caveat',cursive;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+button{color:var(--ink);font-family:inherit}
+html,body{background:var(--bg);margin:0}
+body{color:var(--ink);font-family:var(--body);font-size:14.5px;line-height:1.45}
+.app{min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
+  background-color:var(--bg);background-image:radial-gradient(color-mix(in srgb,var(--ink) 13%,transparent) 1px,transparent 1px);background-size:22px 22px}
+.wrap{max-width:1480px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(28px,3.6vw,42px);line-height:1;letter-spacing:-.02em}
+h1 span{background:var(--sY);padding:0 8px;border:2.5px solid var(--ink);border-radius:6px;box-shadow:4px 4px 0 var(--ink);display:inline-block;transform:rotate(-1.5deg)}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.hbtn{min-height:40px;padding:0 16px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:600 14px var(--body);cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.hbtn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.label{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+
+.main{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,2.05fr) minmax(0,1fr);gap:14px;align-items:stretch}
+@media (min-width:1101px){.main{height:calc(100vh - 110px);min-height:600px}.col,.boardwrap{min-height:0;overflow:hidden}}
+@media (max-width:1100px){.main{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.boardwrap{grid-column:1 / -1;order:-1}}
+@media (max-width:760px){.main{grid-template-columns:minmax(0,1fr)}.col{display:contents}.boardwrap{order:-2}.advice{order:-1;position:sticky;top:8px;z-index:8}}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:7px;box-shadow:3px 3px 0 var(--ink)}
+.card p{margin:0}
+.col>.card:last-child{flex:1;min-height:0}
+
+/* left */
+.budget{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.big{font-family:var(--display);font-weight:800;font-size:42px;line-height:.95;font-variant-numeric:tabular-nums}
+.big small{font-size:15px;font-weight:700;margin-left:4px}
+.runway{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:2px}
+.runway i{height:16px;border:1.5px solid var(--ink);border-radius:3px;background:var(--accent);transition:background .4s}
+.runway i.off{background:var(--paper);opacity:.4}
+.runway i.res{background:repeating-linear-gradient(45deg,var(--sP) 0 3px,#fff 3px 6px)}
+.runway i.res.off{opacity:.5}
+.rwlab{display:flex;justify-content:space-between;font:600 10px var(--mono);color:var(--muted)}
+.ladder{display:flex;flex-direction:column;gap:6px}
+.rung{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;align-items:center;font-size:12.5px;color:var(--muted);line-height:1.3}
+.rung b{display:block;color:var(--ink);font-size:13px}
+.chipS{display:inline-flex;align-items:center;justify-content:center;padding:4px 0;border-radius:6px;border:2px solid var(--ink);font:700 11px var(--mono);letter-spacing:.06em;color:var(--ink)}
+.btn{min-height:46px;padding:0 18px;border-radius:12px;border:2.5px solid var(--ink);background:var(--accent);color:var(--ink);font:700 15px var(--body);cursor:pointer;box-shadow:3px 3px 0 var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.scale{background:var(--sG);min-height:52px;font-size:16px}
+.toast{min-height:18px;font-size:13px;color:var(--danger);font-weight:600}
+.stkrow{margin-top:auto;display:flex;flex-wrap:wrap;gap:10px 8px;align-content:flex-end;padding-top:6px}
+.stk2{display:inline-block;font-family:var(--hand);font-size:18px;font-weight:700;padding:3px 11px;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.stamp2{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--danger);border:3px double var(--danger);box-shadow:none;background:transparent}
+
+/* board */
+.boardwrap{position:relative;display:flex;flex-direction:column;gap:10px;min-width:0}
+.boardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:8px 14px;box-shadow:3px 3px 0 var(--ink)}
+.boardhead .t{font-family:var(--display);font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px}
+.boardhead .ic{width:30px;height:30px;border-radius:8px;border:2px solid var(--ink);display:inline-flex;align-items:center;justify-content:center}
+.boardhead .ic svg{width:22px;height:22px}
+.bmc{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:auto auto auto;border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:#fff}
+.bmc.mini{flex:none;overflow:visible;border-radius:4px;box-shadow:3px 3px 0 var(--ink)}
+.blk{position:relative;border:1px solid var(--line2);padding:5px 6px;display:flex;flex-direction:column;gap:4px;min-width:0;min-height:70px}
+.bmc.mini .blk{min-height:52px;padding:4px 6px}
+.blk .bl{font:700 8.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.blk .bt{font-size:11.5px;color:var(--muted);line-height:1.25}
+.bmc.brief .blk .bt{font-size:12px;color:var(--ink)}
+.sn{align-self:flex-start;padding:3px 6px;font-family:var(--hand);font-size:15.5px;line-height:1.05;box-shadow:1px 2px 0 rgba(20,22,31,.18);transform:rotate(-1.5deg);background:var(--sY);border:0;text-align:left}
+.sw{position:relative;align-self:flex-start;max-width:100%}
+.as{position:relative;display:block;padding:3px 7px 3px 6px;font-family:var(--hand);font-size:15px;font-weight:700;line-height:1.02;box-shadow:1px 2px 0 rgba(20,22,31,.25);transform:rotate(-1.2deg);background:var(--sY);border:1.5px solid transparent;text-align:left;cursor:pointer;color:var(--ink)}
+.as:hover{transform:rotate(0) scale(1.03)}
+.as[aria-pressed="true"]{outline:3px solid var(--blue);outline-offset:2px}
+.as .mk,.mp .mk{position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--ink);background:#fff;font:700 10px var(--mono);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.st-proven{background:var(--sG)} .st-busted{background:var(--sP);border-color:var(--danger)} .st-pivoted{background:var(--sB)}
+.st-proven .mk{background:var(--ok);color:#fff;border-color:var(--ok)} .st-busted .mk{background:var(--danger);color:#fff;border-color:var(--danger)} .st-pivoted .mk{background:var(--blue);color:#fff;border-color:var(--blue)}
+.st-busted .tx{text-decoration:line-through;text-decoration-color:var(--danger);text-decoration-thickness:2px}
+.tear{position:absolute;inset:0;z-index:4;pointer-events:none;padding:3px 7px 3px 6px;font-family:var(--hand);font-size:15px;font-weight:700;line-height:1.02;background:var(--sP);box-shadow:2px 3px 0 rgba(20,22,31,.25);
+  clip-path:polygon(0 0,100% 0,100% 100%,92% 88%,84% 100%,74% 90%,64% 100%,54% 89%,44% 100%,34% 90%,24% 100%,14% 88%,6% 100%,0 92%);animation:tear 1.1s cubic-bezier(.55,0,.8,.45) forwards}
+@keyframes tear{0%{transform:rotate(-1.2deg)}22%{transform:rotate(-9deg) translate(-3px,3px)}100%{transform:translate(40px,170px) rotate(38deg);opacity:0}}
+.fresh{animation:fresh .6s .55s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes fresh{0%{transform:scale(.2) rotate(-14deg);opacity:0}100%{transform:scale(1) rotate(-1.2deg);opacity:1}}
+.lower{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px}
+.lower>.card{min-height:0;overflow:hidden}
+.mapcard{gap:6px}
+.amap{position:relative;flex:1;min-height:200px;margin:8px 4px 18px 22px;border:3px solid var(--ink);border-radius:2px;
+  background-color:#fff;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:10% 12.5%}
+.amap .mid{position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:var(--ink);opacity:.25}
+.amap .hmid{position:absolute;top:50%;left:0;right:0;height:1.5px;background:var(--ink);opacity:.25}
+.danger{position:absolute;left:28%;right:28%;top:0;height:52%;background:repeating-linear-gradient(-45deg,rgba(217,61,66,.11) 0 7px,rgba(217,61,66,.03) 7px 14px);border:2px dashed var(--danger);border-top:0;display:flex;align-items:flex-start;justify-content:center;padding-top:3px}
+.danger span{font:700 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--danger);background:#fff;padding:0 5px;border-radius:3px;text-align:center}
+.amap .ax{position:absolute;font:600 10px var(--mono);letter-spacing:.1em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.amap .ax.y{left:-13px;top:50%;transform:translate(-50%,-50%) rotate(-90deg)}
+.amap .ax.xl{left:0;bottom:-17px;color:var(--danger)} .amap .ax.xc{left:50%;bottom:-17px;transform:translateX(-50%)} .amap .ax.xr{right:0;bottom:-17px;color:var(--ok)}
+.mp{position:absolute;transform:translate(-50%,50%) rotate(var(--r,-2deg));padding:3px 8px;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font:700 12px var(--body);cursor:pointer;white-space:nowrap;background:var(--sY);color:var(--ink);
+  transition:left .8s cubic-bezier(.3,1.3,.5,1),transform .8s cubic-bezier(.3,1.3,.5,1),background .4s;z-index:2}
+.mp.st-proven,.mp.st-pivoted{transform:translate(-100%,50%) rotate(var(--r,-2deg))}
+.mp.st-busted{transform:translate(0,50%) rotate(var(--r,-2deg))}
+.mp:hover{z-index:4}
+.mp[aria-pressed="true"]{outline:3px solid var(--blue);outline-offset:2px;z-index:3}
+.mp .imp{font:600 9.5px var(--mono);color:var(--muted);margin-right:5px}
+.selcard{gap:8px}
+.selnote{position:relative;align-self:stretch}
+.selnote .as{font-size:21px;padding:8px 12px;transform:rotate(-.8deg);cursor:default;min-height:52px}
+.selnote .tear{font-size:21px;padding:8px 12px}
+.selmeta{display:flex;gap:6px;flex-wrap:wrap;font:600 10.5px var(--mono);color:var(--muted)}
+.selmeta span{padding:1px 7px;border-radius:999px;border:1.5px solid var(--line2)}
+.sigs{display:flex;gap:5px;flex-wrap:wrap;min-height:22px;align-items:center;font-size:12px;color:var(--muted)}
+.sig{padding:1px 7px;border-radius:5px;border:1.5px solid var(--ink);font:700 10px var(--mono);transform:rotate(-2deg);color:var(--ink)}
+.moves{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.mv{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 8px;min-height:44px;padding:5px 10px;border-radius:10px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:700 13.5px var(--body);cursor:pointer;text-align:left;box-shadow:2px 2px 0 var(--ink)}
+.mv:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+.mv small{grid-column:1 / -1;font:500 11px var(--body);color:var(--muted)}
+.mv .c{font:700 12px var(--mono)}
+.mv.q{background:var(--sY)} .mv.p{background:var(--sG)} .mv.v{background:var(--sB)}
+.mv:disabled{opacity:.4;cursor:default;box-shadow:none}
+.mv small.warn{color:var(--danger);font-weight:600}
+.empty{font-family:var(--hand);font-size:19px;color:var(--muted);line-height:1.15}
+.coach{outline:3px solid var(--blue)!important;outline-offset:3px;animation:coach 1s ease-in-out infinite;position:relative;z-index:6}
+@keyframes coach{0%,100%{box-shadow:0 0 0 0 rgba(47,91,255,.55)}50%{box-shadow:0 0 0 10px rgba(47,91,255,0)}}
+.coach::after{content:"TAP HERE";position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);padding:2px 8px;border-radius:999px;background:var(--blue);color:#fff;font:700 10px var(--mono);letter-spacing:.12em;white-space:nowrap;pointer-events:none;z-index:7;text-decoration:none}
+.coach.dn::after{bottom:auto;top:calc(100% + 8px)}
+
+/* right */
+.advice{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:14px;background:var(--sY);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);transform:rotate(-.4deg)}
+.advice.urgent{background:var(--sP);animation:urg 1.1s ease-in-out infinite}
+.advice.loud p{font-size:15.5px;font-weight:800}
+.advice.shout{animation:urg .7s ease-in-out infinite,shake .5s ease-in-out infinite}
+.advice.shout p{font-size:16.5px;font-family:var(--display);letter-spacing:.01em}
+@keyframes urg{0%,100%{box-shadow:3px 3px 0 var(--ink),0 0 0 0 rgba(217,61,66,.5)}50%{box-shadow:3px 3px 0 var(--ink),0 0 0 9px rgba(217,61,66,0)}}
+@keyframes shake{0%,100%{transform:rotate(-.4deg)}25%{transform:rotate(-1.4deg) translateX(-2px)}75%{transform:rotate(.6deg) translateX(2px)}}
+.advice p{margin:0;font-size:14px;font-weight:600}
+.av{flex:none;width:62px;height:62px;border-radius:50%;border:2.5px solid var(--ink);background:var(--paper);overflow:hidden;animation:bob 3.2s ease-in-out infinite}
+.av.big{width:96px;height:96px}
+.av svg{display:block;width:100%;height:100%}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.av .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.4s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.av .mouth{transform-box:fill-box;transform-origin:center}
+.talking .mouth{animation:talk .16s ease-in-out infinite alternate}
+@keyframes talk{from{transform:scaleY(1)}to{transform:scaleY(2.6)}}
+.talking .head{animation:nod .5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 90%}
+@keyframes nod{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+.riskbig{display:flex;align-items:center;gap:10px}
+.riskbig .big{font-size:34px}
+.rb{flex:1;height:14px;border:1.5px solid var(--ink);border-radius:4px;background:#fff;overflow:hidden}
+.rb i{display:block;height:100%;background:#F5B800;transition:width .6s}
+.cvbtn{min-height:30px;padding:0 10px;border-radius:999px;border:2px solid var(--ink);background:#F5B800;font:700 11px var(--mono);letter-spacing:.06em;cursor:pointer;color:var(--ink)}
+.cvbtn:hover{background:var(--sY)}
+.rhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.log{display:flex;flex-direction:column;gap:8px;overflow:hidden;flex:1;min-height:0;padding:4px 4px 0 2px;-webkit-mask-image:linear-gradient(#000 75%,transparent);mask-image:linear-gradient(#000 75%,transparent)}
+.lc{position:relative;padding:6px 8px 6px 9px;border-radius:3px;font-family:var(--hand);font-size:16.5px;line-height:1.08;box-shadow:2px 2px 0 rgba(20,22,31,.2);transform:rotate(-.5deg)}
+.lc:nth-child(2n){transform:rotate(.5deg)}
+.lc .badge{display:inline-block;margin-right:5px;padding:0 6px;border-radius:999px;border:1.5px solid var(--ink);background:var(--paper);font:700 9px var(--mono);letter-spacing:.06em;vertical-align:2px}
+.lc .on{display:block;font:600 10px var(--mono);color:var(--muted);margin-top:2px}
+.lc.neg .badge{background:var(--danger);color:#fff;border-color:var(--danger)}
+.lc.first{animation:flipin .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes flipin{0%{transform:rotateY(90deg)}100%{transform:rotateY(0) rotate(-.5deg)}}
+.lempty{font-family:var(--hand);font-size:18px;color:var(--muted)}
+
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:30;background:rgba(233,237,242,.82);backdrop-filter:blur(5px);overflow:auto;display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.panel{width:100%;max-width:760px;background:var(--paper);border:2.5px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);padding:clamp(16px,2.6vw,26px);display:flex;flex-direction:column;gap:14px;animation:rise .45s cubic-bezier(.2,1.2,.4,1);margin:auto 0}
+@keyframes rise{from{transform:translateY(20px);opacity:.3}to{transform:none;opacity:1}}
+.panel h2{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(26px,3.2vw,38px);line-height:1}
+.panel.brief{max-width:1260px;gap:12px}
+.bhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.bgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:16px}
+@media (max-width:900px){.bgrid{grid-template-columns:minmax(0,1fr)}}
+.bcol{display:flex;flex-direction:column;gap:10px;min-width:0}
+.guide{display:flex;gap:14px;align-items:flex-start}
+.bubble{position:relative;flex:1;min-width:0;padding:10px 14px;border-radius:14px;background:var(--sY);border:2px solid var(--ink);display:flex;flex-direction:column;gap:4px}
+.bubble::before{content:"";position:absolute;left:-10px;top:26px;width:16px;height:16px;background:var(--sY);border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+.bubble p{margin:0;font-size:14.5px;min-height:5.8em}
+.ideas{display:flex;flex-direction:column;gap:8px}
+.idea{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:2px solid var(--ink);background:#FBFCFD;cursor:pointer;text-align:left;color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.idea:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+.idea[aria-pressed="true"]{background:var(--sY);outline:3px solid var(--blue);outline-offset:2px}
+.idea:disabled{cursor:default;opacity:.45}
+.idea[aria-pressed="true"]:disabled{opacity:1}
+.idea .ic{width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center}
+.idea b{display:block;font:800 17px var(--display);line-height:1.1}
+.idea span.d{font-size:12.5px;color:var(--muted);line-height:1.25;display:block}
+.kind{font:700 9.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1.5px solid var(--ink);background:#fff;white-space:nowrap}
+.dhead{display:flex;gap:10px;align-items:center}
+.dhead .ic{flex:none;width:40px;height:40px;border-radius:10px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center}
+.dhead h3{margin:0;font-family:var(--display);font-weight:800;font-size:22px;line-height:1}
+.dhead p{margin:0;font-size:13px;color:var(--muted)}
+.hint{font-family:var(--hand);font-size:17px;color:var(--blue)}
+.cvlabel{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tips{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tips li{padding:8px 10px;border-radius:12px;border:2px solid var(--ink);font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:2px;line-height:1.3}
+.tips li b{color:var(--ink);font-size:13.5px}
+@media (max-width:900px){.tips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.tips{grid-template-columns:1fr}.guide{flex-direction:column}.bubble::before{display:none}}
+.flyer{position:fixed;z-index:60;border-radius:50%;overflow:hidden;pointer-events:none;border:2.5px solid var(--ink);background:var(--paper)}
+.flyer svg{display:block;width:100%;height:100%}
+.result{max-width:1200px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:22px}
+.result .rc{display:flex;flex-direction:column;gap:11px;min-width:0}
+@media (max-width:900px){.result{grid-template-columns:minmax(0,1fr)}}
+.band{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;border-radius:14px;border:2.5px solid var(--ink);font-family:var(--display);font-weight:800;font-size:28px;line-height:1}
+.band small{font:700 13px var(--mono);letter-spacing:.06em}
+.band.win{background:var(--sG)} .band.lose{background:var(--sP)} .band.mid{background:var(--sY)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{padding:9px 10px;border-radius:12px;border:2px solid var(--ink);display:flex;flex-direction:column}
+.kpi .v{font-family:var(--display);font-weight:800;font-size:23px;line-height:1.05}
+.kpi small{font-size:11.5px;color:var(--muted)}
+.quote{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1;margin:0}
+.quote span{background:var(--sG);padding:0 6px;border:2px solid var(--ink);border-radius:4px}
+.credit{font-size:11.5px;color:var(--muted);margin:0}
+.cmp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:560px){.cmp{grid-template-columns:minmax(0,1fr)}}
+.cpanel{border:2px solid var(--ink);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:7px;background:#FBFCFD}
+.crow{min-height:50px;padding:5px 8px;font-family:var(--hand);font-size:16px;line-height:1.05;box-shadow:1px 2px 0 rgba(20,22,31,.2);display:flex;flex-direction:column;justify-content:center;gap:2px}
+.crow:nth-child(odd){transform:rotate(-.6deg)}
+.crow em{font:700 9.5px var(--mono);font-style:normal;letter-spacing:.06em}
+.crow.t{background:var(--sG)} .crow.f{background:var(--sP)} .crow.pv{background:var(--sB)}
+.crow em.ok{color:var(--ok)} .crow em.bad{color:var(--danger)}
+.boardstamp{position:absolute;left:50%;top:50%;z-index:9;transform:translate(-50%,-50%) rotate(-8deg);padding:10px 26px;border:5px double currentColor;border-radius:12px;background:rgba(255,255,255,.88);font-family:var(--display);font-weight:800;font-size:clamp(40px,6vw,70px);letter-spacing:.05em;pointer-events:none;white-space:nowrap;animation:bstamp .55s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes bstamp{0%{transform:translate(-50%,-50%) rotate(-8deg) scale(3);opacity:0}100%{transform:translate(-50%,-50%) rotate(-8deg) scale(1);opacity:1}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:25}
+.pm{border:2px solid var(--ink);border-radius:10px;background:#fff;overflow:auto}
+.pm table{width:100%;border-collapse:collapse;font-size:12px;min-width:640px}
+.pm thead th{text-align:left;padding:8px 6px 6px;border-bottom:3px solid #F5B800;font:700 11px var(--body);vertical-align:bottom}
+.pm thead th small{display:block;font:600 9px var(--mono);color:#8A6400;letter-spacing:.02em}
+.pm td{padding:6px;border-bottom:1px solid var(--line);font-family:var(--hand);font-size:16px;line-height:1.05;vertical-align:middle}
+.pm td.mono{font:600 11.5px var(--mono)}
+.pm td.sep,.pm th.sep{border-left:1.5px solid var(--line2)}
+.act-p{color:var(--ok);font-weight:700}.act-v{color:var(--danger);font-weight:700}.act-r{color:var(--amber);font-weight:700}.act-n{color:var(--muted)}
+.pmfoot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:10px;border-top:3px solid #F5B800}
+.pmbox{display:flex;flex-direction:column;gap:3px}
+.pmbox .val{align-self:flex-start;padding:3px 8px;border:2.5px solid var(--ink);font-family:var(--hand);font-size:19px;font-weight:700;min-width:84px}
+.pmbox small{font-size:11px;color:var(--muted)}
+@media (max-width:1100px){.lower{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.amap{min-height:300px}}
+@media (max-width:760px){.lower{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.bmc-x{.pmfoot{grid-template-columns:1fr}}
+@media (min-width:1101px) and (max-height:860px){.stkrow{display:none}.rung{line-height:1.2}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app" id="app">
+<div class="wrap">
+  <header>
+    <h1><i class="homespace" aria-hidden="true"></i><span>Burn or Scale</span></h1>
+    <div class="hbtns"><button type="button" class="hbtn" id="help">Briefing and canvas</button><button type="button" class="hbtn" id="restart">Restart</button><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button></div>
+  </header>
+
+  <div class="main">
+    <div class="col">
+      <div class="card">
+        <span class="label">Your goal</span>
+        <p>Your startup rests on <b>5 assumptions</b>. <b>2 are false</b>, and you do not know which. Find them, fix them, then scale with money still in the bank.</p>
+      </div>
+      <div class="card">
+        <div class="budget"><div><span class="label">Runway</span><div class="big"><span id="bud">100</span><small>₹ lakh</small></div></div><span class="label" id="spent"></span></div>
+        <div class="runway" id="runway" aria-hidden="true"></div>
+        <div class="rwlab"><span>Scale needs ₹10 lakh</span><span>₹100</span></div>
+      </div>
+      <div class="card">
+        <span class="label">Your moves</span>
+        <div class="ladder">
+          <div class="rung"><span class="chipS" style="background:var(--sY)">₹5</span><span><b>Quick test: SAYS</b>Interviews, a landing page. Right 7 times in 10.</span></div>
+          <div class="rung"><span class="chipS" style="background:var(--sG)">₹20</span><span><b>Proper test: PAYS</b>A paid pilot or advance orders. Reveals the truth.</span></div>
+          <div class="rung"><span class="chipS" style="background:var(--sB)">₹15</span><span><b>Pivot</b>Rewrite a busted assumption into 1 that holds.</span></div>
+        </div>
+      </div>
+      <div class="card fixbar">
+        <button type="button" class="btn scale" id="scaleBtn">Scale now</button>
+        <p style="font-size:12.5px;color:var(--muted)">Scaling spends everything left. If any false assumption is still on the canvas, the company burns.</p>
+        <p class="toast" id="toast" aria-live="polite"></p>
+        <div class="stkrow" aria-hidden="true"><span class="stk2" style="background:var(--sP);transform:rotate(-4deg)">Demo day Friday</span><span class="stk2 stamp2" style="transform:rotate(-6deg)">RUNWAY</span><span class="stk2" style="background:var(--sG);transform:rotate(2deg)">Riskiest first</span></div>
+      </div>
+    </div>
+
+    <section class="boardwrap" aria-label="Your startup">
+      <div class="boardhead"><span class="t" id="bTitle"></span><span class="label" id="bSub">Business Model Canvas</span></div>
+      <div class="bmc mini" id="bmcMini"></div>
+      <div class="lower">
+        <div class="card mapcard">
+          <div class="rhead"><span class="label">Assumption map</span><span class="hint" style="font-size:15px">stickies move as evidence arrives</span></div>
+          <div class="amap" id="amap"></div>
+        </div>
+        <div class="card selcard" id="sel"></div>
+      </div>
+    </section>
+
+    <div class="col">
+      <div class="advice" id="advice">
+        <div class="av" id="advAv"></div>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="label">Kabir Sethi, cofounder</span><p id="adviceText"></p></div>
+      </div>
+      <div class="card">
+        <div class="rhead"><span class="label">Innovation risk left</span><button type="button" class="cvbtn" id="metBtn">METRICS</button></div>
+        <div class="riskbig"><span class="big" id="riskV">100%</span><span class="rb"><i id="riskB" style="width:100%"></i></span></div>
+        <small style="font-size:11.5px;color:var(--muted)" id="riskS"></small>
+      </div>
+      <div class="card">
+        <span class="label">Evidence log</span>
+        <div class="log" id="log" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="intro" hidden>
+  <div class="panel brief" role="dialog" aria-modal="true" aria-labelledby="iTitle">
+    <div class="bhead"><div><span class="label">Your briefing</span><h2 id="iTitle">Pick an idea. Then prove it.</h2></div><button type="button" class="btn" id="iStart">Start the company</button><button class="btn walkgo" id="walkIntro" type="button" style="background:#B6EFA0">Walk with me</button></div>
+    <div class="bgrid">
+      <div class="bcol">
+        <div class="guide"><div class="av big" id="iAv"></div><div class="bubble"><span class="label">Kabir Sethi, cofounder</span><p id="iText"></p></div></div>
+        <span class="label">3 ideas on the table</span>
+        <div class="ideas" id="ideas"></div>
+      </div>
+      <div class="bcol">
+        <div class="dhead" id="dHead"></div>
+        <div class="cvlabel"><span class="label">Business Model Canvas</span><span class="hint">Yellow stickies are untested assumptions</span></div>
+        <div class="bmc brief" id="bmcBrief"></div>
+      </div>
+    </div>
+    <ul class="tips">
+      <li><b>Quick test, ₹5 lakh</b>A weak signal from what people say. Right 7 times in 10.</li>
+      <li><b>Proper test, ₹20 lakh</b>A paid pilot or advance orders. Reveals the truth.</li>
+      <li><b>Pivot, ₹15 lakh</b>Swap a busted assumption for a new version that holds.</li>
+      <li><b>Scale, all you have</b>Any false assumption left and you burn. Under ₹10 lakh, you stall.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="overlay" id="mpop" hidden>
+  <div class="panel" style="max-width:1000px" role="dialog" aria-modal="true" aria-labelledby="mpTitle">
+    <div class="bhead"><div><span class="label">Project metrics</span><h2 id="mpTitle" style="font-size:28px"></h2></div><button type="button" class="btn" id="mpClose">Back to the board</button></div>
+    <div id="mpBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="panel result" role="dialog" aria-modal="true" aria-labelledby="rTitle">
+    <div class="rc">
+      <div class="band" id="rBand"></div>
+      <h2 id="rTitle"></h2>
+      <p id="rText" style="margin:0;font-size:14.5px"></p>
+      <div class="kpis" id="rKpis"></div>
+      <p class="quote"><span>Evidence</span> before scale.</p>
+      <p style="margin:0;font-size:14px">Test the riskiest assumption first, and cheap tests before costly ones. What people say is a hint. What people pay is proof. Pivot what breaks, and keep enough money to scale what holds.</p>
+      <p class="credit">Methods: Business Model Canvas and Testing Business Ideas, by Strategyzer.</p>
+    </div>
+    <div class="rc">
+      <div class="cmp">
+        <div class="cpanel"><span class="label">What you believed</span><div id="rBel" style="display:flex;flex-direction:column;gap:7px"></div></div>
+        <div class="cpanel"><span class="label">What was true</span><div id="rTru" style="display:flex;flex-direction:column;gap:7px"></div></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn" id="again">Play again</button><span class="hint" id="rHint"></span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ENGINE START */
+var ENGINE = (function(){
+  var COST = { quick: 5, proper: 20, pivot: 15 }, START = 100, SCALE_MIN = 10, QUICK_ACC = 0.7;
+  var BLOCKS = { kp: 'Key partners', ka: 'Key activities', kr: 'Key resources', vp: 'Value proposition', cr: 'Relationships', ch: 'Channels', cs: 'Customer segments', cost: 'Cost structure', rev: 'Revenue streams' };
+  var IDEAS = [
+    { id: 'tiffin', name: 'Dabba Club', kind: 'Consumer', line: 'A tiffin subscription for office workers', icon: 'tiffin', col: '#FFE66D', rival: 'LunchLoop',
+      bmc: { kp: 'Home cooks, a cloud kitchen', ka: 'Cooking and delivery', kr: 'Kitchen in Guindy, 6 riders', vp: 'Hot home style lunch at your desk by 12:30', cr: 'Monthly plan, WhatsApp support', ch: 'Social media', cs: 'Office workers, 25 to 40', cost: 'Ingredients, cooks, riders', rev: 'Monthly subscription' },
+      as: [
+        { b: 'cs', imp: 90, t: 'Office workers hate their lunch options', s: 'Lunch is a pain', qn: '20 interviews', pn: 'Paid trial week',
+          qT: '14 of 20 office workers call lunch a daily headache', qF: 'Most of 20 office workers say the canteen is fine', pT: 'Paid trial week sells out: 120 office workers pay', pF: 'Paid trial week: only 9 of 300 invited office workers paid',
+          pv: 'Night shift IT teams hate their dinner options', pvs: 'Night shift dinner' },
+        { b: 'rev', imp: 80, t: 'They will pay ₹2,500 a month', s: 'Pays ₹2,500 a month', qn: 'Landing page', pn: 'Advance orders',
+          qT: 'Landing page: 64 visitors click the ₹2,500 plan', qF: 'Landing page: nearly every visitor picks the cheapest plan', pT: '85 advance orders at ₹2,500 a month, paid upfront', pF: 'Advance orders: only 6 people paid ₹2,500. The rest left at checkout',
+          pv: 'They will pay ₹1,600 a month for 4 days a week', pvs: 'Pays ₹1,600 a month' },
+        { b: 'ka', imp: 65, t: 'We can cook 500 meals a day', s: 'Cook 500 a day', qn: 'Talk to the cooks', pn: 'Paid trial run',
+          qT: 'Our head cook says 500 a day is easy with 2 more cooks', qF: 'The kitchen team says 300 a day is the ceiling', pT: 'Trial run: 520 meals a day, all on time', pF: 'Trial run: 280 meals a day, and many arrived late',
+          pv: 'We can cook 500 meals a day with a partner kitchen', pvs: '500 with a partner' },
+        { b: 'cost', imp: 45, t: 'Each meal makes a profit', s: 'Profit per meal', qn: 'Supplier quotes', pn: 'Pilot accounts',
+          qT: 'Supplier quotes put each meal at ₹68 against a ₹110 price', qF: 'Supplier quotes hint that delivery eats the margin', pT: 'Pilot accounts: ₹31 profit on every meal after delivery', pF: 'Pilot accounts: we lose ₹14 on every meal once delivery is counted',
+          pv: 'Each meal makes a profit when 1 office orders in bulk', pvs: 'Profit in bulk' },
+        { b: 'ch', imp: 30, t: 'Instagram will bring customers', s: 'Instagram brings buyers', qn: 'Test post', pn: 'Paid campaign',
+          qT: 'A test Instagram post brings 40 enquiries', qF: 'A test Instagram post brings likes but 3 enquiries', pT: 'Paid campaign: 70 paying customers at ₹180 each to win', pF: 'Paid campaign: ₹2,400 spent for every paying customer',
+          pv: 'Office admin teams will bring customers', pvs: 'Office admins bring buyers' }
+      ] },
+    { id: 'payroll', name: 'ShiftBook', kind: 'Business to business', line: 'A payroll tool for small shops', icon: 'pay', col: '#A9D8FF', rival: 'PayKaro',
+      bmc: { kp: 'Banks, a CA firm', ka: 'Payroll runs, compliance updates', kr: 'Payroll engine', vp: 'Salaries, PF and payslips in 2 minutes on WhatsApp', cr: 'Self service with chat help', ch: 'WhatsApp', cs: 'Shops with 3 to 15 staff', cost: 'Engineers, support', rev: 'Monthly fee per shop' },
+      as: [
+        { b: 'cs', imp: 90, t: 'Shop owners struggle to do payroll', s: 'Payroll is a struggle', qn: '15 interviews', pn: 'Paid pilot',
+          qT: '11 of 15 shop owners call salary day a monthly headache', qF: 'Most of 15 owners say their accountant handles it fine', pT: 'Paid pilot: 40 shops pay ₹499 for month 1', pF: 'Paid pilot: only 3 of 120 shops paid. Their accountants already do it',
+          pv: 'Small clinics struggle to do payroll', pvs: 'Clinics struggle' },
+        { b: 'rev', imp: 80, t: 'Shops will pay ₹999 a month', s: 'Pays ₹999 a month', qn: 'Pricing page', pn: 'Advance sales',
+          qT: 'Pricing page: 52 shops click the ₹999 plan', qF: 'Pricing page: most shops ask for a free plan', pT: '60 shops sign yearly contracts at ₹999 a month', pF: 'Advance sales: 4 shops paid. ₹999 is more than their accountant charges',
+          pv: 'Shops will pay ₹299 a month, billed yearly', pvs: 'Pays ₹299 a month' },
+        { b: 'ch', imp: 65, t: 'Owners will join on WhatsApp by themselves', s: 'Joins on WhatsApp', qn: 'Demo link', pn: 'Self serve trial',
+          qT: 'A WhatsApp demo link gets 90 owners to start setup', qF: 'Owners open the demo link, then call us for help', pT: 'Self serve trial: 7 in 10 shops finish setup alone', pF: 'Self serve trial: under 1 in 10 shops finish setup alone',
+          pv: 'Owners will join through their wholesale distributor', pvs: 'Joins via distributor' },
+        { b: 'ka', imp: 45, t: 'We can keep up with PF and ESI rules', s: 'Keeps up with PF rules', qn: 'Ask an adviser', pn: 'Paid CA audit',
+          qT: 'Our adviser says monthly rule updates take 2 days', qF: 'Our adviser warns the rules change almost every month', pT: 'Paid CA audit: 0 errors across 3 months of payslips', pF: 'Paid CA audit: 1 in 5 payslips has a compliance error',
+          pv: 'We keep up with PF and ESI rules with a CA partner', pvs: 'Rules via a CA partner' },
+        { b: 'cost', imp: 30, t: 'Support costs stay under ₹100 a shop', s: 'Support under ₹100', qn: 'Pilot chat logs', pn: 'Paid support trial',
+          qT: 'Pilot shops send about 2 queries a month', qF: 'Pilot shops ring us almost every salary day', pT: '3 months of paid support: ₹70 a shop each month', pF: '3 months of paid support: ₹340 a shop each month',
+          pv: 'Support stays under ₹100 a shop with Tamil and Hindi video guides', pvs: 'Support with video guides' }
+      ] },
+    { id: 'contracts', name: 'ClauseWise', kind: 'AI product', line: 'An AI assistant that reads contracts for small firms', icon: 'ai', col: '#FFB8D4', rival: 'LexiBot',
+      bmc: { kp: 'A law firm, a cloud provider', ka: 'Model tuning, legal review', kr: 'Our contract AI', vp: 'Know the risky clauses before you sign', cr: 'Trust built over time', ch: 'Chartered accountants', cs: 'Firms with 10 to 50 staff', cost: 'Cloud bills per review', rev: 'Monthly subscription' },
+      as: [
+        { b: 'kr', imp: 90, t: 'Our AI flags risky clauses accurately', s: 'AI is accurate', qn: 'Lawyer skims 10', pn: 'Paid blind test',
+          qT: 'A lawyer friend skims 10 AI reports and calls them solid', qF: 'A lawyer friend skims 10 reports and spots odd misses', pT: 'Paid blind test: the AI matches senior lawyers 96% of the time', pF: 'Paid blind test: the AI misses 1 in 4 risky clauses',
+          pv: 'Our AI flags risky clauses accurately in leases and vendor deals', pvs: 'Accurate on leases' },
+        { b: 'cs', imp: 80, t: 'Small firms worry about the contracts they sign', s: 'Firms worry', qn: '20 interviews', pn: 'Paid pilot',
+          qT: '16 of 20 founders have signed a contract they regret', qF: 'Most founders say they just trust the other side', pT: 'Paid pilot: 45 firms pay ₹3,000 to review their next contract', pF: 'Paid pilot: 5 of 200 firms paid. Most only care at renewal',
+          pv: 'Small firms worry about leases and vendor contracts', pvs: 'Firms worry at renewal' },
+        { b: 'rev', imp: 65, t: 'Firms will pay ₹4,000 a month', s: 'Pays ₹4,000 a month', qn: 'Landing page', pn: 'Advance orders',
+          qT: 'Landing page: 48 visitors pick the ₹4,000 plan', qF: 'Landing page: visitors ask to pay per contract instead', pT: '50 advance orders at ₹4,000 a month', pF: 'Advance orders: 3 firms paid. Most want to pay per contract',
+          pv: 'Firms will pay ₹900 for each contract reviewed', pvs: 'Pays ₹900 a contract' },
+        { b: 'cr', imp: 45, t: 'Firms will trust the AI without a lawyer', s: 'Trusts the AI', qn: 'Short survey', pn: 'Paid pilot',
+          qT: 'Survey: 7 in 10 say an AI report is enough for routine deals', qF: 'Survey: most want a lawyer to sign off', pT: 'Pilot: 82% of firms act on the AI report alone', pF: 'Pilot: 9 in 10 firms paid a lawyer to check the AI anyway',
+          pv: 'Firms will trust the AI once a lawyer signs off', pvs: 'Trust with a lawyer' },
+        { b: 'cost', imp: 30, t: 'Each review costs us under ₹200', s: 'Review under ₹200', qn: 'Cloud estimate', pn: 'Paid pilot billing',
+          qT: 'Cloud estimate: about ₹60 a contract', qF: 'Cloud estimate: long contracts could cost ₹500', pT: 'Pilot billing: ₹85 a contract on average', pF: 'Pilot billing: ₹460 a contract on long agreements',
+          pv: 'Each review costs under ₹200 with a 40 page limit', pvs: 'Under ₹200 with a cap' }
+      ] }
+  ];
+  function byId(id){ for (var i = 0; i < IDEAS.length; i++) if (IDEAS[i].id === id) return IDEAS[i]; return IDEAS[0]; }
+  // 2 false assumptions, weighted by importance, so the important ones are often false
+  function pickFalse(imps, rnd){
+    var pool = imps.map(function(v, i){ return i; }), out = [];
+    while (out.length < 2){
+      var tot = 0; pool.forEach(function(i){ tot += imps[i]; });
+      var r = rnd() * tot, k = 0;
+      for (; k < pool.length - 1; k++){ r -= imps[pool[k]]; if (r < 0) break; }
+      out.push(pool[k]); pool.splice(k, 1);
+    }
+    return out.sort();
+  }
+  function newGame(ideaId, rnd){
+    rnd = rnd || Math.random; var I = byId(ideaId), f = pickFalse(I.as.map(function(a){ return a.imp; }), rnd);
+    return { idea: I.id, budget: START, spent: 0, falseIdx: f, tests: [], pivots: 0, over: null, scaleFund: 0, burntBy: null,
+      a: I.as.map(function(A, i){ var t = f.indexOf(i) < 0; return { truth: t, orig: t, status: 'open', sig: [] }; }) };
+  }
+  function topIdx(st){ var I = byId(st.idea), m = 0; I.as.forEach(function(A, i){ if (A.imp > I.as[m].imp) m = i; }); return m; }
+  function check(st, kind, i){
+    if (st.over) return 'The game is over.';
+    var a = st.a[i]; if (!a) return 'Pick an assumption first.';
+    if (COST[kind] > st.budget) return 'Not enough runway for that.';
+    if (kind === 'quick' && a.status !== 'open') return 'This one is already settled.';
+    if (kind === 'proper' && a.status !== 'open') return 'This one is already settled.';
+    if (kind === 'pivot' && a.status !== 'busted') return 'You can only pivot an assumption a proper test has busted.';
+    return '';
+  }
+  function spend(st, c){ st.budget -= c; st.spent += c; if (st.budget < SCALE_MIN) st.over = 'paralysis'; }
+  function quick(st, i, rnd){
+    var why = check(st, 'quick', i); if (why) return { ok: false, why: why };
+    rnd = rnd || Math.random; var a = st.a[i], sig = rnd() < QUICK_ACC ? a.truth : !a.truth;
+    a.sig.push(sig); st.tests.push({ k: 'quick', i: i, pos: sig }); spend(st, COST.quick);
+    return { ok: true, ev: { k: 'says', i: i, pos: sig } };
+  }
+  function proper(st, i){
+    var why = check(st, 'proper', i); if (why) return { ok: false, why: why };
+    var a = st.a[i]; a.status = a.truth ? 'proven' : 'busted'; st.tests.push({ k: 'proper', i: i, pos: a.truth }); spend(st, COST.proper);
+    return { ok: true, ev: { k: 'pays', i: i, pos: a.truth } };
+  }
+  function pivot(st, i){
+    var why = check(st, 'pivot', i); if (why) return { ok: false, why: why };
+    var a = st.a[i]; a.status = 'pivoted'; a.truth = true; st.pivots++; spend(st, COST.pivot);
+    return { ok: true, ev: { k: 'pivot', i: i, pos: true } };
+  }
+  function scale(st){
+    if (st.over) return { ok: false, why: 'The game is over.' };
+    st.scaleFund = st.budget; st.spent += st.budget; st.budget = 0;
+    var bad = -1; st.a.forEach(function(a, i){ if (!a.truth && bad < 0) bad = i; });
+    st.burntBy = bad; st.over = bad >= 0 ? 'burnt' : 'win';
+    return { ok: true, over: st.over };
+  }
+  function net(a){ var n = 0; a.sig.forEach(function(s){ n += s ? 1 : -1; }); return n; }
+  // evidence position 0 (busted) to 100 (proven); open stickies drift slowly with weak signals
+  function mapX(st, i){ var a = st.a[i]; if (a.status === 'proven' || a.status === 'pivoted') return 97; if (a.status === 'busted') return 3; return Math.max(26, Math.min(74, 50 + 12 * net(a))); }
+  function confidence(st, i){ var a = st.a[i]; if (a.status === 'proven' || a.status === 'pivoted') return 1; if (a.status === 'open' && net(a) > 0) return 0.25; return 0; }
+  function share(st, i){ var I = byId(st.idea), tot = 0; I.as.forEach(function(A){ tot += A.imp; }); return I.as[i].imp / tot * 100; }
+  function riskLeft(st){ var r = 100; st.a.forEach(function(a, i){ r -= share(st, i) * confidence(st, i); }); return Math.max(0, Math.round(r)); }
+  function level(st){ var n = st.tests.length + st.pivots; return Math.min(3, Math.floor(n / 2) + (st.budget < 70 ? 1 : 0) + (st.budget < 40 ? 1 : 0)); }
+  function summary(st){
+    var caught = 0; st.falseIdx.forEach(function(i){ if (st.a[i].status === 'busted' || st.a[i].status === 'pivoted') caught++; });
+    var q = 0, p = 0; st.tests.forEach(function(t){ if (t.k === 'quick') q++; else p++; });
+    var first = st.tests[0], riskiestFirst = !!first && first.i === topIdx(st), cheapFirst = !!first && first.k === 'quick';
+    var left = st.over === 'win' ? st.scaleFund : st.budget;
+    var score = st.over === 'win' ? Math.min(100, left * 2 + (riskiestFirst ? 20 : 0) + (cheapFirst ? 20 : 0)) : 0;
+    return { caught: caught, quick: q, proper: p, tests: q + p, pivots: st.pivots, riskiestFirst: riskiestFirst, cheapFirst: cheapFirst, left: left, score: score };
+  }
+  return { COST: COST, START: START, SCALE_MIN: SCALE_MIN, QUICK_ACC: QUICK_ACC, BLOCKS: BLOCKS, IDEAS: IDEAS, byId: byId, pickFalse: pickFalse, newGame: newGame, check: check,
+    quick: quick, proper: proper, pivot: pivot, scale: scale, net: net, mapX: mapX, confidence: confidence, share: share, riskLeft: riskLeft, level: level, summary: summary, topIdx: topIdx };
+})();
+/* ENGINE END */
+
+(function(){
+  var E = ENGINE, st = null, ideaId = 'tiffin', sel = -1, tut = 0, started = false, log = [], lastEv = null, tearI = -1, freshLog = false;
+  var typeTimer = null, lastSaid = '';
+  var $ = function(id){ return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var AREA = { kp: '1 / 1 / 3 / 3', ka: '1 / 3 / 2 / 5', kr: '2 / 3 / 3 / 5', vp: '1 / 5 / 3 / 7', cr: '1 / 7 / 2 / 9', ch: '2 / 7 / 3 / 9', cs: '1 / 9 / 3 / 11', cost: '3 / 1 / 4 / 6', rev: '3 / 6 / 4 / 11' };
+  var ORDER = ['kp', 'ka', 'kr', 'vp', 'cr', 'ch', 'cs', 'cost', 'rev'];
+  var MK = { open: '?', proven: '✓', busted: '✕', pivoted: '↻' };
+
+  function icon(k){
+    var a = '<svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="#14161F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+    if (k === 'tiffin') a += '<rect x="7" y="9" width="16" height="5" rx="1.5"/><rect x="7" y="14" width="16" height="5" rx="1.5"/><rect x="7" y="19" width="16" height="5" rx="1.5"/><path d="M10 9V5h10v4M13 5V3h4v2"/>';
+    if (k === 'pay') a += '<rect x="4" y="7" width="22" height="16" rx="2"/><path d="M4 12h22"/><path d="M9 17h3M15 17h6"/>';
+    if (k === 'ai') a += '<path d="M8 3h10l5 5v19H8z"/><path d="M18 3v5h5"/><path d="M11 13h6M11 17h8M11 21h5"/><path d="M23 18l1 2.2 2.2 1-2.2 1L23 24.4l-1-2.2-2.2-1 2.2-1z" fill="#14161F"/>';
+    return a + '</svg>';
+  }
+  function kabirSVG(){
+    return '<svg viewBox="0 0 80 80" aria-hidden="true">' +
+      '<path d="M8 82Q11 57 40 55Q69 57 72 82Z" style="fill:#FF9F1C;stroke:#14161F;stroke-width:1.4"/>' +
+      '<path d="M27 58Q40 68 53 58" style="fill:none;stroke:#14161F;stroke-width:1.3"/><path d="M35 63v9M45 63v9" style="stroke:#14161F;stroke-width:1.2;stroke-linecap:round"/><circle cx="35" cy="73" r="1.3" style="fill:#14161F"/><circle cx="45" cy="73" r="1.3" style="fill:#14161F"/>' +
+      '<rect x="35" y="49" width="10" height="8" style="fill:#A8754D"/>' +
+      '<g class="head"><ellipse cx="40" cy="37" rx="13.5" ry="15.5" style="fill:#B9845A;stroke:#14161F;stroke-width:1.2"/>' +
+      '<path d="M25 33Q23 17 36 16L38 12L41 16L45 11L46 16Q57 18 55 33Q53 25 47 24Q40 27 32 24Q27 26 25 33Z" style="fill:#1E1B22;stroke:#14161F;stroke-width:1"/>' +
+      '<path d="M30.5 31.5L36.5 30M43.5 30L49.5 31.5" style="stroke:#1E1B22;stroke-width:2;stroke-linecap:round"/>' +
+      '<ellipse class="eye" cx="34" cy="36" rx="2" ry="2.2" style="fill:#14161F"/><ellipse class="eye" cx="46" cy="36" rx="2" ry="2.2" style="fill:#14161F"/>' +
+      '<path d="M39.5 38.5L38 43.5H41" style="fill:none;stroke:#7E5434;stroke-width:1.1;stroke-linecap:round"/>' +
+      '<path d="M30 44Q31 51 40 52Q49 51 50 44" style="fill:none;stroke:#3A2A22;stroke-width:1;stroke-dasharray:1 1.6;opacity:.7"/>' +
+      '<ellipse class="mouth" cx="40" cy="47" rx="3.6" ry="1.3" style="fill:#7A2E22;stroke:#14161F;stroke-width:.6"/>' +
+      '<path d="M53 33Q57 33 56.5 37" style="fill:none;stroke:#14161F;stroke-width:1.1"/></g>' +
+      '<rect x="56" y="62" width="7" height="12" rx="1.5" transform="rotate(14 59 68)" style="fill:#2B2F3E;stroke:#14161F;stroke-width:.8"/></svg>';
+  }
+
+  function stickyHTML(i, opts){
+    var I = E.byId(st ? st.idea : ideaId), A = I.as[i], a = st ? st.a[i] : null, status = a ? a.status : 'open';
+    var txt = status === 'pivoted' ? A.pv : A.t, cls = 'as st-' + status + (status === 'pivoted' && tearI === i && !reduce ? ' fresh' : '');
+    var h = '<span class="sw">';
+    if (status === 'pivoted' && tearI === i && !reduce) h += '<span class="tear" aria-hidden="true">' + A.t + '</span>';
+    if (opts && opts.big) h += '<span class="' + cls + '"><span class="tx">' + txt + '</span><span class="mk">' + MK[status] + '</span></span>';
+    else h += '<button type="button" class="' + cls + (opts && opts.coach ? ' coach' : '') + '" data-a="' + i + '" aria-pressed="' + (sel === i) + '" aria-label="Assumption: ' + txt + '"><span class="tx">' + txt + '</span><span class="mk">' + MK[status] + '</span></button>';
+    return h + '</span>';
+  }
+  function drawBMC(target, mode){
+    var I = E.byId(st && mode === 'mini' ? st.idea : ideaId), byB = {};
+    I.as.forEach(function(A, i){ byB[A.b] = i; });
+    var h = '';
+    ORDER.forEach(function(k){
+      var wide = k === 'cost' || k === 'rev', i = byB[k];
+      h += '<div class="blk' + (wide ? ' wide' : '') + '" style="grid-area:' + AREA[k] + '"><span class="bl">' + E.BLOCKS[k] + '</span>';
+      if (mode === 'brief'){
+        if (i === undefined) h += '<span class="bt">' + I.bmc[k] + '</span>';
+        else h += '<span class="sn">' + I.as[i].t + '</span>';
+      } else {
+        if (i === undefined) h += '<span class="bt">' + I.bmc[k] + '</span>';
+        else h += stickyHTML(i, { coach: tut === 1 && i === E.topIdx(st) });
+      }
+      h += '</div>';
+    });
+    $(target).innerHTML = h;
+  }
+
+  function buildMap(){
+    var I = E.byId(st.idea), h = '<span class="mid"></span><span class="hmid"></span><div class="danger"><span>important and unproven</span></div>' +
+      '<span class="ax y">Importance</span><span class="ax xl">✕ Busted</span><span class="ax xc">No evidence</span><span class="ax xr">Proven ✓</span>';
+    I.as.forEach(function(A, i){ h += '<button type="button" class="mp" data-a="' + i + '" style="--r:' + (i % 2 ? '2deg' : '-2deg') + ';left:50%;bottom:' + (6 + A.imp * .86) + '%"></button>'; });
+    $('amap').innerHTML = h;
+  }
+  function updateMap(){
+    var I = E.byId(st.idea);
+    Array.prototype.forEach.call($('amap').querySelectorAll('.mp'), function(b){
+      var i = +b.dataset.a, a = st.a[i], A = I.as[i];
+      b.className = 'mp st-' + a.status;
+      b.style.left = E.mapX(st, i) + '%';
+      b.setAttribute('aria-pressed', sel === i);
+      b.innerHTML = '<span class="imp">' + A.imp + '</span><span class="tx">' + (a.status === 'pivoted' ? A.pvs : A.s) + '</span><span class="mk">' + MK[a.status] + '</span>';
+    });
+  }
+
+  function drawSel(){
+    var I = E.byId(st.idea);
+    if (sel < 0){
+      $('sel').innerHTML = '<span class="label">Test bench</span><p class="empty">Tap a sticky on the canvas or the map to choose an assumption to test.</p><p style="font-size:12.5px;color:var(--muted)">Start with the 1 that would hurt most if it were wrong. The number on each map sticky is its importance.</p>';
+      return;
+    }
+    var A = I.as[sel], a = st.a[sel], b = st.budget, C = E.COST;
+    var stName = { open: a.sig.length ? 'Weak signals only' : 'Not tested', proven: 'Proven by a paid test', busted: 'Busted by a paid test', pivoted: 'Pivoted, now holds' }[a.status];
+    var sig = a.sig.map(function(s){ return '<span class="sig" style="background:' + (s ? 'var(--sG)' : 'var(--sP)') + '">SAYS ' + (s ? '✓' : '✕') + '</span>'; }).join('');
+    if (!a.sig.length) sig = '<span>No signals yet</span>';
+    function mv(k, cls, name, sub, cost){
+      var why = E.check(st, k, sel), after = b - cost, warn = !why && after < E.SCALE_MIN;
+      return '<button type="button" class="mv ' + cls + (k === 'quick' && tut === 2 ? ' coach' : '') + '" data-move="' + k + '"' + (why ? ' disabled' : '') + '><span>' + name + '</span><span class="c">₹' + cost + ' lakh</span><small class="' + (warn ? 'warn' : '') + '">' + (why ? (a.status === 'open' || k !== 'quick' && k !== 'proper' ? why : 'Already settled.') : warn ? 'Leaves ₹' + after + ' lakh. Too little to scale.' : sub + ' Leaves ₹' + after + ' lakh.') + '</small></button>';
+    }
+    $('sel').innerHTML = '<div class="rhead"><span class="label">Test bench</span><span class="label">' + E.BLOCKS[A.b] + '</span></div>' +
+      '<div class="selnote">' + stickyHTML(sel, { big: true }) + '</div>' +
+      '<div class="selmeta"><span>Importance ' + A.imp + '</span><span>' + stName + '</span></div>' +
+      '<div class="sigs">' + sig + '</div>' +
+      '<div class="moves">' +
+        mv('quick', 'q', 'Quick test: ' + A.qn, 'Weak signal.', C.quick) +
+        mv('proper', 'p', 'Proper test: ' + A.pn, 'Reveals the truth.', C.proper) +
+        mv('pivot', 'v', 'Pivot this assumption', 'Swap in a version that holds.', C.pivot) +
+      '</div>';
+  }
+
+  function render(){
+    var I = E.byId(st.idea);
+    $('bud').textContent = st.budget;
+    $('spent').textContent = 'Spent ₹' + st.spent + ' lakh';
+    var rw = ''; for (var k = 0; k < 20; k++) rw += '<i class="' + (k < 2 ? 'res' : '') + (k * 5 >= st.budget ? ' off' : '') + '"></i>';
+    $('runway').innerHTML = rw;
+    $('scaleBtn').textContent = st.over ? 'Game over' : 'Scale now: spend ₹' + st.budget + ' lakh';
+    $('scaleBtn').disabled = !!st.over;
+    $('bTitle').innerHTML = '<span class="ic" style="background:' + I.col + '">' + icon(I.icon) + '</span>' + I.name + '<span class="kind">' + I.kind + '</span>';
+    $('bSub').textContent = I.line;
+    drawBMC('bmcMini', 'mini');
+    updateMap(); drawSel();
+    var r = E.riskLeft(st), settled = 0; st.a.forEach(function(a){ if (a.status !== 'open') settled++; });
+    $('riskV').textContent = r + '%'; $('riskB').style.width = r + '%';
+    $('riskS').textContent = settled + ' of 5 assumptions settled by paid evidence. Risk falls only with supporting evidence.';
+    $('log').innerHTML = log.length ? log.slice().reverse().map(function(e, n){
+      var bg = e.k === 'says' ? 'var(--sY)' : e.k === 'pays' ? 'var(--sG)' : 'var(--sB)';
+      var badge = e.k === 'says' ? 'SAYS' : e.k === 'pays' ? 'PAYS' : 'PIVOT';
+      return '<div class="lc' + (e.pos ? '' : ' neg') + (n === 0 && freshLog ? ' first' : '') + '" style="background:' + bg + '"><span class="badge">' + badge + (e.pos ? ' ✓' : ' ✕') + '</span>' + e.t + '<span class="on">' + e.on + '</span></div>';
+    }).join('') : '<p class="lempty">No evidence yet. Every test leaves a learning card here.</p>';
+    freshLog = false;
+    advise();
+    tearI = -1;
+  }
+
+  function say(el, av, text, force){
+    if (!force && text === lastSaid && el.id === 'adviceText') return;
+    if (el.id === 'adviceText') lastSaid = text;
+    clearInterval(typeTimer);
+    if (reduce){ el.textContent = text; return; }
+    var i = 0; el.textContent = ''; av.classList.add('talking');
+    typeTimer = setInterval(function(){ i += 2; el.textContent = text.slice(0, i); if (i >= text.length){ clearInterval(typeTimer); av.classList.remove('talking'); } }, 22);
+  }
+  function advise(){
+    var I = E.byId(st.idea), lvl = E.level(st), t, cls = '';
+    if (tut === 1) t = 'I still say we skip this. But fine. Tap our most important sticky, "' + I.as[E.topIdx(st)].t + '". If that is wrong, nothing else matters.';
+    else if (tut === 2) t = 'Now the quick test. ₹5 lakh for a weak signal. Cheap, at least. Then we scale, yes?';
+    else if (st.over === 'win') t = 'We scaled, and it held. Fine. The testing was worth it.';
+    else if (st.over === 'burnt') t = 'Who knew that 1 was wrong? Well. The evidence would have.';
+    else if (st.over === 'paralysis') t = 'We tested until the money ran out. ' + I.rival + ' launched last week.';
+    else {
+      var e = lastEv, base;
+      if (!e) base = 'Why test at all? We already know people want this. Competitors are coming. Scale now!';
+      else if (e.k === 'says' && e.pos) base = 'See? Told you. Competitors are coming. Scale now!';
+      else if (e.k === 'says') base = 'That is just a few people talking. Competitors are coming. Scale now!';
+      else if (e.k === 'pays' && e.pos) base = 'Proven! So stop testing. Competitors are coming. Scale now!';
+      else if (e.k === 'pays') base = '1 bad pilot. We fix it after launch. Competitors are coming. Scale now!';
+      else base = 'A pivot? That costs us weeks. Competitors are coming. Scale now!';
+      var news = ['', ' ' + I.rival + ' is hiring.', ' ' + I.rival + ' just raised ₹40 Cr.', ' ' + I.rival + ' launches next week!'][lvl];
+      t = base + news;
+      if (lvl >= 2) t = t.replace('Competitors are coming.', 'COMPETITORS ARE COMING.').replace('Scale now!', 'SCALE NOW!');
+      if (lvl >= 3) t = t.toUpperCase();
+      cls = ['', 'urgent', 'urgent loud', 'urgent loud shout'][lvl];
+    }
+    $('advice').className = 'advice ' + cls;
+    if ($('intro').hidden) say($('adviceText'), $('advAv'), t);
+  }
+  function toast(m){ $('toast').textContent = m || ''; }
+
+  function move(kind){
+    if (sel < 0 || st.over) return;
+    var I = E.byId(st.idea), A = I.as[sel], res, before = st.a[sel].status;
+    if (kind === 'quick') res = E.quick(st, sel);
+    else if (kind === 'proper') res = E.proper(st, sel);
+    else res = E.pivot(st, sel);
+    if (!res.ok){ toast(res.why); return; }
+    toast(''); var ev = res.ev; lastEv = ev;
+    if (ev.k === 'says') log.push({ k: 'says', pos: ev.pos, t: ev.pos ? A.qT : A.qF, on: A.qn + ', on "' + A.s + '"' });
+    else if (ev.k === 'pays') log.push({ k: 'pays', pos: ev.pos, t: ev.pos ? A.pT : A.pF, on: A.pn + ', on "' + A.s + '"' });
+    else { log.push({ k: 'pivot', pos: true, t: 'Torn up: ' + A.t + '. New sticky: ' + A.pv, on: 'Pivot on ' + E.BLOCKS[A.b] }); tearI = sel; }
+    freshLog = true;
+    if (tut === 2 && kind === 'quick') tut = 0; else if (tut) tut = 0;
+    render();
+    if (st.over) finish();
+  }
+  function doScale(){
+    if (st.over) return;
+    tut = 0; var res = E.scale(st); if (!res.ok) return;
+    render(); finish();
+  }
+
+  function finish(){
+    var I = E.byId(st.idea), S = E.summary(st), key = st.over, T;
+    if (key === 'win') T = ['Evidence Before Scale', 'win', 'Victory', 'You found the false assumptions, pivoted them, and scaled ' + I.name + ' with ₹' + S.left + ' lakh still in the bank. Customers paid before you grew, so the growth held.' +
+      (S.riskiestFirst && S.cheapFirst ? ' You also opened with a cheap test on the riskiest assumption. Textbook.' : !S.riskiestFirst ? ' Next time, open with the riskiest assumption.' : ' Next time, open with a cheap test.')];
+    else if (key === 'burnt'){ var A = I.as[st.burntBy], a = st.a[st.burntBy]; T = ['Burnt', 'lose', 'Defeat', 'You poured ₹' + st.scaleFund + ' lakh into growth. Then "' + A.t + '" turned out to be false: ' + A.pF.charAt(0).toLowerCase() + A.pF.slice(1) + '. The money was gone within months.' + (a.status === 'busted' ? ' You had already busted it, but never pivoted.' : '')]; }
+    else T = ['Analysis Paralysis', 'mid', 'Close, not quite', 'You kept testing until the runway fell below ₹10 lakh, too little to scale. You learnt a lot, but ' + I.rival + ' launched while you ran pilots. Cheap tests first would have saved the money.'];
+    $('rBand').className = 'band ' + T[1]; $('rBand').innerHTML = T[2] + (key === 'win' ? '<small>SCORE ' + S.score + ' / 100</small>' : '');
+    $('rTitle').textContent = T[0]; $('rText').textContent = T[3];
+    $('rKpis').innerHTML = [['₹' + S.left + ' lakh', key === 'win' ? 'Money left to scale' : key === 'burnt' ? 'Burnt on scaling' : 'Money left'], [S.tests + '', 'Tests run (' + S.quick + ' quick, ' + S.proper + ' proper)'], [S.caught + ' of 2', 'False assumptions caught']]
+      .map(function(k){ return '<div class="kpi"><span class="v">' + k[0] + '</span><small>' + k[1] + '</small></div>'; }).join('');
+    $('rBel').innerHTML = I.as.map(function(A){ return '<div class="crow" style="background:var(--sY)"><em>' + E.BLOCKS[A.b].toUpperCase() + '</em>' + A.t + '</div>'; }).join('');
+    $('rTru').innerHTML = I.as.map(function(A, i){
+      var a = st.a[i];
+      if (a.orig) return '<div class="crow t"><em class="ok">TRUE ✓' + (a.status === 'proven' ? ', PROVEN' : ', NEVER PROVEN') + '</em>' + A.t + '</div>';
+      if (a.status === 'pivoted') return '<div class="crow pv"><em class="bad">FALSE ✕, CAUGHT. PIVOTED TO</em>' + A.pv + '</div>';
+      if (a.status === 'busted') return '<div class="crow f"><em class="bad">FALSE ✕, CAUGHT, NOT PIVOTED</em>' + A.pF + '</div>';
+      return '<div class="crow f"><em class="bad">FALSE ✕, MISSED</em>' + A.pF + '</div>';
+    }).join('');
+    $('rHint').textContent = key === 'win' ? 'Try another idea' : 'The false ones change every game';
+    var bw = document.querySelector('.boardwrap'), s = document.createElement('div');
+    s.className = 'boardstamp'; s.style.color = T[1] === 'win' ? 'var(--ok)' : T[1] === 'mid' ? 'var(--amber)' : 'var(--danger)';
+    s.textContent = T[1] === 'win' ? 'SCALED' : T[1] === 'mid' ? 'STALLED' : 'BURNT'; bw.appendChild(s);
+    if (T[1] === 'win' && !reduce) confetti();
+    setTimeout(function(){ $('overlay').hidden = false; $('overlay').scrollTop = 0; try { $('again').focus({ preventScroll: true }); } catch (e) {} }, reduce ? 300 : 2000);
+  }
+  function confetti(){
+    var c = document.createElement('canvas'); c.className = 'confetti'; c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+    var x = c.getContext('2d'), cols = ['#FFE66D', '#A9D8FF', '#B6EFA0', '#FFB8D4', '#FF9F1C'], ps = [];
+    for (var i = 0; i < 140; i++) ps.push({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, vy: 2 + Math.random() * 3, vx: Math.random() * 2 - 1, c: cols[i % 5], a: Math.random() * 6 });
+    var t0 = performance.now();
+    (function f(t){ x.clearRect(0, 0, c.width, c.height); ps.forEach(function(p){ p.y += p.vy; p.x += p.vx; p.a += .1; x.save(); x.translate(p.x, p.y); x.rotate(p.a); x.fillStyle = p.c; x.fillRect(-5, -3, 10, 6); x.restore(); }); if (t - t0 < 3200) requestAnimationFrame(f); else c.remove(); })(t0);
+  }
+
+  function openMetrics(){
+    var I = E.byId(st.idea), cost = {}, h = '';
+    st.tests.forEach(function(t){ cost[t.i] = (cost[t.i] || 0) + E.COST[t.k]; });
+    h += '<div class="pm"><table><thead><tr><th>Hypotheses log</th><th>Risk<small>% of total</small></th><th class="sep">Experiment log</th><th>Cost<small>₹ lakh</small></th><th class="sep">Learning</th><th>Confidence<small>0 to 1</small></th><th>Risk reduction<small>risk × confidence</small></th><th class="sep">Action</th></tr></thead><tbody>';
+    var tot = 0;
+    I.as.forEach(function(A, i){
+      var a = st.a[i], r = Math.round(E.share(st, i)), c = E.confidence(st, i), n = E.net(a), spentI = (cost[i] || 0) + (a.status === 'pivoted' ? E.COST.pivot : 0); tot += spentI;
+      var exp = [], learn;
+      if (a.sig.length) exp.push(a.sig.length + ' × ' + A.qn);
+      if (a.status !== 'open') exp.push(A.pn);
+      if (a.status === 'pivoted') exp.push('pivot');
+      learn = a.status === 'proven' || a.status === 'pivoted' ? '✓' : a.status === 'busted' ? '✕' : a.sig.length ? (n > 0 ? '✓?' : n < 0 ? '✕?' : '?') : '';
+      var act = a.status === 'busted' ? '<span class="act-v">Pivot</span>' : a.status === 'proven' || a.status === 'pivoted' ? '<span class="act-p">Persevere</span>' : a.sig.length ? '<span class="act-r">Test properly</span>' : '<span class="act-n">Not tested</span>';
+      h += '<tr><td>' + (a.status === 'pivoted' ? A.pv : A.t) + '</td><td class="mono">' + r + '%</td><td class="sep">' + (exp.join(', ') || '<span class="act-n">Run a test</span>') + '</td><td class="mono">' + (spentI ? '₹' + spentI : '') + '</td><td class="sep" style="font-size:19px">' + learn + '</td><td class="mono">' + c + '</td><td class="mono">' + (c ? r + '% × ' + c + ' = ' + (+(r * c).toFixed(1)) + '%' : '0%') + '</td><td class="sep">' + act + '</td></tr>';
+    });
+    var rl = E.riskLeft(st);
+    h += '</tbody></table><div class="pmfoot">' +
+      '<div class="pmbox"><span class="label">Overall cost</span><span class="val">₹' + tot + ' lakh</span><small>spent on tests and pivots</small></div>' +
+      '<div class="pmbox"><span class="label">Innovation risk level</span><span class="val">' + rl + '%</span><small>starts at 100% and falls only with supporting evidence. A quick test counts for 0.25, a paid test for 1.</small></div>' +
+      '<div class="pmbox"><span class="label">Runway left</span><span class="val">₹' + st.budget + ' lakh</span><small>you need at least ₹10 lakh to scale</small></div></div></div>';
+    $('mpTitle').textContent = I.name + ': risk × confidence';
+    $('mpBody').innerHTML = h; $('mpop').hidden = false; try { $('mpClose').focus({ preventScroll: true }); } catch (e) {}
+  }
+
+  function drawIdeas(){
+    $('ideas').innerHTML = E.IDEAS.map(function(I){
+      return '<button type="button" class="idea" data-idea="' + I.id + '" aria-pressed="' + (ideaId === I.id) + '"' + (started ? ' disabled' : '') + '><span class="ic" style="background:' + I.col + '">' + icon(I.icon) + '</span><span><b>' + I.name + '</b><span class="d">' + I.line + '</span></span><span class="kind">' + I.kind + '</span></button>';
+    }).join('');
+    var I = E.byId(ideaId);
+    $('dHead').innerHTML = '<span class="ic" style="background:' + I.col + '">' + icon(I.icon) + '</span><div><h3>' + I.name + '</h3><p>' + I.line + '. 5 assumptions, 2 of them false.</p></div>';
+    drawBMC('bmcBrief', 'brief');
+  }
+  function showIntro(){
+    $('iAv').innerHTML = kabirSVG(); $('intro').hidden = false; drawIdeas();
+    $('iTitle').textContent = started ? 'The canvas we started with' : 'Pick an idea. Then prove it.';
+    $('iStart').textContent = started ? 'Back to the board' : 'Start the company';
+    say($('iText'), $('iAv'), started ? 'Still the same canvas. Still the same plan, if you ask me. Competitors are coming. Scale now!' :
+      'Hi, I am Kabir, your cofounder. We have ₹100 lakh and 3 ideas. Pick 1. Each rests on 5 assumptions, the yellow stickies on its canvas. Between us? Testing is for people with time. Competitors are coming. We should scale now.', true);
+    try { $('iStart').focus({ preventScroll: true }); } catch (e) {}
+  }
+  function start(){
+    if (started){ $('intro').hidden = true; clearInterval(typeTimer); $('iAv').classList.remove('talking'); lastSaid = ''; render(); return; }
+    started = true; newGame(); tut = 1;
+    var from = $('iAv').getBoundingClientRect(), target = $('advAv');
+    $('intro').hidden = true; clearInterval(typeTimer); $('iAv').classList.remove('talking');
+    var to = target.getBoundingClientRect();
+    if (reduce || !from.width || !to.width || !document.body.animate){ lastSaid = ''; render(); return; }
+    var fly = document.createElement('div'); fly.className = 'flyer'; fly.innerHTML = kabirSVG();
+    fly.style.left = from.left + 'px'; fly.style.top = from.top + 'px'; fly.style.width = from.width + 'px'; fly.style.height = from.height + 'px'; fly.style.transformOrigin = '0 0';
+    document.body.appendChild(fly); target.style.visibility = 'hidden';
+    var dx = to.left - from.left, dy = to.top - from.top, sc = to.width / from.width;
+    var an = fly.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + dx * .5 + 'px,' + (dy * .5 - 110) + 'px) scale(' + (1 + sc) / 2 + ') rotate(-8deg)', offset: .5 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')' }], { duration: 950, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    an.onfinish = function(){ fly.remove(); target.style.visibility = ''; lastSaid = ''; render(); };
+  }
+  function newGame(){
+    st = E.newGame(ideaId); sel = -1; log = []; lastEv = null; tearI = -1; lastSaid = '';
+    $('overlay').hidden = true; var old = document.querySelector('.boardstamp'); if (old) old.remove();
+    $('advAv').innerHTML = kabirSVG(); toast(''); buildMap(); render();
+  }
+  function reset(){ started = false; tut = 0; newGame(); showIntro(); }
+
+  function pick(e){ var b = e.target.closest('[data-a]'); if (!b) return; sel = +b.dataset.a; if (tut === 1){ tut = sel === E.topIdx(st) ? 2 : 0; } render(); }
+  $('bmcMini').addEventListener('click', pick);
+  $('amap').addEventListener('click', pick);
+  $('sel').addEventListener('click', function(e){ var b = e.target.closest('.mv'); if (b && !b.disabled) move(b.dataset.move); });
+  $('scaleBtn').addEventListener('click', doScale);
+  $('metBtn').addEventListener('click', openMetrics);
+  $('mpClose').addEventListener('click', function(){ $('mpop').hidden = true; });
+  $('mpop').addEventListener('click', function(e){ if (e.target.id === 'mpop') $('mpop').hidden = true; });
+  $('ideas').addEventListener('click', function(e){ var b = e.target.closest('.idea'); if (!b || b.disabled) return; ideaId = b.dataset.idea; newGame(); drawIdeas(); });
+  $('help').addEventListener('click', showIntro);
+  $('restart').addEventListener('click', reset);
+  $('again').addEventListener('click', reset);
+  $('iStart').addEventListener('click', start);
+  document.addEventListener('keydown', function(e){ if (e.key !== 'Escape') return; if (!$('mpop').hidden){ $('mpop').hidden = true; return; } if (!$('intro').hidden) start(); else if (!$('overlay').hidden) reset(); });
+  reset();
+})();
+</script>
+
+<style>
+</style>
+<style id="gwcss">
+[hidden]{display:none!important}
+.walkb{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;padding:6px 12px;border:2.5px solid #14161F;border-radius:12px;background:#B6EFA0;box-shadow:3px 3px 0 #14161F;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex:none}
+.walkb svg{width:18px;height:18px}
+.walkb:hover{transform:translate(-1px,-2px);box-shadow:5px 5px 0 #14161F}
+.walkb.bigw{font-size:18px;padding:10px 18px;border-width:3px;border-radius:14px;box-shadow:5px 5px 0 #14161F}
+.walkb.bigw svg{width:22px;height:22px}
+#gw{position:fixed;inset:0;z-index:100000;pointer-events:none}
+.gw-ring{position:fixed;border:3px dashed #FF9F1C;border-radius:14px;box-shadow:0 0 0 9999px rgba(20,22,31,.5);transition:all .35s ease;animation:gwp 1.4s ease-in-out infinite}
+@keyframes gwp{50%{border-color:#fff}}
+.gw-tip{position:fixed;width:min(340px,calc(100vw - 20px));background:#fff;color:#14161F;border:3px solid #14161F;border-radius:16px;box-shadow:5px 5px 0 #14161F;padding:12px 14px;pointer-events:auto;transition:top .35s,left .35s;font-family:'IBM Plex Sans',system-ui,sans-serif}
+.gw-k{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.1em;color:#2E9E5B}
+.gw-k svg{width:20px;height:20px}
+.gw-tip p{margin:6px 0 10px;font-size:14.5px;line-height:1.4}
+.gw-tip .tap{font-family:'Caveat',cursive;font-weight:700;font-size:19px;color:#2B59C3}
+.gw-b{display:flex;gap:8px;justify-content:flex-end}
+.gw-b button{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;border:2.5px solid #14161F;border-radius:10px;padding:5px 12px;cursor:pointer;background:#fff}
+.gw-b #gwNext{background:#FF9F1C}
+.gw-tip.gwnudge{animation:gwn .45s ease}
+@keyframes gwn{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.gw-tip .lock{display:block;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:#6B7280}
+@media (max-width:700px){
+ .walkb:not(.bigw){padding:5px 9px;font-size:12px}
+ .gw-tip p{font-size:14px}
+}
+</style>
+<style id="phonecss">
+@media (max-width:700px){
+ .wrap{padding:8px 10px 88px!important;gap:10px!important}
+ header{flex-wrap:wrap!important;gap:8px!important;align-items:center!important}
+ header h1{font-size:22px!important}
+ .hbtns{flex-wrap:wrap!important;gap:6px!important}
+ .hbtn{font-size:12px!important;padding:5px 9px!important;min-height:0!important}
+ .main{display:flex!important;flex-direction:column!important;gap:10px!important;height:auto!important;min-height:0!important}
+ .col{display:contents!important}
+ .boardwrap{overflow:visible!important;min-height:0!important}
+ .stkrow,.doodle,.stk{display:none!important}
+ .overlay{align-items:flex-start!important;overflow:auto!important;padding:8px!important;z-index:200!important}
+ .overlay>.panel{max-height:none!important;padding:14px!important}
+ .overlay h2{font-size:23px!important}
+ .fixbar{position:fixed!important;left:0;right:0;bottom:0;z-index:40;margin:0!important;border-radius:16px 16px 0 0!important;border-left:0!important;border-right:0!important;border-bottom:0!important;padding:8px 10px 10px!important;box-shadow:0 -4px 0 rgba(20,22,31,.2)!important;background:#fff!important}
+ .fixbar .btn{width:100%;min-height:46px}
+ .fixbar .toast{margin:4px 0 0!important;font-size:12px}
+}
+@media (max-width:700px){.main>.col:first-child>.card:nth-child(2){order:1}.boardwrap{order:2}.advice{order:3}.main>.col:last-child>.card:nth-child(2){order:4}.main>.col:first-child>.card:nth-child(3){order:5}.main>.col:first-child>.card:nth-child(1){order:6}.main>.col:last-child>.card:nth-child(3){order:7}}
+@media (max-width:700px){
+ .advice{position:static!important}
+ .fixbar p:not(.toast){display:none!important}
+ .lower{grid-template-columns:minmax(0,1fr)!important}
+}
+</style>
+<div id="gw" hidden><div class="gw-ring" id="gwRing"></div><div class="gw-tip" id="gwTip"><div class="gw-k"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span id="gwK">WALK WITH ME</span> · <span id="gwN"></span></div><p id="gwT"></p><div class="gw-b"><button id="gwStop" type="button">Stop guide</button><button id="gwNext" type="button">Next</button></div></div></div>
+<script>
+
+const GW=(()=>{const A=i=>'#bmcMini [data-a="'+i+'"]',M=k=>'#sel .mv[data-move="'+k+'"]',S=[];
+const I=()=>{const b=document.querySelector('#ideas .idea[aria-pressed="true"]');return ENGINE.byId(b?b.dataset.idea:'tiffin')};
+const a=i=>I().as[i],lc=t=>t.charAt(0).toLowerCase()+t.slice(1);
+const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));
+add('#bmcMini',()=>'You run '+I().name+', '+lc(I().line)+'. Your business model rests on 5 assumptions. 2 of them are false, and you do not know which.');
+add('#bud','You have ₹100 lakh of runway. Every test costs money. Scale with a false assumption still on the canvas and the company burns.');
+add('#amap','The assumption map puts the most important ones at the top. Test those first.');
+add(A(0),()=>'Pick the most important one: '+lc(a(0).t)+'.',{click:true});
+add(M('quick'),()=>'Start cheap. A quick test, '+lc(a(0).qn)+', for ₹5 lakh.',{click:true});
+add('#sel','A quick test only tells you what people say. It is right 7 times in 10, so treat it as a hint. Before you bet the company, find out what people pay for.',{wait:900});
+add(M('proper'),()=>'Run a proper test: '+lc(a(0).pn)+'.',{click:true});
+add('#sel',()=>'Busted. '+a(0).pF+'. Much better to learn this now, for ₹20 lakh, than after you scale.',{wait:900});
+add(M('pivot'),'Pivot. Rewrite the busted assumption into 1 that holds.',{click:true});
+add(A(1),()=>'Next most important: '+lc(a(1).t)+'.',{click:true,wait:600});
+add(M('proper'),()=>'This one decides the business, so go straight to a proper test: '+lc(a(1).pn)+'.',{click:true});
+add('#sel',()=>'Busted again. '+a(1).pF+'. That is the second false assumption.',{wait:900});
+add(M('pivot'),'Pivot it too.',{click:true});
+add('#riskV','You have found and fixed both false assumptions. The rest matter less, so stop testing and keep your runway.',{wait:900});
+add('#scaleBtn','Scale now, with money still in the bank.',{click:true});
+add('#overlay .panel','Scaled. You tested the riskiest ideas first, paid for the truth only where it mattered, and kept your runway.',{wait:2600,last:true});
+return S})();
+function GW_START(){const g=id=>document.getElementById(id);g('mpop').hidden=true;g('restart').click();
+ const r=Math.random;Math.random=()=>0.1;try{g('iStart').click()}finally{Math.random=r}g('intro').hidden=true}
+
+</script>
+<script>
+(function(){
+const g=id=>document.getElementById(id);
+let I=-1,T=null,E=null,H=null,SEQ=0,LIST=null;const L=()=>LIST||GW;
+function find(st){return typeof st.sel==='function'?st.sel():document.querySelector(st.sel)}
+function vis(el){if(!el)return false;const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&!el.disabled&&!el.closest('[hidden]')}
+function place(){if(I<0||!E)return;if(!E.isConnected){const n=find(L()[I]);if(n)E=n;else return}const r=E.getBoundingClientRect(),pad=6,ring=g('gwRing'),tip=g('gwTip');
+ ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';ring.style.width=(r.width+pad*2)+'px';ring.style.height=(r.height+pad*2)+'px';
+ const tw=tip.offsetWidth,th=tip.offsetHeight,vw=innerWidth,vh=innerHeight;let top=r.bottom+14;if(top+th>vh-8)top=r.top-th-14;if(top<8)top=Math.max(8,Math.min(vh-th-8,r.top+12));
+ let left=r.left+r.width/2-tw/2;left=Math.max(10,Math.min(vw-tw-10,left));tip.style.top=top+'px';tip.style.left=left+'px'}
+function show(i){I=i;const st=L()[i],my=++SEQ;clearInterval(T);g('gw').hidden=true;let pre=false;
+ const t0=Date.now();T=setInterval(()=>{if(my!==SEQ)return;if(Date.now()-t0<(st.wait||0))return;if(st.pre&&!pre){pre=true;try{st.pre()}catch(e){}return}
+  const el=find(st);if(!vis(el))return;clearInterval(T);
+  E=el;g('gw').hidden=false;g('gwN').textContent='step '+(i+1)+' of '+L().length;g('gwT').innerHTML=(typeof st.t==='function'?st.t():st.t)+(st.click?' <span class="tap">tap the glowing spot</span>':'<span class="lock">READ, THEN PRESS NEXT</span>');
+  g('gwNext').style.display=st.click?'none':'';g('gwNext').textContent=st.last?(LIST?"Start playing":'Done'):'Next';
+  el.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(place,420);place();
+  if(st.click){H=ev=>{const cur=E&&E.isConnected?E:find(st);if(!cur||!(cur===ev.target||cur.contains(ev.target)))return;document.removeEventListener('click',H,true);H=null;g('gw').hidden=true;setTimeout(next,250)};document.addEventListener('click',H,true)}},150)}
+setInterval(()=>{if(I>=0&&E&&!E.isConnected)place()},300);
+function next(){if(I>=L().length-1){stop();return}show(I+1)}
+function stop(){LIST=null;const k=g('gwK');if(k)k.textContent='WALK WITH ME';SEQ++;clearInterval(T);if(H)document.removeEventListener('click',H,true);H=null;I=-1;E=null;g('gw').hidden=true}
+window.gwStop=stop;
+function curEl(){if(I<0)return null;const st=L()[I];if(E&&E.isConnected)return E;return find(st)}
+function allowed(t){if(!t||!t.closest)return true;if(t.closest('#gwTip,.walkgo,#homeTab'))return true;
+ const st=L()[I];if(!st||!st.click||g('gw').hidden)return false;const c=curEl();return !!c&&(c===t||c.contains(t))}
+function nudge(){const tip=g('gwTip');if(g('gw').hidden)return;tip.classList.remove('gwnudge');void tip.offsetWidth;tip.classList.add('gwnudge')}
+function block(ev){if(I<0)return;if(allowed(ev.target))return;ev.stopImmediatePropagation();ev.stopPropagation();
+ if(ev.cancelable&&!/^(touch|pointer)/.test(ev.type))ev.preventDefault();if(ev.type==='click')nudge()}
+['click','mousedown','mouseup','pointerdown','pointerup','touchstart','touchend','dblclick','contextmenu','change','input','submit'].forEach(t=>document.addEventListener(t,block,true));
+document.addEventListener('keydown',ev=>{if(I<0)return;if(ev.key==='Escape'){ev.stopImmediatePropagation();stop();return}if((ev.key==='Enter'||ev.key===' ')&&!allowed(ev.target)){ev.stopImmediatePropagation();ev.preventDefault()}},true);window.gwCur=()=>({i:I,click:!!(L()[I]&&L()[I].click),last:!!(L()[I]&&L()[I].last),shown:!g('gw').hidden,n:L().length});window.gwEl=window.__gwEl=()=>(E&&!E.isConnected?find(L()[I]):E);
+window.gwTour=function(){if(typeof TOUR==='undefined')return;stop();document.querySelectorAll('.ov.on,#infoOv').forEach(o=>{if(o.id==='infoOv')o.hidden=true});LIST=TOUR;g('gwK').textContent='QUICK TOUR';setTimeout(()=>show(0),250)};
+window.gwStart=function(){const io=g('infoOv');if(io)io.hidden=true;stop();try{GW_START()}catch(e){console.error(e)}setTimeout(()=>show(0),300)};
+g('gwNext').onclick=()=>{if(L()[I]&&L()[I].last){stop();return}next()};
+g('gwStop').onclick=stop;
+document.querySelectorAll('.walkgo').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();window.gwStart()}));
+addEventListener('resize',place);addEventListener('scroll',place,true);
+})();
+</script>
+<a id="homeTab" href="../" aria-label="Back to Shiva's home page"><svg viewBox="0 0 16 16" fill="none" stroke="#14161F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>Home</a>
+<style id="homecss">
+#homeTab{position:fixed;left:10px;top:10px;z-index:100001;display:inline-flex;align-items:center;gap:5px;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:0;text-transform:none;line-height:1;color:#14161F;text-decoration:none;background:#FF9F1C;border:2.5px solid #14161F;border-radius:10px;padding:5px 10px 5px 8px;box-shadow:2px 2px 0 #14161F;transform:none;rotate:0deg;writing-mode:horizontal-tb}
+#homeTab:hover,#homeTab:focus-visible{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #14161F}
+#homeTab svg{width:14px;height:14px}
+.homespace{display:inline-block;width:84px;height:24px;vertical-align:middle;flex:none;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;transform:none!important}
+.ov,.overlay{padding-top:56px!important}
+</style>
+<style id="cvfix">
+@media (max-width:700px){
+ .cvscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 8px;margin:0 -2px}
+ .cvscroll>.bmc{min-width:640px!important;width:640px!important}
+ .cvhint{display:block;font-family:'Caveat',cursive;font-weight:700;font-size:18px;color:#2F5BFF;margin:2px 0 0;text-align:right}
+}
+.cvhint{display:none}
+</style>
+<script id="cvfixjs">(function(){if(!matchMedia('(max-width:700px)').matches)return;
+function wrap(){document.querySelectorAll('.bmc').forEach(function(b){if(b.closest('.cvscroll')||b.closest('#bmcwrap'))return;var w=document.createElement('div');w.className='cvscroll';b.parentNode.insertBefore(w,b);w.appendChild(b);var h=document.createElement('span');h.className='cvhint';h.textContent='swipe to see the whole canvas \u2192';w.parentNode.insertBefore(h,w.nextSibling)})}
+wrap();new MutationObserver(wrap).observe(document.body,{childList:true,subtree:true});})();</script>
+
+</html>

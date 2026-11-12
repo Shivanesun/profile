@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One More Lane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Caveat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#E9EDF2; --paper:#FFFFFF; --ink:#14161F; --muted:#575E6E;
+  --sY:#FFE66D; --sB:#A9D8FF; --sG:#B6EFA0; --sP:#FFB8D4; --sL:#D5C6FF; --accent:#FF9F1C; --red:#E5383B; --blue:#2F5BFF; --green:#2E9E5B;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace; --hand:'Caveat',cursive;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);margin:0}
+body{color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.4;
+  background-image:radial-gradient(rgba(20,22,31,.13) 1px,transparent 1px);background-size:22px 22px}
+button{color:var(--ink);font-family:var(--body)}
+.app{max-width:1880px;margin:0 auto;padding:12px 18px 14px;display:flex;flex-direction:column;gap:10px}
+@media (min-width:1000px) and (min-height:620px){
+  html,body{height:100%;overflow:hidden}
+  .app{height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr)}
+  .main{min-height:0}
+}
+/* top bar */
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.title h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(22px,2.2vw,32px);line-height:1;letter-spacing:-.02em}
+.title h1 span{background:var(--sY);padding:0 8px;border:3px solid var(--ink);border-radius:8px;box-shadow:4px 4px 0 var(--ink);display:inline-block;transform:rotate(-1.5deg)}
+.title .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.meters{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+.meter{background:var(--paper);border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);padding:5px 12px;min-width:120px}
+.meter .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.meter .v{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.05}
+.meter.commute{min-width:230px}
+.meter .down{color:#fff;background:var(--blue);border-radius:5px;padding:0 5px;font-weight:700;letter-spacing:.04em}
+.crow{display:flex;align-items:center;gap:8px}
+.delta{font-family:var(--mono);font-size:12px;font-weight:700;border:2px solid var(--ink);border-radius:7px;padding:1px 6px}
+.delta.up{background:var(--sP);color:#9B1C1F}.delta.dn{background:var(--sG);color:#145C30}.delta:empty{display:none}
+.goalbar{position:relative;height:9px;border:2px solid var(--ink);border-radius:6px;background:#fff;margin-top:3px;margin-right:16px}
+.goalbar i{position:absolute;left:0;top:0;bottom:0;background:var(--sG);border-radius:3px;transition:width .6s}
+.goalbar .flag{position:absolute;right:-18px;top:-5px;font-family:var(--mono);font-size:10px;font-weight:700;background:var(--sY);border:1.5px solid var(--ink);border-radius:4px;padding:0 2px}
+.gl{font-family:var(--hand);font-weight:700;font-size:16px;line-height:1;margin-top:2px;color:var(--blue)}
+.meter.commute .v.bad{color:var(--red)} .meter.commute .v.good{color:var(--green)}
+.meter .goal{font-family:var(--hand);font-weight:700;font-size:17px;color:var(--blue);margin-left:6px}
+.bar{height:9px;border:2px solid var(--ink);border-radius:6px;overflow:hidden;margin-top:4px;background:#fff}
+.bar i{display:block;height:100%;background:var(--sG);transition:width .6s}
+.bar i.low{background:var(--red)}
+/* main */
+.main{display:grid;grid-template-columns:minmax(250px,22%) minmax(0,1fr) minmax(240px,20%);gap:14px}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:10px 12px;min-height:0}
+.moves{display:flex;flex-direction:column;gap:6px;overflow:auto}
+.ghead{font-family:var(--hand);font-weight:700;font-size:21px;line-height:1;margin:4px 0 2px;display:flex;align-items:center;gap:6px}
+.ghead i{width:12px;height:12px;border:2px solid var(--ink);border-radius:3px;display:inline-block}
+.mv{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:2.5px solid var(--ink);border-radius:10px;background:#FAFBFD;padding:5px 8px;cursor:pointer;transition:transform .12s,box-shadow .12s;position:relative}
+.mv:hover:not(:disabled){transform:translate(-1px,-2px);box-shadow:3px 3px 0 var(--ink)}
+.mv.sel{background:var(--sY);box-shadow:3px 3px 0 var(--ink)}
+.mv:disabled{opacity:.42;cursor:not-allowed}
+.mv.done{opacity:1;background:#EAF8E4;cursor:default}
+.mv.done .cost{text-decoration:none}
+.mv svg{width:24px;height:24px;flex:none}
+.mv .nm{font-weight:700;font-size:12.5px;line-height:1.15;flex:1}
+.mv .nm small{display:block;font-weight:500;color:var(--muted);font-size:10.5px}
+.mv .cost{font-family:var(--mono);font-size:11.5px;font-weight:600;white-space:nowrap}
+.mv .tick{position:absolute;right:-7px;top:-7px;width:20px;height:20px;border:2px solid var(--ink);border-radius:50%;background:var(--sG);font-size:11px;display:grid;place-items:center;font-weight:800}
+.mv .cnt{position:absolute;right:-7px;top:-7px;min-width:20px;height:20px;padding:0 4px;border:2px solid var(--ink);border-radius:10px;background:var(--sB);font-size:11px;display:grid;place-items:center;font-weight:800}
+.endrow{margin-top:auto;padding-top:6px;display:flex;gap:8px;align-items:center}
+.go{flex:1;font-family:var(--display);font-weight:800;font-size:17px;padding:10px;border:3px solid var(--ink);border-radius:12px;background:var(--accent);box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.go:hover{transform:translate(-1px,-2px);box-shadow:6px 6px 0 var(--ink)}
+.picked{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.leftcol{display:flex;flex-direction:column;min-height:0}
+
+.stage{position:relative;padding:8px;display:flex;flex-direction:column;gap:8px}
+.scene{flex:1;min-height:0;border:2.5px solid var(--ink);border-radius:12px;overflow:hidden;background:#F4F8FC}
+.scene svg{width:100%;height:100%;display:block}
+.news{display:flex;align-items:center;gap:10px;border:2.5px solid var(--ink);border-radius:10px;background:var(--sY);padding:6px 10px;min-height:42px}
+.news b{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;background:var(--ink);color:#fff;padding:3px 7px;border-radius:5px;flex:none}
+.news span{font-family:var(--display);font-weight:700;font-size:15.5px;line-height:1.15}
+.turnbadge{position:absolute;top:16px;left:18px;font-family:var(--display);font-weight:800;font-size:15px;background:var(--paper);border:2.5px solid var(--ink);border-radius:10px;padding:3px 10px;box-shadow:3px 3px 0 var(--ink)}
+
+.right{display:flex;flex-direction:column;gap:10px;min-height:0}
+.adv{display:flex;gap:8px;align-items:flex-start}
+.adv .face{flex:none;width:68px;height:68px;border:2.5px solid var(--ink);border-radius:14px;overflow:hidden}
+.adv .who{font-family:var(--display);font-weight:800;font-size:14px;line-height:1.1}
+.adv .role{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.bubble{position:relative;margin-top:5px;border:2.5px solid var(--ink);border-radius:12px;padding:7px 9px;font-size:13px;line-height:1.3;background:#fff;min-height:58px}
+.adv.eng .bubble{background:#FFF1E0}
+.adv.eng.urgent .bubble{background:#FFE0E0;animation:shake .5s 2}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.adv.pl .bubble{background:#E9F6FF}
+.mouth{transform-box:fill-box;transform-origin:center}
+.talk .mouth{animation:talk .18s infinite alternate}
+@keyframes talk{to{transform:scaleY(2.2)}}
+.eye{animation:blink 4s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.spark{flex:1;min-height:90px;display:flex;flex-direction:column}
+.spark .k{font-family:var(--hand);font-weight:700;font-size:19px}
+.spark svg{flex:1;width:100%;min-height:70px}
+
+/* overlays */
+.ov{position:fixed;inset:0;background:rgba(20,22,31,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.ov.on{display:flex}
+.card{background:var(--paper);border:3px solid var(--ink);border-radius:20px;box-shadow:8px 8px 0 var(--ink);max-width:880px;width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:22px 26px;
+  background-image:radial-gradient(rgba(20,22,31,.08) 1px,transparent 1px);background-size:18px 18px}
+.card h2{font-family:var(--display);font-weight:800;font-size:32px;margin:0 0 6px;letter-spacing:-.02em;line-height:1.05}
+.card p{margin:6px 0;font-size:15px}
+.brief{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}
+.brief .face{width:150px;height:150px;border:3px solid var(--ink);border-radius:20px;overflow:hidden;box-shadow:4px 4px 0 var(--ink)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.rule{border:2.5px solid var(--ink);border-radius:12px;padding:8px 10px;font-size:13px}
+.rule b{font-family:var(--display);font-size:22px;display:block;line-height:1.1}
+.rule:nth-child(1){background:var(--sY)}.rule:nth-child(2){background:var(--sB)}.rule:nth-child(3){background:var(--sG)}
+.hand{font-family:var(--hand);font-weight:700;font-size:22px;color:var(--blue)}
+.big{font-family:var(--display);font-weight:800;font-size:18px;padding:11px 22px;border:3px solid var(--ink);border-radius:14px;background:var(--accent);box-shadow:5px 5px 0 var(--ink);cursor:pointer}
+.big.alt{background:var(--paper)}
+.big:hover{transform:translate(-1px,-2px);box-shadow:7px 7px 0 var(--ink)}
+
+/* result */
+.res{max-width:1340px;padding:14px 18px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;overflow:hidden}
+@media (max-width:900px){.res{grid-template-columns:1fr;overflow:auto}.main{grid-template-columns:1fr}.brief{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
+.band{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.14em;text-transform:uppercase;padding:4px 12px;border:2.5px solid var(--ink);border-radius:8px;display:inline-block}
+.band.win{background:var(--sG)}.band.lose{background:var(--sP)}
+.res h2{font-size:28px;margin:8px 0 4px}
+.mapbox{border:2.5px solid var(--ink);border-radius:14px;background:#fff;padding:6px;display:flex;flex-direction:column;gap:4px;min-height:0}
+.maphead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 6px}
+.maphead .t{font-family:var(--hand);font-weight:700;font-size:23px;line-height:1}
+.mapbox svg{width:100%;height:auto;display:block;max-height:calc(100vh - 170px)}
+.breakbtn{font-family:var(--display);font-weight:800;font-size:15px;padding:7px 14px;border:3px solid var(--ink);border-radius:12px;background:var(--sG);box-shadow:4px 4px 0 var(--ink);cursor:pointer;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.breakbtn.back{background:var(--sP);animation:none}
+.breakbtn.back:hover{transform:translate(-1px,-2px);box-shadow:6px 6px 0 var(--ink)}
+.rstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.rs{border:2.5px solid var(--ink);border-radius:10px;padding:5px 9px}
+.rs .n{font-family:var(--display);font-weight:800;font-size:22px;line-height:1.1}
+.rs .l{font-size:11.5px;color:var(--muted)}
+.rs:nth-child(1){background:#FFF6CC}.rs:nth-child(2){background:#E3F2FF}.rs:nth-child(3){background:#E8F9E1}
+.chart{border:2.5px solid var(--ink);border-radius:12px;padding:4px 6px;background:#fff}
+.chart svg{width:100%;height:auto;display:block}
+.lesson{margin-top:8px;border:2.5px solid var(--ink);border-radius:12px;background:var(--sY);padding:8px 12px;font-size:14px;transform:rotate(-.6deg)}
+.lesson b{font-family:var(--display)}
+.realmap{display:flex;align-items:center;gap:10px;margin-top:10px;padding:7px 12px;border:2.5px solid var(--ink);border-radius:12px;background:var(--sL);box-shadow:4px 4px 0 var(--ink);text-decoration:none;color:var(--ink);font-size:13.5px;transition:transform .15s,box-shadow .15s}
+.realmap:hover{transform:translate(-2px,-3px);box-shadow:7px 7px 0 var(--ink)}
+.realmap b{display:block;font-family:var(--display);font-size:16px}
+.rmico{flex:none;width:40px;height:40px;border:2px solid var(--ink);border-radius:10px;background:#fff;display:grid;place-items:center}.rmico svg{width:30px;height:30px}
+.rbtns{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.stamp{position:absolute;right:26px;top:18px;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.08em;text-transform:uppercase;border:4px solid currentColor;border-radius:10px;padding:2px 12px;transform:rotate(8deg);opacity:.85}
+.stamp.win{color:var(--green)}.stamp.lose{color:var(--red)}
+.rright{position:relative;display:flex;flex-direction:column;min-height:0;overflow:auto}
+.edge{fill:none;stroke-width:3;stroke-linecap:round}
+.drawn{animation:dr .7s ease-out both}
+@keyframes dr{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+.fadein{animation:fi .25s ease-out both}
+@keyframes fi{from{opacity:0}}
+.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1) both;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{transform:scale(0);opacity:0}}
+.coach{outline:3px dashed var(--blue);outline-offset:3px}
+.tip{position:absolute;z-index:40;font-family:var(--hand);font-weight:700;font-size:21px;color:#fff;background:var(--blue);border:2.5px solid var(--ink);border-radius:10px;padding:2px 10px;box-shadow:3px 3px 0 var(--ink);pointer-events:none;animation:bobt 1s infinite alternate;white-space:nowrap}
+@keyframes bobt{to{transform:translateY(-4px)}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="title"><h1><i class="homespace" aria-hidden="true"></i><span>One More Lane</span></h1></div><button class="infob infogo" id="infoTop" type="button" aria-label="How it works">i</button><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button>
+    <div class="meters">
+      <div class="meter"><div class="k">Turn</div><div class="v" id="mTurn">1 of 12</div></div>
+      <div class="meter"><div class="k">Money</div><div class="v" id="mMoney">₹1000 Cr</div></div>
+      <div class="meter"><div class="k">Approval</div><div class="v" id="mAppr">60%</div><div class="bar"><i id="mApprBar" style="width:60%"></i></div></div>
+      <div class="meter commute"><div class="k">Average commute </div><div class="crow"><div class="v" id="mComm">51 min</div><span class="delta" id="mDelta"></span></div><div class="goalbar"><i id="mGoalBar"></i><span class="flag">40</span></div><div class="gl" id="mGoalTxt" hidden></div></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="panel leftcol" aria-label="Your moves">
+      <div class="moves" id="moves"></div>
+      <div class="endrow"><span class="picked" id="picked">0 of 2 picked</span><button class="go" id="go">End turn</button></div>
+    </section>
+
+    <section class="panel stage">
+      <div class="scene" id="scene"></div>
+      <div class="turnbadge" id="yearBadge">Year 1</div>
+      <div class="news"><b>CITY NEWS</b><span id="news">You have just been sworn in as mayor. The main road is jammed.</span></div>
+    </section>
+
+    <section class="right">
+      <div class="panel adv eng" id="advEng">
+        <div class="face" id="faceEng"></div>
+        <div style="flex:1;min-width:0"><div class="who">Ravi Kumar</div><div class="role">Chief engineer</div><div class="bubble" id="sayEng"></div></div>
+      </div>
+      <div class="panel adv pl" id="advPl">
+        <div class="face" id="facePl"></div>
+        <div style="flex:1;min-width:0"><div class="who">Lakshmi Menon</div><div class="role">City planner</div><div class="bubble" id="sayPl"></div></div>
+      </div>
+      <div class="panel spark"><div class="k">Commute</div><svg id="spark" viewBox="0 0 240 110" preserveAspectRatio="xMidYMid meet"></svg></div>
+    </section>
+  </main>
+</div>
+
+<!-- intro -->
+<div class="ov on" id="intro">
+  <div class="card introcard">
+    <div class="brief">
+      <div class="face" id="faceIntro"></div>
+      <div>
+        <div class="hand">Congratulations, Mayor.</div>
+        <h2>Your city is stuck in traffic.</h2>
+        <p class="one">Cut the average commute from 51 to 40 minutes in 6 years.</p>
+      </div>
+    </div>
+    <div class="rbtns"><button class="big" id="start">Play</button><button class="big alt walkgo" id="walkIntro" type="button" style="background:#B6EFA0">Walk with me</button><button class="linkb infogo" id="infoIntro" type="button">How it works</button></div>
+  </div>
+</div>
+
+<!-- result -->
+<div class="ov" id="result">
+  <div class="card res">
+    <div class="mapbox">
+      <div class="maphead"><div class="t" id="mapTitle">What really happened on your road</div><button class="breakbtn" id="breakBtn">Break the loop</button></div>
+      <svg id="map" viewBox="0 0 720 470"></svg>
+    </div>
+    <div class="rright">
+      <div class="stamp" id="stamp">Gridlock</div>
+      <div><span class="band" id="band">Defeat</span></div>
+      <h2 id="rTitle">The jam came back.</h2>
+      <p id="rText" style="margin:2px 0;font-size:14px"></p>
+      <div class="rstats">
+        <div class="rs"><div class="n" id="rsComm">0</div><div class="l">final average commute</div></div>
+        <span id="rsCars" hidden></span>
+        <div class="rs"><div class="n" id="rsShare">0</div><div class="l">trips by public transport</div></div>
+      </div>
+      <svg id="rChart" hidden></svg>
+      <div class="lesson" id="lesson"></div>
+      <div class="irl2"><b>In real life</b> I mapped a state's power shortage as a system, to see the loops behind it. The map became a reference for the data strategists when they built their dashboards, so they could understand the system before they planned. <a href="https://tnsystems.kumu.io/tamil-nadu-electricity-systems-map?token=VFoUiJmg9KubD0pR" target="_blank" rel="noopener">See the real map &#8599;</a></div>
+      <div class="rbtns"><button class="big" id="again">Play again</button><a class="irl-li" href="https://www.linkedin.com/in/shivanesun" target="_blank" rel="noopener"><span class="liico">in</span>Talk to me</a></div>
+    </div>
+  </div>
+</div>
+<canvas class="confetti" id="confetti"></canvas>
+
+<script>
+/* ENGINE START */
+const MOVES={
+ widen:{cost:200,once:false,g:'road',name:'Widen the road',hint:'Quick relief'},
+ flyover:{cost:400,once:false,g:'road',name:'Build a flyover',hint:'Big relief'},
+ lane:{cost:50,once:true,g:'pt',name:'Bus lane',hint:'Worse for a while, then better'},
+ buses:{cost:80,once:false,g:'pt',name:'More buses',hint:'Shorter waits'},
+ metro:{cost:500,once:true,g:'pt',name:'Metro extension',hint:'Opens after 4 turns'},
+ feeder:{cost:30,once:true,g:'lm',name:'Feeder minibuses and shared autos',hint:'From homes to stops'},
+ foot:{cost:20,once:true,g:'lm',name:'Footpaths and safe crossings',hint:'Walk to the stop'},
+ cycle:{cost:15,once:true,g:'lm',name:'Cycle lanes',hint:'Ride to the stop'},
+ ramps:{cost:25,once:true,g:'acc',name:'Ramps and low floor buses',hint:'Elders and wheelchair users'},
+ lights:{cost:20,once:true,g:'acc',name:'Street lights and safe stops',hint:'Women ride at night'},
+ passes:{cost:40,once:true,g:'acc',name:'Cheap passes',hint:'Students and daily workers'}};
+const TARGET=40, TURNS=12;
+function init(){return{turn:0,money:1000,cap:80,fleet:10,lane:0,metroT:-1,metro:0,lm:0,acc:0,T:100,share:.25,latent:1,approval:60,done:{},count:{},hist:[],road:0,widen:0,flyover:0,over:null}}
+function calc(s){
+ const cars=s.T*(1-s.share)*s.latent, x=cars/s.cap, carT=18+30*x*x;
+ let inV=s.lane?Math.max(20,carT*.6):carT*1.1; if(s.metro) inV=Math.min(inV,26);
+ const wait=60/s.fleet, walk=18-4*s.lm, trT=inV+wait+walk;
+ return{cars,carT,trT,commute:(1-s.share)*carT+s.share*trT};
+}
+function canPick(s,m,picked){const M=MOVES[m];if(M.once&&s.done[m])return false;if(picked.includes(m))return true;
+ const spent=picked.reduce((a,k)=>a+MOVES[k].cost,0);return picked.length<2&&s.money-spent>=M.cost}
+function step(s,moves){
+ const prev=calc(s).commute;let bump=0;
+ for(const m of moves){const M=MOVES[m];s.money-=M.cost;if(M.once)s.done[m]=1;s.count[m]=(s.count[m]||0)+1;
+  if(m==='widen'){s.cap+=15;bump+=4;s.road++;s.widen++}
+  if(m==='flyover'){s.cap+=28;bump+=6;s.road++;s.flyover++}
+  if(m==='lane'){s.lane=1;s.cap-=10;bump-=7}
+  if(m==='buses'){s.fleet+=6}
+  if(m==='metro'){s.metroT=4}
+  if(['feeder','foot','cycle'].includes(m))s.lm++;
+  if(['ramps','lights','passes'].includes(m))s.acc++;}
+ if(s.metroT>0){s.metroT--;if(s.metroT===0)s.metro=1}
+ s.T+=1.5+0.8*s.road*(1-s.share);
+ const lt=1+1.6*((s.cap-80)/s.cap); s.latent+=(Math.max(1,lt)-s.latent)*.35;
+ const c=calc(s), diff=(c.carT-c.trT)/8, lg=1/(1+Math.exp(-(diff-.3)));
+ const reach=.4+.2*s.lm, am=.5+.17*s.acc;
+ const tgt=Math.min(.8,Math.max(.05,lg*reach*am));
+ s.share+=(tgt-s.share)*.4;
+ const n=calc(s);
+ s.approval=Math.max(0,Math.min(100,s.approval+(prev-n.commute)*1.4+bump-0.6));
+ s.money+=50; s.turn++;
+ s.hist.push({commute:n.commute,cars:n.cars,share:s.share,moves:moves.slice()});
+ if(s.approval<10&&s.turn>=3)s.over='voted';
+ else if(s.turn>=TURNS)s.over=n.commute<=TARGET?'win':'jam';
+ return s;
+}
+/* ENGINE END */
+
+const $=id=>document.getElementById(id);
+let S, picked=[], c0, coachOn=false;
+
+/* ---------- faces ---------- */
+function face(kind){
+ if(kind==='eng') return `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#FFE9C7"/>
+  <path d="M14 100 q0-30 36-32 q36 2 36 32z" fill="#FF9F1C" stroke="#14161F" stroke-width="3"/>
+  <path d="M30 76 h40" stroke="#FFE66D" stroke-width="5"/>
+  <circle cx="50" cy="50" r="22" fill="#B07A50" stroke="#14161F" stroke-width="3"/>
+  <path d="M24 42 q2-24 26-24 q24 0 26 24z" fill="#FFE66D" stroke="#14161F" stroke-width="3"/><path d="M20 42 h60" stroke="#14161F" stroke-width="4" stroke-linecap="round"/>
+  <g class="eye"><circle cx="42" cy="51" r="2.6" fill="#14161F"/><circle cx="58" cy="51" r="2.6" fill="#14161F"/></g>
+  <path d="M40 60 q10 -5 20 0" fill="#22222A" stroke="#14161F" stroke-width="2"/>
+  <ellipse class="mouth" cx="50" cy="65" rx="5" ry="1.6" fill="#7A2E3B"/></svg>`;
+ if(kind==='pl') return `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#DDEFFF"/>
+  <path d="M14 100 q0-30 36-32 q36 2 36 32z" fill="#5BA88F" stroke="#14161F" stroke-width="3"/>
+  <path d="M38 70 l12 14 l12-14" fill="none" stroke="#FFE66D" stroke-width="4"/>
+  <circle cx="68" cy="26" r="9" fill="#22222A" stroke="#14161F" stroke-width="2.5"/>
+  <circle cx="50" cy="50" r="22" fill="#C68B5E" stroke="#14161F" stroke-width="3"/>
+  <path d="M27 52 q-2-28 24-28 q24 0 22 26 q-8-14-24-14 q-14 0-22 16z" fill="#22222A" stroke="#14161F" stroke-width="2.5"/>
+  <rect x="35" y="45" width="12" height="9" rx="3" fill="none" stroke="#14161F" stroke-width="2.2"/><rect x="53" y="45" width="12" height="9" rx="3" fill="none" stroke="#14161F" stroke-width="2.2"/><path d="M47 49 h6" stroke="#14161F" stroke-width="2"/>
+  <g class="eye"><circle cx="41" cy="50" r="2.2" fill="#14161F"/><circle cx="59" cy="50" r="2.2" fill="#14161F"/></g>
+  <circle cx="50" cy="40" r="2" fill="#E5383B"/>
+  <ellipse class="mouth" cx="50" cy="64" rx="5" ry="1.6" fill="#7A2E3B"/></svg>`;
+ return `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#FFF3C4"/>
+  <path d="M12 100 q0-32 38-34 q38 2 38 34z" fill="#3A4A7A" stroke="#14161F" stroke-width="3"/>
+  <path d="M30 70 q20 22 40 0" fill="none" stroke="#FFE66D" stroke-width="5"/><circle cx="50" cy="88" r="6" fill="#FFE66D" stroke="#14161F" stroke-width="2"/>
+  <circle cx="50" cy="48" r="22" fill="#B98A5A" stroke="#14161F" stroke-width="3"/>
+  <path d="M27 46 q0-26 24-26 q22 0 22 24 q-10-10-24-10 q-14 0-22 12z" fill="#2A2A33" stroke="#14161F" stroke-width="2.5"/>
+  <g class="eye"><circle cx="42" cy="49" r="2.4" fill="#14161F"/><circle cx="58" cy="49" r="2.4" fill="#14161F"/></g>
+  <path d="M42 60 q8 6 16 0" fill="none" stroke="#14161F" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+}
+$('faceEng').innerHTML=face('eng');$('facePl').innerHTML=face('pl');$('faceIntro').innerHTML=face('mayor');
+
+const typers={};
+function say(who,text,urgent){
+ const el=$(who==='eng'?'sayEng':'sayPl'), box=$(who==='eng'?'advEng':'advPl');
+ if(who==='eng')box.classList.toggle('urgent',!!urgent);
+ clearInterval(typers[who]);el.textContent='';box.classList.add('talk');let i=0;
+ typers[who]=setInterval(()=>{el.textContent=text.slice(0,++i);if(i>=text.length){clearInterval(typers[who]);box.classList.remove('talk')}},18);
+}
+
+/* ---------- icons ---------- */
+const IC={
+ widen:'<path d="M3 26 10 6h12l7 20z" fill="#D9DDE3"/><path d="M16 9v4M16 17v4"/><path d="M5 16 1 16M27 16h4"/>',
+ flyover:'<path d="M2 26h28"/><path d="M3 20q13-16 26 0" fill="none"/><path d="M8 20v6M24 20v6"/>',
+ lane:'<rect x="3" y="4" width="26" height="24" fill="#FFB8D4"/><path d="M10 4v24M22 4v24" stroke-dasharray="3 3"/><text x="16" y="20" font-size="9" text-anchor="middle" fill="#14161F" stroke="none" font-weight="800">BUS</text>',
+ buses:'<rect x="5" y="5" width="22" height="18" rx="3" fill="#FF9F1C"/><path d="M5 13h22"/><circle cx="10" cy="25" r="2.5" fill="#14161F"/><circle cx="22" cy="25" r="2.5" fill="#14161F"/>',
+ metro:'<rect x="6" y="4" width="20" height="20" rx="5" fill="#D5C6FF"/><path d="M6 14h20"/><path d="M10 28l3-4M22 28l-3-4"/>',
+ feeder:'<path d="M5 22V12q0-5 6-5h10l6 8v7z" fill="#B6EFA0"/><circle cx="10" cy="23" r="3" fill="#14161F"/><circle cx="23" cy="23" r="3" fill="#14161F"/>',
+ foot:'<circle cx="16" cy="6" r="3" fill="#FFE66D"/><path d="M16 9v9l-4 8M16 18l4 8M11 13h10"/>',
+ cycle:'<circle cx="8" cy="21" r="5"/><circle cx="24" cy="21" r="5"/><path d="M8 21l6-9h6l4 9M14 12l2 9"/>',
+ ramps:'<path d="M3 27h26L29 15z" fill="#A9D8FF"/><circle cx="11" cy="7" r="2.5" fill="#14161F"/><path d="M11 10v6h6"/><circle cx="12" cy="20" r="4"/>',
+ lights:'<path d="M16 29V10"/><path d="M16 10q0-6 8-6"/><path d="M20 6h8l-2 4h-4z" fill="#FFE66D"/><path d="M24 13v2M28 12l2 2M20 12l-2 2"/>',
+ passes:'<rect x="3" y="8" width="26" height="16" rx="3" fill="#FFE66D"/><path d="M20 8v16" stroke-dasharray="2 2"/><path d="M7 14h9M7 18h6"/>'};
+const GROUPS=[['road','Roads','#D9DDE3'],['pt','Public transport','#FF9F1C'],['lm','Last mile','#B6EFA0'],['acc','Access for all','#A9D8FF']];
+
+function renderMoves(){
+ let h='';
+ for(const [g,label,col] of GROUPS){
+  h+=`<div class="ghead"><i style="background:${col}"></i>${label}</div>`;
+  for(const k in MOVES){const M=MOVES[k];if(M.g!==g)continue;
+   const done=M.once&&S.done[k], sel=picked.includes(k), ok=canPick(S,k,picked);
+   h+=`<button class="mv${sel?' sel':''}${done?' done':''}" data-k="${k}" ${(!ok&&!done)||done?'disabled':''}>
+    <svg viewBox="0 0 32 32" fill="none" stroke="#14161F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">${IC[k]}</svg>
+    <span class="nm" title="${M.hint}">${M.name}</span><span class="cost">${done?'done':'₹'+M.cost+' Cr'}</span>
+    ${done?'<span class="tick">✓</span>':(!M.once&&S.count[k]?`<span class="cnt">×${S.count[k]}</span>`:'')}</button>`;}
+ }
+ $('moves').innerHTML=h;
+ $('picked').textContent=picked.length+' of 2 picked';
+ $('moves').querySelectorAll('.mv').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
+  if(picked.includes(k))picked=picked.filter(x=>x!==k);else if(canPick(S,k,picked))picked.push(k);
+  hideTip();renderMoves();if(coachOn&&picked.length)showTip($('go'),'then end your turn');});
+}
+
+/* ---------- meters ---------- */
+function renderMeters(){
+ const c=calc(S);
+ $('mTurn').textContent=Math.min(S.turn+1,TURNS)+' of '+TURNS;
+ $('mMoney').textContent='₹'+Math.round(S.money)+' Cr';
+ $('mAppr').textContent=Math.round(S.approval)+'%';
+ $('mApprBar').style.width=S.approval+'%';$('mApprBar').classList.toggle('low',S.approval<25);
+ const v=$('mComm');v.textContent=Math.round(c.commute)+' min';
+ const last=S.hist.length>1?S.hist[S.hist.length-2].commute:c0.commute, dl=S.hist.length?Math.round(c.commute-last):0;
+ const dEl=$('mDelta');dEl.textContent=dl?(dl>0?'▲ '+dl+' min':'▼ '+(-dl)+' min'):'';dEl.className='delta '+(dl>0?'up':'dn');
+ const prog=Math.max(0,Math.min(1,(c0.commute-c.commute)/(c0.commute-TARGET)));$('mGoalBar').style.width=(prog*100)+'%';
+ 
+ v.className='v '+(c.commute<=TARGET?'good':'bad');
+ $('yearBadge').textContent='Year '+(Math.floor(Math.min(S.turn,TURNS-1)/2)+1)+(S.turn%2?', second half':', first half');
+ // spark
+ const pts=[c0.commute,...S.hist.map(h=>h.commute)];const W=240,H=110,mx=Math.max(90,...pts),mn=20;
+ const X=i=>8+i*(W-16)/TURNS, Y=v=>H-8-(v-mn)/(mx-mn)*(H-16);
+ let sp=`<line x1="0" x2="${W}" y1="${Y(TARGET)}" y2="${Y(TARGET)}" stroke="#2F5BFF" stroke-width="1.5" stroke-dasharray="4 4"/><text x="${W-4}" y="${Y(TARGET)-4}" text-anchor="end" font-size="11" fill="#2F5BFF" font-family="Caveat" font-weight="700">goal</text>`;
+ sp+=`<polyline fill="none" stroke="#14161F" stroke-width="2.5" stroke-linejoin="round" points="${pts.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`;
+ pts.forEach((v,i)=>sp+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" fill="${v<=TARGET?'#B6EFA0':'#FFB8D4'}" stroke="#14161F" stroke-width="1.5"/>`);
+ $('spark').innerHTML=sp;
+}
+
+/* ---------- city scene ---------- */
+const SW=760,SH=430;
+let cars=[],busesV=[],metroX=0,walkers=[],cyclists=[],autos=[],raf;
+function lanes(){return Math.max(2,Math.round(2+(S.cap-70)/15))}
+function sceneStatic(){
+ const L=lanes(), roadTop=230, lh=Math.min(26,150/L), roadH=L*lh, c=calc(S);
+ const sprawlN=Math.min(14,4+Math.round((S.T-100)/4));
+ let s=`<svg viewBox="0 0 ${SW} ${SH}" preserveAspectRatio="xMidYMid meet"><defs><pattern id="g" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#14161F" opacity=".1"/></pattern></defs>
+ <rect width="${SW}" height="${SH}" fill="url(#g)"/>`;
+ // suburbs
+ for(let i=0;i<sprawlN;i++){const x=10+(i%7)*30, y=60+Math.floor(i/7)*48-(i%2)*6, col=['#FFB8D4','#B6EFA0','#FFE66D','#A9D8FF','#D5C6FF'][i%5];
+  s+=`<g class="pop" style="animation-delay:${i*.03}s"><path d="M${x} ${y+18} l12 -12 l12 12z" fill="${col}" stroke="#14161F" stroke-width="2"/><rect x="${x+3}" y="${y+18}" width="18" height="16" fill="#fff" stroke="#14161F" stroke-width="2"/></g>`;}
+ s+=`<text x="20" y="40" font-family="Caveat" font-weight="700" font-size="22">Suburbs</text>`;
+ if(sprawlN>8) s+=`<text x="20" y="170" font-family="Caveat" font-weight="700" font-size="18" fill="#E5383B">the city keeps spreading</text>`;
+ // towers
+ const tw=[[600,70,40,120,'#A9D8FF'],[645,40,44,150,'#D5C6FF'],[694,90,40,100,'#FFE66D']];
+ for(const [x,y,w,h,col] of tw){s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${col}" stroke="#14161F" stroke-width="2.5"/>`;for(let r=y+12;r<y+h-10;r+=18)s+=`<path d="M${x+8} ${r}h${w-16}" stroke="#14161F" stroke-width="2" stroke-dasharray="6 5"/>`}
+ s+=`<text x="600" y="30" font-family="Caveat" font-weight="700" font-size="22">Business district</text>`;
+ // metro
+ if(S.metroT>0||S.metro){const y=196;s+=`<path d="M30 ${y} H${SW-30}" stroke="#14161F" stroke-width="6" ${S.metro?'':'stroke-dasharray="14 10" opacity=".45"'}/>`;
+  for(let x=80;x<SW-40;x+=110)s+=`<path d="M${x} ${y} v${roadTop-y}" stroke="#14161F" stroke-width="5" ${S.metro?'':'opacity=".45"'}/>`;
+  if(!S.metro)s+=`<text x="300" y="${y-10}" font-family="Caveat" font-weight="700" font-size="19">metro being built, ${S.metroT} turn${S.metroT>1?'s':''} to go</text>`;}
+ // flyover
+ if(S.flyover){s+=`<path d="M230 ${roadTop+roadH/2} q160 -120 320 0" fill="none" stroke="#14161F" stroke-width="${10+4*S.flyover}" opacity=".85"/><path d="M230 ${roadTop+roadH/2} q160 -120 320 0" fill="none" stroke="#D9DDE3" stroke-width="${6+4*S.flyover}"/>`}
+ // footpath top
+ const fpY=roadTop-16;
+ s+=`<rect x="0" y="${fpY}" width="${SW}" height="16" fill="${S.done.foot?'#E8E2D6':'#F4F8FC'}" stroke="#14161F" stroke-width="${S.done.foot?2:0}"/>`;
+ if(!S.done.foot) s+=`<path d="M0 ${roadTop-2} H${SW}" stroke="#14161F" stroke-width="2" stroke-dasharray="2 8"/>`;
+ // road
+ s+=`<rect x="0" y="${roadTop}" width="${SW}" height="${roadH}" fill="#5A6070" stroke="#14161F" stroke-width="3"/>`;
+ for(let i=1;i<L;i++)s+=`<path d="M0 ${roadTop+i*lh} H${SW}" stroke="#fff" stroke-width="2" stroke-dasharray="18 14" opacity=".8"/>`;
+ if(S.lane)s+=`<rect x="0" y="${roadTop+roadH-lh}" width="${SW}" height="${lh}" fill="#E5383B" opacity=".55"/><text x="${SW-90}" y="${roadTop+roadH-lh/2+5}" font-size="12" font-weight="800" fill="#fff" font-family="IBM Plex Mono">BUS ONLY</text>`;
+ // cycle lane
+ const clY=roadTop+roadH;
+ if(S.done.cycle)s+=`<rect x="0" y="${clY}" width="${SW}" height="12" fill="#B6EFA0" stroke="#14161F" stroke-width="2"/>`;
+ // stops
+ const stopY=clY+(S.done.cycle?12:0);
+ for(const x of [160,400,640]){
+  s+=`<g><rect x="${x-26}" y="${stopY+6}" width="52" height="30" rx="4" fill="#fff" stroke="#14161F" stroke-width="2"/><text x="${x}" y="${stopY+25}" text-anchor="middle" font-size="10" font-weight="800" font-family="IBM Plex Mono">STOP</text>`;
+  if(S.done.ramps)s+=`<path d="M${x+26} ${stopY+36} l18 0 l-18 -10z" fill="#A9D8FF" stroke="#14161F" stroke-width="1.8"/>`;
+  if(S.done.lights)s+=`<path d="M${x-34} ${stopY+40} v-40 q0 -6 8 -6" fill="none" stroke="#14161F" stroke-width="2.5"/><circle cx="${x-24}" cy="${stopY-4}" r="6" fill="#FFE66D" stroke="#14161F" stroke-width="1.8"/><circle cx="${x-24}" cy="${stopY-4}" r="14" fill="#FFE66D" opacity=".35"/>`;
+  if(S.done.passes)s+=`<rect x="${x-14}" y="${stopY+40}" width="28" height="14" rx="3" fill="#FFE66D" stroke="#14161F" stroke-width="1.5"/><text x="${x}" y="${stopY+50}" text-anchor="middle" font-size="8" font-weight="800">PASS</text>`;
+ }
+ // homes to stops (last mile)
+ s+=`<rect x="0" y="${SH-40}" width="${SW}" height="40" fill="#F0EBDF"/><text x="12" y="${SH-14}" font-family="Caveat" font-weight="700" font-size="19">Neighbourhoods</text>`;
+ if(!S.lm) s+=`<text x="300" y="${SH-14}" font-family="Caveat" font-weight="700" font-size="19" fill="#E5383B">no easy way to reach the stops</text>`;
+ // live layer
+ s+=`<g id="live"></g>`;
+ // status ribbon
+ const jam=c.carT>55?'Gridlock':c.carT>42?'Heavy traffic':c.carT>32?'Moving slowly':'Flowing';
+ s+=`<g transform="translate(${SW-180},${roadTop-46})"><rect width="170" height="24" rx="6" fill="#fff" stroke="#14161F" stroke-width="2"/><text x="85" y="17" text-anchor="middle" font-size="13" font-weight="800">${jam}, car trip ${Math.round(c.carT)} min</text></g>`;
+ s+='</svg>';
+ $('scene').innerHTML=s;
+ // build movers
+ const nCars=Math.min(140,Math.round(c.cars*0.9)), carLanes=L-(S.lane?1:0);
+ const speed=Math.max(.15,2.6*(24/c.carT)**1.6);
+ cars=[];for(let i=0;i<nCars;i++){cars.push({x:Math.random()*SW,lane:i%carLanes,col:['#FFB8D4','#A9D8FF','#FFE66D','#B6EFA0','#D5C6FF','#FFFFFF'][i%6],v:speed*(0.85+Math.random()*.3)})}
+ const nBus=Math.max(1,Math.round(S.fleet/5));const bSpeed=S.lane?Math.max(1.6,speed*1.4):speed*0.9;
+ busesV=[];for(let i=0;i<nBus;i++)busesV.push({x:i*SW/nBus,lane:S.lane?L-1:Math.floor(Math.random()*carLanes),v:bSpeed});
+ walkers=S.done.foot?Array.from({length:8},(_,i)=>({x:i*95,v:.5+Math.random()*.3})):[];
+ cyclists=S.done.cycle?Array.from({length:5},(_,i)=>({x:i*150,v:1.1})):[];
+ autos=S.done.feeder?Array.from({length:4},(_,i)=>({x:i*190,v:1.3})):[];
+ window._geo={roadTop,lh,fpY,clY,stopY};
+ cancelAnimationFrame(raf);tick();
+}
+function tick(){
+ const g=document.getElementById('live');if(!g)return;const {roadTop,lh,fpY,clY}=window._geo;let h='';
+ for(const c of cars){c.x=(c.x+c.v)%(SW+30);h+=`<rect x="${c.x-30}" y="${roadTop+c.lane*lh+lh*.2}" width="22" height="${lh*.6}" rx="3" fill="${c.col}" stroke="#14161F" stroke-width="1.5"/>`}
+ for(const b of busesV){b.x=(b.x+b.v)%(SW+60);h+=`<g><rect x="${b.x-60}" y="${roadTop+b.lane*lh+lh*.08}" width="48" height="${lh*.84}" rx="4" fill="#FF9F1C" stroke="#14161F" stroke-width="2"/><path d="M${b.x-54} ${roadTop+b.lane*lh+lh*.35} h36" stroke="#14161F" stroke-width="1.5" stroke-dasharray="5 3"/></g>`}
+ if(S.metro){metroX=(metroX+3.2)%(SW+160);h+=`<g><rect x="${metroX-160}" y="180" width="120" height="14" rx="5" fill="#D5C6FF" stroke="#14161F" stroke-width="2"/><path d="M${metroX-150} 185 h100" stroke="#14161F" stroke-width="1.5" stroke-dasharray="8 5"/></g>`}
+ for(const w of walkers){w.x=(w.x+w.v)%SW;h+=`<g><circle cx="${w.x}" cy="${fpY+3}" r="3" fill="#14161F"/><path d="M${w.x} ${fpY+6} v6" stroke="#14161F" stroke-width="2"/></g>`}
+ for(const c of cyclists){c.x=(c.x+c.v)%SW;h+=`<g><circle cx="${c.x-4}" cy="${clY+8}" r="3" fill="none" stroke="#14161F" stroke-width="1.5"/><circle cx="${c.x+4}" cy="${clY+8}" r="3" fill="none" stroke="#14161F" stroke-width="1.5"/></g>`}
+ for(const a of autos){a.x=(a.x+a.v)%SW;h+=`<g><path d="M${a.x-10} ${SH-24} v-8 q0-6 6-6 h8 l6 7 v7z" fill="#B6EFA0" stroke="#14161F" stroke-width="1.6"/><circle cx="${a.x-5}" cy="${SH-23}" r="2.5" fill="#14161F"/><circle cx="${a.x+7}" cy="${SH-23}" r="2.5" fill="#14161F"/></g>`}
+ g.innerHTML=h;raf=requestAnimationFrame(tick);
+}
+
+/* ---------- news and advisors ---------- */
+function react(moves,before,after){
+ const n=S.hist.length, c=after.commute, up=c>before.commute+0.5;
+ let news;
+ if(moves.includes('flyover'))news='Ribbon cut on the new flyover. Traffic flies, for now.';
+ else if(moves.includes('widen'))news='New lanes open on the main road. Drivers cheer.';
+ else if(moves.includes('lane'))news='Drivers fume as a lane is painted red for buses.';
+ else if(moves.includes('metro'))news='Work begins on the metro extension.';
+ else if(S.road&&up)news='The jam is back, even on the wider road.';
+ else if(up)news='Commute times climb again. Readers ask: where is the mayor?';
+ else if(after.commute<before.commute-1)news='Morning commute gets shorter. Buses are fuller than ever.';
+ else news='Another ordinary week on the main road.';
+ if(S.share>.45&&!moves.length)news='More people now ride than drive to the business district.';
+ $('news').textContent=news;
+ // engineer
+ if(up&&c>45)say('eng',`Commute is up to ${Math.round(c)} minutes, Mayor. 1 more lane will sort it out, I promise you.`,true);
+ else if(moves.some(m=>m==='widen'||m==='flyover'))say('eng','See? The road is moving. Concrete never lies, Mayor.');
+ else if(moves.includes('lane'))say('eng','You took a whole lane away from cars! The papers will eat us alive.',true);
+ else say('eng','The voters want wider roads. Give them wider roads.');
+ // planner
+ let p;
+ if(S.road>=2&&S.share<.2)p='Watch the cars, not the minutes. Every lane you add fills up again, and the city spreads further out.';
+ else if(!S.lane&&!S.metro&&S.fleet<=10)p='Buses stuck in the same jam as cars will never win anyone over. Give them their own way.';
+ else if((S.lane||S.metro)&&S.lm<2)p='Buses are faster now, but people cannot reach the stops easily. Fix the last mile.';
+ else if(S.lm>=2&&S.acc<2)p='It works for some. Elders, women at night and daily workers still cannot use it. Make it for everyone.';
+ else if(S.lane&&S.lm>=2&&S.acc>=2&&S.fleet<22)p='The riders are coming. Add buses so they do not wait in the sun.';
+ else p='Hold your nerve. The loop is turning in our favour.';
+ setTimeout(()=>say('pl',p),900);
+}
+
+/* ---------- turn ---------- */
+$('go').onclick=()=>{
+ if(S.over)return;hideTip();coachOn=false;
+ const before=calc(S);const mv=picked.slice();picked=[];
+ step(S,mv);const after=calc(S);
+ renderMoves();renderMeters();sceneStatic();react(mv,before,after);
+ if(S.over)setTimeout(showResult,1500);
+};
+
+/* ---------- coach tip ---------- */
+let tipEl=null;
+function showTip(target,text){hideTip();const r=target.getBoundingClientRect();tipEl=document.createElement('div');tipEl.className='tip';tipEl.textContent=text;document.body.appendChild(tipEl);
+ const tr=tipEl.getBoundingClientRect();tipEl.style.left=Math.max(8,r.left+r.width/2-tr.width/2)+'px';tipEl.style.top=(r.top-tr.height-10)+'px';target.classList.add('coach');tipEl._t=target}
+function hideTip(){if(tipEl){tipEl._t.classList.remove('coach');tipEl.remove();tipEl=null}}
+
+/* ---------- systems map ---------- */
+// R1 sits on a true circle; R2 and R3 are circles that share 2 nodes with it
+const R1C={x:255,y:250,r:145};
+const onC=(c,deg)=>({x:Math.round(c.x+c.r*Math.cos(deg*Math.PI/180)),y:Math.round(c.y+c.r*Math.sin(deg*Math.PI/180))});
+const NODES={
+ B:{...onC(R1C,-90),t:['Driving','feels faster'],c:'#FFFFFF'},
+ C:{...onC(R1C,-18),t:['More cars','on the road'],c:'#FFB8D4'},
+ D:{...onC(R1C,54),t:['Jams','return'],c:'#FFB8D4'},
+ E:{...onC(R1C,126),t:['"1 more lane!"'],c:'#FFE66D'},
+ A:{...onC(R1C,198),t:['Road space'],c:'#D9DDE3'},
+ F:{x:565,y:70,t:['City spreads','further out'],c:'#FFFFFF'},
+ G:{x:500,y:428,t:['Buses get','stuck too'],c:'#FFFFFF'},
+ H:{x:628,y:292,t:['Riders give up','and buy cars'],c:'#FFFFFF'}};
+function circ3(p,q,r){const ax=p.x,ay=p.y,bx=q.x,by=q.y,cx=r.x,cy=r.y,d=2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));
+ const ux=((ax*ax+ay*ay)*(by-cy)+(bx*bx+by*by)*(cy-ay)+(cx*cx+cy*cy)*(ay-by))/d,uy=((ax*ax+ay*ay)*(cx-bx)+(bx*bx+by*by)*(ax-cx)+(cx*cx+cy*cy)*(bx-ax))/d;
+ return{x:ux,y:uy,r:Math.hypot(ax-ux,ay-uy)}}
+const cent=ks=>({x:ks.reduce((a,k)=>a+NODES[k].x,0)/ks.length,y:ks.reduce((a,k)=>a+NODES[k].y,0)/ks.length,sat:true});
+const R2C=cent(['B','F','C']), R3C=cent(['D','G','H','C']);
+function nsize(n){return{w:n.w||150,h:n.h||(n.t.length>1?48:36)}}
+function nodeSvg(k,n,extra=''){const {w,h}=nsize(n);
+ return `<g class="pop" id="n${k}" ${extra}><rect x="${n.x-w/2}" y="${n.y-h/2}" width="${w}" height="${h}" rx="10" fill="${n.c}" stroke="#14161F" stroke-width="2.5"/>${n.t.map((t,i)=>`<text x="${n.x}" y="${n.y+(n.t.length>1?(i?15:-3):5)}" text-anchor="middle" font-size="14" font-weight="700" font-family="IBM Plex Sans">${t}</text>`).join('')}</g>`}
+function clip(n,tx,ty,gap){const {w,h}=nsize(n);const dx=tx-n.x,dy=ty-n.y;const t=Math.min((w/2+gap)/Math.max(Math.abs(dx),1e-6),(h/2+gap)/Math.max(Math.abs(dy),1e-6));return[n.x+dx*t,n.y+dy*t]}
+// an arc that bulges away from the loop centre, so every loop reads as a circle
+function edgePath(a,b,NS,cen){NS=NS||NODES;const A=NS[a],B=NS[b];const mx0=(A.x+B.x)/2,my0=(A.y+B.y)/2,len=Math.hypot(B.x-A.x,B.y-A.y);
+ let cx=mx0,cy=my0;
+ if(cen){let ux=mx0-cen.x,uy=my0-cen.y;const ul=Math.hypot(ux,uy)||1;ux/=ul;uy/=ul;let sag;if(cen.sat)sag=len*.13;else{const r=Math.max(cen.r,len/2+1);sag=r-Math.sqrt(r*r-len*len/4)}cx=mx0+ux*sag*2;cy=my0+uy*sag*2}
+ const [sx,sy]=clip(A,cx,cy,4),[ex,ey]=clip(B,cx,cy,7);
+ edgePath.last={ex,ey,mx:cx,my:cy};return `M${sx} ${sy} Q${cx} ${cy} ${ex} ${ey}`}
+function edge(a,b,col,delay,extra='',NS,dash,cen){const d=edgePath(a,b,NS,cen),{ex,ey,mx,my}=edgePath.last;const ang=Math.atan2(ey-my,ex-mx),L=11,w=.5;
+ const p1=[ex-L*Math.cos(ang-w),ey-L*Math.sin(ang-w)],p2=[ex-L*Math.cos(ang+w),ey-L*Math.sin(ang+w)];
+ const head=`<path d="M${p1[0]} ${p1[1]} L${ex} ${ey} L${p2[0]} ${p2[1]}" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"`;
+ if(delay==null)return `<g ${extra}><path class="edge" d="${d}" stroke="${col}"/>${head}/></g>`;
+ if(dash)return `<g class="fadein" style="animation-delay:${delay}s"><path class="edge" d="${d}" stroke="${col}" stroke-dasharray="7 7"/>${head}/></g>`;
+ return `<path class="edge drawn" d="${d}" stroke="${col}" style="--len:420;stroke-dasharray:420;animation-delay:${delay}s"/>${head} class="fadein" style="animation-delay:${delay+.6}s"/>`}
+let mapTimers=[];
+function drawMap(phase){
+ mapTimers.forEach(clearTimeout);mapTimers=[];
+ const m=$('map');let s='';
+ if(phase===1){
+  const RED='#E5383B';
+  const lbl=(c,t,lines,d)=>`<g class="pop" style="animation-delay:${d}s"><circle cx="${c.x}" cy="${c.y-14}" r="17" fill="#fff" stroke="${RED}" stroke-width="2.5"/><text x="${c.x}" y="${c.y-9}" text-anchor="middle" font-size="13" font-weight="800" fill="${RED}">${t}</text>${lines.map((l,i)=>`<text x="${c.x}" y="${c.y+20+i*17}" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="18" fill="${RED}">${l}</text>`).join('')}</g>`;
+  const steps=[
+   {nodes:['A','B','C','D','E'],edges:[['A','B'],['B','C'],['C','D'],['D','E'],['E','A']],cen:R1C,lab:lbl(R1C,'R1',['More road,','more cars'],0),title:'Loop 1 of 3: more road, more cars'},
+   {nodes:['F'],edges:[['B','F'],['F','C']],cen:R2C,lab:lbl({x:(R2C.x*2+NODES.F.x)/3,y:(R2C.y*2+NODES.F.y)/3+14},'R2',['The city','spreads'],0),title:'Loop 2 of 3: the city spreads'},
+   {nodes:['G','H'],edges:[['D','G'],['G','H'],['H','C']],cen:R3C,lab:lbl({x:R3C.x+18,y:R3C.y-4},'R3',['Buses','die'],0),title:'Loop 3 of 3: buses die'}];
+  let t=0,edgesS='',nodesS='',labS='';
+  steps.forEach((st,si)=>{
+   st.nodes.forEach((k,i)=>nodesS+=nodeSvg(k,NODES[k],`style="animation-delay:${t+i*.1}s"`));
+   t+=.4;
+   st.edges.forEach(([a,b])=>{edgesS+=edge(a,b,RED,t,'',NODES,false,st.cen);t+=.4});
+   labS+=st.lab.replace('animation-delay:0s',`animation-delay:${t+.1}s`);
+   mapTimers.push(setTimeout(()=>{$('mapTitle').textContent=st.title},(si?t-st.edges.length*.4-.4:0)*1000));
+   t+=.9;
+  });
+  mapTimers.push(setTimeout(()=>{$('mapTitle').textContent='The vicious loop on your road'},(t+.4)*1000));
+  s+=edgesS+nodesS+labS;
+  if(S.road)s+=`<g class="pop" style="animation-delay:${t}s"><rect x="8" y="${NODES.A.y+26}" width="160" height="28" rx="8" fill="${RED}" stroke="#14161F" stroke-width="2"/><text x="88" y="${NODES.A.y+45}" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">You pushed here ${S.road} time${S.road>1?'s':''}</text></g>`;
+  else s+=`<g class="pop" style="animation-delay:${t}s"><text x="${NODES.A.x}" y="${NODES.A.y+45}" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="18" fill="#2E9E5B">You never fed this loop</text></g>`;
+ } else {
+  const pt=!!(S.lane||S.metro), lm=S.lm>=2, ac=S.acc>=2;
+  const ptItems=[S.lane?'bus lane':'',S.done.metro?'metro':'',S.fleet>10?'more buses':''].filter(Boolean).join(', ');
+  const lmItems=['feeder','foot','cycle'].filter(k=>S.done[k]).map(k=>({feeder:'feeders',foot:'footpaths',cycle:'cycle lanes'})[k]).join(', ');
+  const acItems=['ramps','lights','passes'].filter(k=>S.done[k]).map(k=>({ramps:'ramps',lights:'safe stops',passes:'cheap passes'})[k]).join(', ');
+  const RC={x:360,y:242,r:172};
+  const G={
+   P:{...onC(RC,-90),t:['Buses run','free and often'],tag:'Public transport',ok:pt,items:ptItems},
+   L:{...onC(RC,-30),t:['People can','reach the stops'],tag:'Last mile',ok:lm,items:lmItems},
+   X:{...onC(RC,30),t:['Everyone','can ride'],tag:'Access for all',ok:ac,items:acItems},
+   R:{...onC(RC,90),t:['Riders','grow'],ok:true},
+   C:{...onC(RC,150),t:['Fewer cars','on the road'],ok:true},
+   J:{...onC(RC,210),t:['Jams ease,','buses speed up'],ok:true}};
+  for(const k in G){G[k].w=164;G[k].h=50}
+  const broken=!(pt&&lm&&ac);
+  const order=['P','L','X','R','C','J','P'];
+  for(let i=0;i<6;i++){const a=order[i],b=order[i+1];const bad=!G[a].ok||!G[b].ok;s+=edge(a,b,bad?'#E5383B':'#2E9E5B',.5+i*.4,'',G,bad,RC)}
+  s+=edge('R','P',broken?'#E5383B':'#2E9E5B',3,'',G,broken);
+  s+=`<g class="pop" style="animation-delay:3.4s"><text x="372" y="246" font-family="Caveat" font-weight="700" font-size="17" fill="${broken?'#E5383B':'#2E9E5B'}">fares fund</text><text x="372" y="263" font-family="Caveat" font-weight="700" font-size="17" fill="${broken?'#E5383B':'#2E9E5B'}">more buses</text></g>`;
+  Object.entries(G).forEach(([k,n],i)=>{const w=164,h=50,tagged=!!n.tag;const fill=n.ok?'#B6EFA0':'#FFFFFF';
+   let g=`<g class="pop" style="animation-delay:${i*.12}s"><rect x="${n.x-w/2}" y="${n.y-h/2}" width="${w}" height="${h}" rx="10" fill="${fill}" stroke="${n.ok?'#14161F':'#E5383B'}" stroke-width="2.5" ${n.ok?'':'stroke-dasharray="7 5"'}/>`;
+   n.t.forEach((t,j)=>g+=`<text x="${n.x}" y="${n.y+(j?15:-3)}" text-anchor="middle" font-size="14" font-weight="700" fill="${n.ok?'#14161F':'#E5383B'}">${t}</text>`);
+   if(tagged){g+=`<rect x="${n.x-w/2+8}" y="${n.y-h/2-14}" width="${w-16}" height="20" rx="6" fill="${n.ok?'#2E9E5B':'#E5383B'}" stroke="#14161F" stroke-width="2"/><text x="${n.x}" y="${n.y-h/2+1}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">✂ ${n.tag}</text>`;
+    const side=k==='P';g+=`<text x="${n.x}" y="${side?n.y-h/2-20:n.y+h/2+15}" text-anchor="middle" font-size="11" font-weight="600" fill="${n.ok?'#2E9E5B':'#E5383B'}">${n.ok?n.items:'missing, so the loop breaks here'}</text>`}
+   s+=g+'</g>'});
+  const gc=broken?'#E5383B':'#2E9E5B';
+  s+=`<g class="pop" style="animation-delay:3.7s"><circle cx="315" cy="242" r="19" fill="#fff" stroke="${gc}" stroke-width="2.5"/><text x="315" y="247" text-anchor="middle" font-size="13" font-weight="800" fill="${gc}">R4</text>
+   <text x="300" y="282" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="20" fill="${gc}">${broken?'broken':'the good loop'}</text></g>`;
+ }
+ m.innerHTML=s;
+}
+
+/* ---------- result ---------- */
+function showResult(){
+ const win=S.over==='win', c=calc(S);
+ $('band').textContent=win?'Victory':'Defeat';$('band').className='band '+(win?'win':'lose');
+ $('stamp').textContent=win?'City moves':S.over==='voted'?'Voted out':'Gridlock';$('stamp').className='stamp '+(win?'win':'lose');
+ const pt=!!(S.lane||S.metro),lm=S.lm>=2,ac=S.acc>=2;
+ if(win){$('rTitle').textContent='You broke the loop.';$('rText').textContent='You stopped feeding the road and gave people a better way to travel, one they could reach and afford.'}
+ else if(S.over==='voted'){$('rTitle').textContent='The city voted you out.';$('rText').textContent='Commutes kept rising and patience ran out before your fixes could work.'}
+ else if(S.road&&!pt){$('rTitle').textContent='Every lane filled up again.';$('rText').textContent='Each new road bought a few good months. Then more cars came, the city spread, and the jam returned bigger.'}
+ else{const miss=[!pt&&'public transport',!lm&&'the last mile',!ac&&'access for all'].filter(Boolean);$('rTitle').textContent='So close. 1 piece was missing.';$('rText').textContent='Your city still lacked '+miss.join(' and ')+'. A loop only breaks when all 3 cuts are made.'}
+ $('rsComm').textContent=Math.round(c.commute)+' min';
+ const ch=Math.round((c.cars/calc(init()).cars-1)*100);$('rsCars').textContent=(ch>0?'+':'')+ch+'%';
+ $('rsShare').textContent=Math.round(S.share*100)+'%';
+ // chart
+ const pts=[c0,...S.hist];const W=420,H=150,cm=pts.map(p=>p.commute),cr=pts.map(p=>p.cars);
+ const mx=Math.max(90,...cm),mxc=Math.max(...cr)*1.1;const X=i=>34+i*(W-50)/TURNS,Y=v=>H-24-(v-15)/(mx-15)*(H-40),Yc=v=>H-24-v/mxc*(H-40);
+ let ch2=`<text x="6" y="14" font-family="Caveat" font-weight="700" font-size="17">Your 6 years</text>
+ <path d="M34 ${H-24} H${W-12}" stroke="#14161F" stroke-width="1.5"/>
+ <line x1="34" x2="${W-12}" y1="${Y(TARGET)}" y2="${Y(TARGET)}" stroke="#2F5BFF" stroke-dasharray="4 4"/><text x="${W-12}" y="${Y(TARGET)-4}" text-anchor="end" font-size="10.5" fill="#2F5BFF" font-weight="700">goal 40 min</text>
+ <polyline fill="none" stroke="#FF9F1C" stroke-width="3" stroke-linejoin="round" points="${cr.map((v,i)=>X(i)+','+Yc(v)).join(' ')}"/>
+ <polyline fill="none" stroke="#14161F" stroke-width="3" stroke-linejoin="round" points="${cm.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`;
+ S.hist.forEach((h,i)=>{if(h.moves.some(m=>m==='widen'||m==='flyover'))ch2+=`<circle cx="${X(i+1)}" cy="${H-24}" r="5" fill="#E5383B" stroke="#14161F" stroke-width="1.5"/>`;
+  if(h.moves.some(m=>MOVES[m].g!=='road'))ch2+=`<rect x="${X(i+1)-4}" y="${H-20}" width="8" height="8" fill="#2E9E5B" stroke="#14161F" stroke-width="1.2"/>`});
+ ch2+=`<g font-size="10.5" font-weight="600"><path d="M120 10 h16" stroke="#14161F" stroke-width="3"/><text x="140" y="14">commute</text><path d="M200 10 h16" stroke="#FF9F1C" stroke-width="3"/><text x="220" y="14">cars on the road</text><circle cx="316" cy="10" r="4" fill="#E5383B" stroke="#14161F"/><text x="324" y="14">road</text><rect x="354" y="6" width="8" height="8" fill="#2E9E5B" stroke="#14161F"/><text x="366" y="14">transit</text></g>`;
+ $('rChart').innerHTML=ch2;
+ $('lesson').innerHTML='<b>The lesson:</b> a wider road fills up again. A better way to travel does not.';
+ $('mapTitle').textContent='The vicious loop on your road';mapPhase=1;$('breakBtn').textContent='Break the loop';$('breakBtn').classList.remove('back');
+ drawMap(1);$('result').classList.add('on');if(win)confetti();
+}
+let mapPhase=1;
+$('breakBtn').onclick=()=>{const b=$('breakBtn');
+ if(mapPhase===1){mapPhase=2;$('mapTitle').textContent='How the loop breaks';b.textContent='↺ See the vicious loop';b.classList.add('back');drawMap(2)}
+ else{mapPhase=1;$('mapTitle').textContent='The vicious loop on your road';b.textContent='Break the loop';b.classList.remove('back');drawMap(1)}};
+
+function confetti(){const cv=$('confetti'),x=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;const cols=['#FFE66D','#A9D8FF','#B6EFA0','#FFB8D4','#FF9F1C'];
+ const p=Array.from({length:140},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.5,v:2+Math.random()*3,r:Math.random()*6,c:cols[Math.floor(Math.random()*5)],w:6+Math.random()*6}));let f=0;
+ (function a(){x.clearRect(0,0,cv.width,cv.height);p.forEach(q=>{q.y+=q.v;q.r+=.1;x.save();x.translate(q.x,q.y);x.rotate(q.r);x.fillStyle=q.c;x.fillRect(-q.w/2,-3,q.w,6);x.restore()});if(++f<220)requestAnimationFrame(a);else x.clearRect(0,0,cv.width,cv.height)})()}
+
+/* ---------- start ---------- */
+function reset(){S=init();c0={commute:calc(S).commute,cars:calc(S).cars};picked=[];renderMoves();renderMeters();sceneStatic();
+ $('news').textContent='You have just been sworn in as mayor. The main road is jammed every morning.';}
+reset();
+$('start').onclick=()=>{$('intro').classList.remove('on');
+ say('eng','Welcome, Mayor. The answer is simple: widen the main road. People will thank you by Friday.');
+ setTimeout(()=>say('pl','Before you pour concrete, ask where all those cars will come from next year.'),1400);
+ setTimeout(()=>{const w=document.querySelector('.mv[data-k="widen"]');if(coachOn&&w)showTip(w,'pick up to 2 moves')},600);};
+$('again').onclick=()=>{$('result').classList.remove('on');coachOn=false;reset();say('eng','Back again, Mayor? The road still needs widening.');say('pl','This time, think about the loop.')};
+addEventListener('resize',()=>{if(tipEl){const t=tipEl._t,x=tipEl.textContent;showTip(t,x)}});
+</script>
+
+<style>
+</style>
+<style id="lanedecl">.introcard{max-width:640px!important}.introcard .one{font-size:17px;margin:6px 0 0}.rstats{grid-template-columns:repeat(2,1fr)!important}.rright .irl2{margin-top:8px}</style>
+<style id="gwcss">
+[hidden]{display:none!important}
+.walkb{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;padding:6px 12px;border:2.5px solid #14161F;border-radius:12px;background:#B6EFA0;box-shadow:3px 3px 0 #14161F;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex:none}
+.walkb svg{width:18px;height:18px}
+.walkb:hover{transform:translate(-1px,-2px);box-shadow:5px 5px 0 #14161F}
+.walkb.bigw{font-size:18px;padding:10px 18px;border-width:3px;border-radius:14px;box-shadow:5px 5px 0 #14161F}
+.walkb.bigw svg{width:22px;height:22px}
+#gw{position:fixed;inset:0;z-index:100000;pointer-events:none}
+.gw-ring{position:fixed;border:3px dashed #FF9F1C;border-radius:14px;box-shadow:0 0 0 9999px rgba(20,22,31,.5);transition:all .35s ease;animation:gwp 1.4s ease-in-out infinite}
+@keyframes gwp{50%{border-color:#fff}}
+.gw-tip{position:fixed;width:min(340px,calc(100vw - 20px));background:#fff;color:#14161F;border:3px solid #14161F;border-radius:16px;box-shadow:5px 5px 0 #14161F;padding:12px 14px;pointer-events:auto;transition:top .35s,left .35s;font-family:'IBM Plex Sans',system-ui,sans-serif}
+.gw-k{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.1em;color:#2E9E5B}
+.gw-k svg{width:20px;height:20px}
+.gw-tip p{margin:6px 0 10px;font-size:14.5px;line-height:1.4}
+.gw-tip .tap{font-family:'Caveat',cursive;font-weight:700;font-size:19px;color:#2B59C3}
+.gw-b{display:flex;gap:8px;justify-content:flex-end}
+.gw-b button{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;border:2.5px solid #14161F;border-radius:10px;padding:5px 12px;cursor:pointer;background:#fff}
+.gw-b #gwNext{background:#FF9F1C}
+.gw-tip.gwnudge{animation:gwn .45s ease}
+@keyframes gwn{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.gw-tip .lock{display:block;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:#6B7280}
+@media (max-width:700px){
+ .walkb:not(.bigw){padding:5px 9px;font-size:12px}
+ .gw-tip p{font-size:14px}
+}
+</style>
+<style id="phonecss">
+@media (max-width:700px){
+ body{font-size:13px}
+ .app{padding:8px 10px 86px!important;gap:8px}
+ .top{gap:8px}
+ .title h1{font-size:22px}
+ .meters{margin-left:0!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:100%}
+ .meter{min-width:0!important;padding:4px 8px!important;box-shadow:3px 3px 0 var(--ink)!important}
+ .meter .v{font-size:17px!important}
+ .meter.commute{grid-column:1 / -1}
+ .main{display:flex!important;flex-direction:column;gap:10px}
+ .right{display:contents!important}
+ .stage{order:1}.leftcol{order:2}#advEng{order:3}#advPl{order:4}.spark{order:5}
+ .endrow{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:3px solid var(--ink);border-radius:16px 16px 0 0;padding:8px 12px 10px!important;margin:0!important;display:flex;align-items:center;gap:10px;box-shadow:0 -4px 0 rgba(20,22,31,.2)}
+ .endrow .go{flex:1;padding:9px!important;font-size:16px!important}
+ .scene{height:220px!important;min-height:0!important}
+ .adv .face{width:52px!important;height:52px!important}
+ .bubble{min-height:0!important}
+ .ov{align-items:flex-start!important;overflow:auto!important;padding:8px!important}
+ .card{max-height:none!important;padding:14px!important;box-shadow:5px 5px 0 var(--ink)!important}
+ .brief{grid-template-columns:72px 1fr!important;gap:12px!important}.brief .face{width:72px!important;height:72px!important}
+ .card h2{font-size:23px!important}.card p{font-size:13.5px}
+ .rules{grid-template-columns:1fr!important;gap:6px!important}.rule b{font-size:18px!important}
+ .rbtns .big{font-size:16px;padding:9px 14px}
+ .res{grid-template-columns:1fr!important;overflow:visible!important;padding:12px!important}
+ .rright{overflow:visible!important}
+ .maphead .t{font-size:19px}.breakbtn{font-size:13px;padding:6px 10px}
+ .rs .n{font-size:17px!important}
+ .stamp{font-size:14px!important;right:0!important;top:0!important}
+ .res h2{font-size:21px!important}
+}
+</style>
+<div id="gw" hidden><div class="gw-ring" id="gwRing"></div><div class="gw-tip" id="gwTip"><div class="gw-k"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span id="gwK">WALK WITH ME</span> · <span id="gwN"></span></div><p id="gwT"></p><div class="gw-b"><button id="gwStop" type="button">Stop guide</button><button id="gwNext" type="button">Next</button></div></div></div>
+<script>
+
+const GW=(()=>{const M=k=>'.mv[data-k="'+k+'"]',S=[];
+const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));
+add('.meter.commute','Your goal: bring the average commute down from 51 to 40 minutes by year 6.');
+add('#advEng','Ravi wants to widen the road. It feels right, but every new lane pulls in new cars and the jam comes back. We will give people another way to travel instead.');
+add(M('lane'),'Turn 1. Start with a bus lane. It is cheap and it moves buses past the jam. It gets worse for a while, then better.',{click:true});
+add(M('buses'),'Now add more buses, so the lane has something to carry.',{click:true});
+add('#go','End the turn.',{click:true});
+add('#mComm','The commute got a little worse. A new bus lane always hurts for a while. Stay calm and keep going.',{wait:1200});
+add(M('feeder'),'Turn 2. Buses only help if people can reach the stops. Add feeder minibuses and shared autos.',{click:true});
+add(M('foot'),'And footpaths with safe crossings.',{click:true});
+add('#go','End the turn.',{click:true});
+add(M('lights'),'Turn 3. Now make it work for everyone. Street lights and safe stops, so women ride at night.',{click:true,wait:900});
+add(M('passes'),'Cheap passes for students and daily workers.',{click:true});
+add('#go','End the turn.',{click:true});
+add(M('buses'),'Turn 4. More riders now, so add more buses.',{click:true,wait:900});
+add(M('ramps'),'And ramps with low floor buses for elders and wheelchair users.',{click:true});
+add('#go','End the turn.',{click:true});
+add(M('metro'),'Turn 5. You have saved enough for the metro extension. It opens after 4 turns.',{click:true,wait:900});
+add('#go','End the turn.',{click:true});
+add(M('cycle'),'Turn 6. Cycle lanes to the stops finish the last mile.',{click:true,wait:900});
+add(M('buses'),'Plus a few more buses.',{click:true});
+add('#go','End the turn.',{click:true});
+add('#go','Turn 7. Nothing new is needed. Let the system work.',{click:true,wait:900});
+add(M('buses'),'Turn 8. The metro is about to open. Top up the buses one last time.',{click:true,wait:900});
+add('#go','End the turn.',{click:true});
+add('#spark','See the line? Worse first, then falling fast. That is a loop breaking.',{wait:900});
+for(const n of [9,10,11,12])add('#go','Turn '+n+'. Just end the turn.',{click:true,wait:600});
+add('#breakBtn','You won. Tap here to see the loop you broke.',{click:true,wait:1800});
+add('#map','Public transport, the last mile and access for all. All 3 cuts together are what broke the loop.',{wait:900,last:true});
+return S})();
+function GW_START(){document.getElementById('intro').classList.remove('on');document.getElementById('result').classList.remove('on');coachOn=false;hideTip();reset();
+ say('eng','Welcome, Mayor. The answer is simple: widen the main road.');setTimeout(()=>say('pl','Let us walk through this together. Think about the loop.'),900)}
+
+</script>
+<script>
+(function(){
+const g=id=>document.getElementById(id);
+let I=-1,T=null,E=null,H=null,SEQ=0,LIST=null;const L=()=>LIST||GW;
+function find(st){return typeof st.sel==='function'?st.sel():document.querySelector(st.sel)}
+function vis(el){if(!el)return false;const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&!el.disabled&&!el.closest('[hidden]')}
+function place(){if(I<0||!E)return;if(!E.isConnected){const n=find(L()[I]);if(n)E=n;else return}const r=E.getBoundingClientRect(),pad=6,ring=g('gwRing'),tip=g('gwTip');
+ ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';ring.style.width=(r.width+pad*2)+'px';ring.style.height=(r.height+pad*2)+'px';
+ const tw=tip.offsetWidth,th=tip.offsetHeight,vw=innerWidth,vh=innerHeight;let top=r.bottom+14;if(top+th>vh-8)top=r.top-th-14;if(top<8)top=Math.max(8,Math.min(vh-th-8,r.top+12));
+ let left=r.left+r.width/2-tw/2;left=Math.max(10,Math.min(vw-tw-10,left));tip.style.top=top+'px';tip.style.left=left+'px'}
+function show(i){I=i;const st=L()[i],my=++SEQ;clearInterval(T);g('gw').hidden=true;let pre=false;
+ const t0=Date.now();T=setInterval(()=>{if(my!==SEQ)return;if(Date.now()-t0<(st.wait||0))return;if(st.pre&&!pre){pre=true;try{st.pre()}catch(e){}return}
+  const el=find(st);if(!vis(el))return;clearInterval(T);
+  E=el;g('gw').hidden=false;g('gwN').textContent='step '+(i+1)+' of '+L().length;g('gwT').innerHTML=(typeof st.t==='function'?st.t():st.t)+(st.click?' <span class="tap">tap the glowing spot</span>':'<span class="lock">READ, THEN PRESS NEXT</span>');
+  g('gwNext').style.display=st.click?'none':'';g('gwNext').textContent=st.last?(LIST?"Start playing":'Done'):'Next';
+  el.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(place,420);place();
+  if(st.click){H=ev=>{const cur=E&&E.isConnected?E:find(st);if(!cur||!(cur===ev.target||cur.contains(ev.target)))return;document.removeEventListener('click',H,true);H=null;g('gw').hidden=true;setTimeout(next,250)};document.addEventListener('click',H,true)}},150)}
+setInterval(()=>{if(I>=0&&E&&!E.isConnected)place()},300);
+function next(){if(I>=L().length-1){stop();return}show(I+1)}
+function stop(){LIST=null;const k=g('gwK');if(k)k.textContent='WALK WITH ME';SEQ++;clearInterval(T);if(H)document.removeEventListener('click',H,true);H=null;I=-1;E=null;g('gw').hidden=true}
+window.gwStop=stop;
+function curEl(){if(I<0)return null;const st=L()[I];if(E&&E.isConnected)return E;return find(st)}
+function allowed(t){if(!t||!t.closest)return true;if(t.closest('#gwTip,.walkgo,#homeTab'))return true;
+ const st=L()[I];if(!st||!st.click||g('gw').hidden)return false;const c=curEl();return !!c&&(c===t||c.contains(t))}
+function nudge(){const tip=g('gwTip');if(g('gw').hidden)return;tip.classList.remove('gwnudge');void tip.offsetWidth;tip.classList.add('gwnudge')}
+function block(ev){if(I<0)return;if(allowed(ev.target))return;ev.stopImmediatePropagation();ev.stopPropagation();
+ if(ev.cancelable&&!/^(touch|pointer)/.test(ev.type))ev.preventDefault();if(ev.type==='click')nudge()}
+['click','mousedown','mouseup','pointerdown','pointerup','touchstart','touchend','dblclick','contextmenu','change','input','submit'].forEach(t=>document.addEventListener(t,block,true));
+document.addEventListener('keydown',ev=>{if(I<0)return;if(ev.key==='Escape'){ev.stopImmediatePropagation();stop();return}if((ev.key==='Enter'||ev.key===' ')&&!allowed(ev.target)){ev.stopImmediatePropagation();ev.preventDefault()}},true);window.gwCur=()=>({i:I,click:!!(L()[I]&&L()[I].click),last:!!(L()[I]&&L()[I].last),shown:!g('gw').hidden,n:L().length});window.gwEl=window.__gwEl=()=>(E&&!E.isConnected?find(L()[I]):E);
+window.gwTour=function(){if(typeof TOUR==='undefined')return;stop();document.querySelectorAll('.ov.on,#infoOv').forEach(o=>{if(o.id==='infoOv')o.hidden=true});LIST=TOUR;g('gwK').textContent='QUICK TOUR';setTimeout(()=>show(0),250)};
+window.gwStart=function(){const io=g('infoOv');if(io)io.hidden=true;stop();try{GW_START()}catch(e){console.error(e)}setTimeout(()=>show(0),300)};
+g('gwNext').onclick=()=>{if(L()[I]&&L()[I].last){stop();return}next()};
+g('gwStop').onclick=stop;
+document.querySelectorAll('.walkgo').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();window.gwStart()}));
+addEventListener('resize',place);addEventListener('scroll',place,true);
+})();
+</script>
+<a id="homeTab" href="../" aria-label="Back to Shiva's home page"><svg viewBox="0 0 16 16" fill="none" stroke="#14161F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>Home</a>
+<style id="homecss">
+#homeTab{position:fixed;left:10px;top:10px;z-index:100001;display:inline-flex;align-items:center;gap:5px;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:0;text-transform:none;line-height:1;color:#14161F;text-decoration:none;background:#FF9F1C;border:2.5px solid #14161F;border-radius:10px;padding:5px 10px 5px 8px;box-shadow:2px 2px 0 #14161F;transform:none;rotate:0deg;writing-mode:horizontal-tb}
+#homeTab:hover,#homeTab:focus-visible{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #14161F}
+#homeTab svg{width:14px;height:14px}
+.homespace{display:inline-block;width:84px;height:24px;vertical-align:middle;flex:none;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;transform:none!important}
+.ov,.overlay{padding-top:56px!important}
+</style>
+<style id="infocss">
+.infob{width:30px;height:30px;flex:none;border:2.5px solid #14161F;border-radius:50%;background:#fff;color:#14161F;font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:16px;cursor:pointer;box-shadow:2px 2px 0 #14161F;padding:0}
+.linkb{background:none;border:0;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:700;font-size:15px;text-decoration:underline;cursor:pointer;color:#14161F}
+#infoOv{position:fixed;inset:0;z-index:99980;background:rgba(20,22,31,.45);display:flex;align-items:center;justify-content:center;padding:56px 12px 12px;overflow:auto}
+#infoOv .icard{background:#fff;border:3px solid #14161F;border-radius:20px;box-shadow:8px 8px 0 #14161F;max-width:760px;width:100%;padding:18px 20px;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#14161F}
+#infoOv h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:26px;margin:0 0 8px}
+#infoOv .ig{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 12px}
+#infoOv .ib{border:2.5px solid #14161F;border-radius:12px;padding:8px 11px;font-size:13.5px;line-height:1.35}
+#infoOv .ib b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;margin-bottom:2px}
+#infoOv .ib:nth-child(4n+1){background:#BDEFEA}#infoOv .ib:nth-child(4n+2){background:#FFE66D}#infoOv .ib:nth-child(4n+3){background:#A9D8FF}#infoOv .ib:nth-child(4n+4){background:#B6EFA0}
+#infoOv .ibtns{display:flex;gap:10px;flex-wrap:wrap}
+#infoOv .ibtns button{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:16px;padding:9px 18px;border:3px solid #14161F;border-radius:14px;background:#FF9F1C;box-shadow:4px 4px 0 #14161F;cursor:pointer;color:#14161F}
+#infoOv .ibtns button.alt{background:#fff}
+.irl2{font-size:13px;line-height:1.45;color:#3B4150;border-left:4px solid #14A39A;padding:2px 0 2px 10px;margin:4px 0}
+.irl2 b{font-family:'Bricolage Grotesque',system-ui,sans-serif;color:#14161F;margin-right:4px}
+.irl2 a{color:#14161F;font-weight:700}
+.irl-li{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border:2.5px solid #14161F;border-radius:12px;background:#fff;box-shadow:3px 3px 0 #14161F;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:14px;color:#14161F;text-decoration:none}
+.irl-li .liico{display:grid;place-items:center;width:26px;height:26px;border:2px solid #14161F;border-radius:7px;background:#A9D8FF;font-weight:800}
+@media (max-width:700px){#infoOv .ig{grid-template-columns:1fr}#infoOv{align-items:flex-start}}
+</style>
+<div id="infoOv" hidden><div class="icard"><h2>How it works</h2><div class="ig"><div class="ib"><b>Your goal</b>Bring the average commute down from 51 to 40 minutes by the end of year 6.</div><div class="ib"><b>Turns</b>12 turns of 6 months each. Pick up to 2 moves a turn, then end the turn.</div><div class="ib"><b>Money</b>₹1000 Cr to start, plus ₹50 Cr every turn.</div><div class="ib"><b>Approval</b>If approval falls below 10%, the city votes you out.</div></div><div class="ibtns"><button id="infoClose" type="button">Got it</button><button class="alt" id="tourBtn" type="button">Show me around</button></div></div></div>
+<script>const TOUR=(()=>{const S=[];const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));add('.meter.commute','Your goal. Bring the commute down to 40 minutes.');add('#moves','Your moves: roads, public transport, the last mile and access for all. Tap up to 2 each turn.');add('.stage','Your city. Watch how people travel as your moves land.');add('#advEng','Your advisers. They will not always agree.');add('#go','End the turn when you are ready. 12 turns in all.');S[S.length-1].last=true;return S})();window.GW_STARTBTN="start";</script>
+<script id="infojs">(function(){const g=id=>document.getElementById(id);const o=g('infoOv');if(!o)return;
+document.querySelectorAll('.infogo').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();o.hidden=false}));
+g('infoClose').onclick=()=>{o.hidden=true};g('tourBtn').onclick=()=>{o.hidden=true;window.gwTour()};
+o.addEventListener('click',e=>{if(e.target===o)o.hidden=true});
+const st=g(window.GW_STARTBTN||'start');let toured=false;if(st)st.addEventListener('click',()=>{if(!toured){toured=true;setTimeout(window.gwTour,700)}});})();</script>
+
+</html>

@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Finance Tower</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Caveat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{color-scheme:light;--bg:#E9EDF2;--ink:#14161F;--muted:#575E6E;--sY:#FFE66D;--sB:#A9D8FF;--sG:#B6EFA0;--sP:#FFB8D4;--sL:#D5C6FF;--acc:#FF9F1C;--red:#E5383B;--green:#2E9E5B;--blue:#2F5BFF;
+--display:'Bricolage Grotesque',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;--hand:'Caveat',cursive}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.4;background-image:radial-gradient(rgba(20,22,31,.13) 1px,transparent 1px);background-size:22px 22px}
+[hidden]{display:none!important}
+.app{max-width:1440px;margin:0 auto;padding:12px 18px 16px;display:flex;flex-direction:column;gap:12px}
+@media (min-width:1000px) and (min-height:640px){html,body{height:100%;overflow:hidden}.app{height:100vh}.main{flex:1;min-height:0}}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+h1{margin:0;font-family:var(--display);font-weight:800;font-size:30px;line-height:1}
+h1 span{background:var(--sG);padding:0 8px;border:3px solid var(--ink);border-radius:8px;box-shadow:4px 4px 0 var(--ink);display:inline-block;transform:rotate(-1.5deg)}
+.tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.tab{font-family:var(--display);font-weight:700;font-size:14px;padding:6px 12px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;cursor:pointer;display:flex;align-items:center;gap:6px}
+.tab[aria-selected="true"]{background:var(--sY);box-shadow:3px 3px 0 var(--ink)}
+.tab .ok{font-family:var(--mono);font-size:10px;color:var(--green)}
+.main{display:grid;grid-template-columns:270px minmax(0,1fr) 330px;gap:12px}
+.panel{background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:5px 5px 0 var(--ink);padding:12px 14px;min-height:0}
+.col{display:flex;flex-direction:column;gap:12px;min-height:0}
+.lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.co{font-family:var(--display);font-weight:800;font-size:18px;line-height:1.1}.co small{display:block;font-family:var(--body);font-weight:500;font-size:12.5px;color:var(--muted)}
+.cards{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sc{display:flex;align-items:center;gap:10px;padding:8px 10px;border:2.5px solid var(--ink);border-radius:10px;background:#fff;cursor:pointer;font-family:var(--display);font-weight:700;font-size:15px;box-shadow:3px 3px 0 var(--ink);transition:transform .25s,opacity .25s}
+.sc svg{width:26px;height:26px;flex:none}
+.sc:hover{transform:translate(-1px,-2px)}
+.sc.in{opacity:.35;box-shadow:none;transform:translateX(12px);cursor:default}
+.slot{margin-top:10px;border:2.5px dashed var(--ink);border-radius:12px;padding:8px;text-align:center;font-family:var(--hand);font-weight:700;font-size:19px;color:var(--blue)}
+.agents{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;position:relative}
+.ag{border:2.5px solid var(--ink);border-radius:12px;padding:6px 8px;background:#F3F4F7;display:flex;align-items:center;gap:7px;transition:background .3s,transform .3s}
+.ag i{display:grid;place-items:center;width:26px;height:26px;border:2px solid var(--ink);border-radius:8px;background:#fff;font-style:normal;font-size:14px;flex:none}
+.ag b{font-family:var(--display);font-size:13.5px;display:block;line-height:1}.ag span{font-size:11px;color:var(--muted)}
+.ag.on{background:var(--sG);transform:scale(1.04)}
+.ag.done{background:#E8F9E1}
+.centre{display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;min-height:0}
+.empty{display:grid;place-items:center;text-align:center;color:var(--muted);font-family:var(--hand);font-weight:700;font-size:22px;height:100%}
+.zrow{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:10px;align-items:center}
+.zsvg{width:100%;height:auto;display:block}
+.zv{text-align:center}.zv b{display:block;font-family:var(--display);font-size:40px;line-height:1}.zv span{font-family:var(--display);font-weight:700;font-size:15px;padding:2px 10px;border:2px solid var(--ink);border-radius:8px;display:inline-block;margin-top:4px}
+.zv small{display:block;font-size:11px;color:var(--muted);margin-top:4px}
+.dup{width:100%;height:100%;max-height:330px;display:block}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kp{border:2px solid var(--ink);border-radius:10px;padding:6px 9px}
+.kp small{display:block;font-size:11px;color:var(--muted)}
+.kp b{font-family:var(--display);font-size:21px}.kp .ar{font-size:14px;margin-left:4px}
+.kp.good{background:#E8F9E1}.kp.bad{background:#FFE8EA}.kp.mid{background:#FFF6CC}
+.cf{display:flex;flex-direction:column;gap:5px}
+.cfr{display:grid;grid-template-columns:76px 1fr 46px;align-items:center;gap:6px;font-size:12px}
+.cfr .bw{position:relative;height:14px;background:#F3F4F7;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden}
+.cfr .bw i{position:absolute;top:0;bottom:0;transition:all .7s}
+.cfr .bw::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1.5px dashed var(--ink)}
+.cfr b{font-family:var(--mono);font-size:11.5px;text-align:right}
+.bot{display:flex;flex-direction:column;gap:7px;min-height:0;flex:1}
+.chat{flex:1;min-height:70px;overflow:auto;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.msg{padding:6px 10px;border:2px solid var(--ink);border-radius:12px 12px 12px 3px;background:#EEF4FF;max-width:95%}
+.msg.me{align-self:flex-end;border-radius:12px 12px 3px 12px;background:var(--sY)}
+.qs{display:flex;flex-wrap:wrap;gap:6px}
+.q{font-family:var(--body);font-weight:600;font-size:12px;padding:5px 9px;border:2px solid var(--ink);border-radius:999px;background:#fff;cursor:pointer}
+.q:hover{background:var(--sB)}
+.decide{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:5px 5px 0 var(--ink);padding:9px 14px}
+.decide .dq{font-family:var(--display);font-weight:800;font-size:16px;margin-right:auto}
+.decide .dq small{display:block;font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
+.pick{font-family:var(--display);font-weight:800;font-size:14px;padding:8px 14px;border:2.5px solid var(--ink);border-radius:12px;background:var(--acc);box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+.pick:disabled{background:#E6E8EC;box-shadow:none;cursor:not-allowed;color:#8A90A0}
+.fade{animation:fd .5s ease both}@keyframes fd{from{opacity:0;transform:translateY(6px)}}
+.ov{position:fixed;inset:0;background:rgba(20,22,31,.45);display:none;align-items:center;justify-content:center;padding:56px 14px 14px;z-index:60;overflow:auto}
+.ov.on{display:flex}
+.card{background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:8px 8px 0 var(--ink);max-width:620px;width:100%;padding:20px 22px}
+.card h2{margin:0 0 6px;font-family:var(--display);font-weight:800;font-size:28px;line-height:1.05}
+.card p{margin:6px 0;font-size:15px}
+.hand{font-family:var(--hand);font-weight:700;font-size:23px;color:var(--blue)}
+.big{font-family:var(--display);font-weight:800;font-size:18px;padding:10px 20px;border:3px solid var(--ink);border-radius:14px;background:var(--acc);box-shadow:5px 5px 0 var(--ink);cursor:pointer}
+.rbtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.band{display:inline-block;font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:3px 12px;border:2.5px solid var(--ink);border-radius:8px}
+.band.win{background:var(--sG)}.band.lose{background:var(--sP)}
+.lesson{border:2.5px solid var(--ink);border-radius:12px;background:var(--sY);padding:8px 12px;font-size:14px;margin-top:10px;transform:rotate(-.5deg)}
+.irl2{font-size:13px;line-height:1.45;color:#3B4150;border-left:4px solid #14A39A;padding:2px 0 2px 10px;margin-top:10px}
+.irl2 b{font-family:var(--display);color:var(--ink)}
+@media (max-width:999px){.main{grid-template-columns:1fr}.tabs{margin-left:0;width:100%}}
+</style>
+
+<div class="app">
+ <header class="top">
+  <h1><i class="homespace" aria-hidden="true"></i><span>Finance Tower</span></h1>
+  <div class="tabs" id="tabs" role="tablist"></div><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button>
+ </header>
+ <main class="main">
+  <section class="col">
+   <div class="panel" id="stmts">
+    <div class="lab">The company</div>
+    <div class="co" id="coName"></div>
+    <div class="cards" id="cards"></div>
+    <div class="slot" id="slot">tap the 3 statements to load them</div>
+   </div>
+   <div class="panel">
+    <div class="lab">Agents at work</div>
+    <div class="agents" id="agents"></div>
+   </div>
+  </section>
+  <section class="centre">
+   <div class="panel" id="zPanel"><div class="lab">Altman Z'' score, for private companies</div><div id="zBody"><div class="empty" style="height:120px">load the statements to see the score</div></div></div>
+   <div class="panel" id="dPanel" style="display:flex;flex-direction:column"><div class="lab">DuPont: where the return comes from</div><div id="dBody" style="flex:1;min-height:0"><div class="empty">and where the return really comes from</div></div></div>
+  </section>
+  <section class="col">
+   <div class="panel"><div class="lab">Key numbers</div><div class="kpis" id="kpis"><div class="kp"><small>Revenue growth</small><b>?</b></div><div class="kp"><small>Net margin</small><b>?</b></div><div class="kp"><small>Current ratio</small><b>?</b></div><div class="kp"><small>Debt to equity</small><b>?</b></div></div>
+    <div class="lab" style="margin-top:10px">Cash flow, ₹ Cr</div><div class="cf" id="cf"></div></div>
+   <div class="panel bot"><div class="lab">Ask Finance Tower</div><div class="chat" id="chat"></div><div class="qs" id="qs"></div></div>
+  </section>
+ </main>
+ <div class="decide" id="decide">
+  <div class="dq">Which company's good number is hiding a problem?<small id="dqs">Read all 3 companies first.</small></div>
+  <div id="picks" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+ </div>
+</div>
+
+<div class="ov on" id="intro"><div class="card">
+ <div class="hand">Good morning, Director.</div>
+ <h2>3 companies. 1 good number is hiding a problem.</h2>
+ <p>Load each company's P&amp;L, balance sheet and cash flow. Finance Tower's agents will read them for you. Then find the problem.</p>
+ <div class="rbtns"><button class="big" id="start">Play</button><button class="big walkgo" id="walkIntro" type="button" style="background:#B6EFA0">Walk with me</button></div>
+</div></div>
+
+<div class="ov" id="result"><div class="card">
+ <span class="band" id="rBand"></span>
+ <h2 id="rTitle" style="margin-top:8px"></h2>
+ <p id="rText"></p>
+ <div class="lesson"><b>The lesson:</b> a high return can be borrowed. DuPont shows where it really comes from.</div>
+ <div class="irl2"><b>In real life</b> Finance Tower reads the 3 statements of 30 companies. Orchestrated agents turn them into KPIs and insights that directors can act on.</div>
+ <div class="rbtns"><button class="big" id="again">Play again</button></div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const C={
+ K:{n:'Kaveri Foods',d:'Packaged foods, 18 years old',z:6.1,dp:[12,1.4,1.5],weak:null,
+  k:[['Revenue growth','+14%','good','▲'],['Net margin','12%','good','▲'],['Current ratio','1.8','good','▲'],['Debt to equity','0.5','good','▼']],
+  cf:[['Operating',62],['Investing',-30],['Financing',-12],['Net',20]],
+  q:[['Why is the return strong?','Margins of 12% and good use of assets. Debt is low, so the return is earned, not borrowed.'],['Any risk?','New plants need cash. Watch investing cash flow as it grows.'],['What should the board watch?','Keep margins above 10% while it expands.']]},
+ N:{n:'Nimbus Apps',d:'Start up, 3 years old, growing fast',z:0.6,dp:[-18,0.9,1.3],weak:0,
+  k:[['Revenue growth','+85%','good','▲'],['Net margin','-18%','bad','▼'],['Current ratio','0.9','bad','▼'],['Debt to equity','0.3','good','▼']],
+  cf:[['Operating',-40],['Investing',-15],['Financing',30],['Net',-25]],
+  q:[['Why the distress zone?','Losses eat into working capital and retained earnings, so 2 of the 4 parts of the score pull it down.'],['How long can it last?','About 7 months of cash at the current burn.'],['What should the board watch?','The path to positive operating cash, not just growth.']]},
+ S:{n:'Steelridge Works',d:'Steel parts maker, 25 years old',z:1.6,dp:[6,0.8,4.2],weak:2,
+  k:[['Revenue growth','+4%','mid','▲'],['Net margin','6%','mid','▼'],['Current ratio','1.0','mid','▼'],['Debt to equity','3.2','bad','▲']],
+  cf:[['Operating',35],['Investing',-10],['Financing',-28],['Net',-3]],
+  q:[['Why is the return so high?','Mostly debt. Assets are 4.2 times equity, while the margin is only 6%.'],['Can it borrow more?','Unlikely. Debt is 3.2 times equity and repayments take most of the operating cash.'],['What should the board watch?','Interest cover and the next refinancing date.']]}
+};
+const ORDER=['K','N','S'];
+const ST=[['pl','P&L','<path d="M6 4h14l6 6v18H6z" fill="#FFE66D"/><path d="M10 14h12M10 19h12M10 24h8"/>'],['bs','Balance sheet','<path d="M6 4h20v24H6z" fill="#A9D8FF"/><path d="M16 4v24M8 12h6M18 12h6M8 18h6M18 18h6"/>'],['cf','Cash flow','<path d="M6 4h20v24H6z" fill="#B6EFA0"/><path d="M9 22l5-6 4 3 6-8"/><path d="M20 11h4v4"/>']];
+const AG=[['📄','Reader','pulls the numbers'],['➗','Analyst','works the ratios'],['⚖️','Risk','scores health'],['💡','Advisor','writes the insight']];
+let cur='K',S={};
+function init(){S={};ORDER.forEach(k=>S[k]={loaded:[],done:false});cur='K'}
+function tabs(){$('tabs').innerHTML=ORDER.map(k=>`<button class="tab" role="tab" data-c="${k}" aria-selected="${k===cur}">${C[k].n}${S[k].done?'<span class="ok">✓ read</span>':''}</button>`).join('');
+ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{cur=b.dataset.c;render()})}
+function cards(){const s=S[cur];$('coName').innerHTML=`${C[cur].n}<small>${C[cur].d}</small>`;
+ $('cards').innerHTML=ST.map(([id,n,ic])=>`<button class="sc${s.loaded.includes(id)?' in':''}" data-s="${id}" type="button"${s.loaded.includes(id)?' disabled':''}><svg viewBox="0 0 32 32" fill="none" stroke="#14161F" stroke-width="2" stroke-linejoin="round">${ic}</svg>${n}</button>`).join('');
+ $('slot').textContent=s.done?'all 3 statements read':s.loaded.length?`${s.loaded.length} of 3 loaded`:'tap the 3 statements to load them';
+ document.querySelectorAll('.sc').forEach(b=>b.onclick=()=>load(b.dataset.s))}
+function agents(state){$('agents').innerHTML=AG.map((a,i)=>`<div class="ag ${state&&state[i]||''}"><i>${a[0]}</i><div><b>${a[1]}</b><span>${a[2]}</span></div></div>`).join('')}
+function load(id){const s=S[cur];if(s.loaded.includes(id)||s.done)return;s.loaded.push(id);cards();if(s.loaded.length===3)run()}
+function run(){const k=cur;let i=0;const st=['','','',''];agents(st);
+ const t=setInterval(()=>{if(i>0)st[i-1]='done';if(i<4){st[i]='on';agents(st);i++}else{clearInterval(t);agents(['done','done','done','done']);S[k].done=true;if(cur===k)render();else tabs();decide();
+  say(C[k].q[0][1].length?`I have read ${C[k].n}. Ask me anything below.`:'' ,false)}},420)}
+function zSvg(z){const W=360,max=8,x=v=>20+Math.min(v,max)/max*(W-40);
+ return `<svg class="zsvg" viewBox="0 0 ${W} 74"><rect x="${x(0)}" y="20" width="${x(1.1)-x(0)}" height="18" fill="#FFB8C0" stroke="#14161F" stroke-width="2"/><rect x="${x(1.1)}" y="20" width="${x(2.6)-x(1.1)}" height="18" fill="#FFE66D" stroke="#14161F" stroke-width="2"/><rect x="${x(2.6)}" y="20" width="${x(8)-x(2.6)}" height="18" fill="#B6EFA0" stroke="#14161F" stroke-width="2"/>
+ <g font-family="IBM Plex Sans" font-size="11" font-weight="700"><text x="${(x(0)+x(1.1))/2}" y="54" text-anchor="middle">distress</text><text x="${(x(1.1)+x(2.6))/2}" y="54" text-anchor="middle">grey</text><text x="${(x(2.6)+x(8))/2}" y="54" text-anchor="middle">safe</text><text x="${x(1.1)}" y="70" text-anchor="middle" fill="#575E6E">1.1</text><text x="${x(2.6)}" y="70" text-anchor="middle" fill="#575E6E">2.6</text></g>
+ <g class="needle" style="transform:translateX(${x(z)-x(0)}px);transition:transform 1s cubic-bezier(.3,1.4,.5,1)"><path d="M${x(0)} 4l-7 -0 7 14 7 -14z" fill="#14161F" transform="translate(0 0)"/><path d="M${x(0)} 18v24" stroke="#14161F" stroke-width="3"/></g></svg>`}
+function zone(z){return z<1.1?['distress','#FFB8C0']:z<2.6?['grey zone','#FFE66D']:['safe','#B6EFA0']}
+function dupont(c){const [m,t,l]=c.dp,roe=Math.round(m*t*l*10)/10,w=c.weak;
+ const box=(x,y,w2,h,title,val,i)=>{const hot=w===i,ok=w===null||w!==i;const fill=i===-1?(roe<0?'#FFB8C0':'#FFE66D'):hot?'#FFB8C0':'#E8F9E1';
+  return `<g class="fade" style="animation-delay:${(i+1)*.15}s"><rect x="${x}" y="${y}" width="${w2}" height="${h}" rx="12" fill="${fill}" stroke="#14161F" stroke-width="${hot?3.5:2.5}"/><text x="${x+w2/2}" y="${y+24}" text-anchor="middle" font-family="IBM Plex Sans" font-size="13" font-weight="700">${title}</text><text x="${x+w2/2}" y="${y+54}" text-anchor="middle" font-family="Bricolage Grotesque" font-size="26" font-weight="800">${val}</text>${hot?`<text x="${x+w2/2}" y="${y+h+22}" text-anchor="middle" font-family="Caveat" font-size="20" font-weight="700" fill="#E5383B">${i===2?'doing the heavy lifting':'the weak link'}</text>`:''}</g>`};
+ return `<svg class="dup" viewBox="0 0 560 270" preserveAspectRatio="xMidYMid meet">
+ <path d="M280 78v24M90 102h380M90 102v26M280 102v26M470 102v26" fill="none" stroke="#14161F" stroke-width="2.5"/>
+ ${box(190,8,180,70,'Return on equity',roe+'%',-1)}
+ ${box(10,128,160,70,'Profit margin',m+'%',0)}<text x="185" y="170" font-family="Bricolage Grotesque" font-size="26" font-weight="800">×</text>
+ ${box(200,128,160,70,'Asset turnover',t+'×',1)}<text x="375" y="170" font-family="Bricolage Grotesque" font-size="26" font-weight="800">×</text>
+ ${box(390,128,160,70,'Leverage',l+'×',2)}</svg>`}
+function dash(){const c=C[cur],s=S[cur];
+ if(!s.done){$('zBody').innerHTML='<div class="empty" style="height:110px">load the statements to see the score</div>';$('dBody').innerHTML='<div class="empty">and where the return really comes from</div>';
+  $('kpis').innerHTML=c.k.map(k=>`<div class="kp"><small>${k[0]}</small><b>?</b></div>`).join('');$('cf').innerHTML='';$('qs').innerHTML='';return}
+ const zn=zone(c.z);
+ $('zBody').innerHTML=`<div class="zrow"><div id="zg">${zSvg(0)}</div><div class="zv"><b>${c.z.toFixed(1)}</b><span style="background:${zn[1]}">${zn[0]}</span><small>below 1.1 means distress</small></div></div>`;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{$('zg').innerHTML=zSvg(c.z)}));
+ $('dBody').innerHTML=dupont(c);
+ $('kpis').innerHTML=c.k.map(k=>`<div class="kp ${k[2]} fade"><small>${k[0]}</small><b>${k[1]}</b><span class="ar">${k[3]}</span></div>`).join('');
+ $('cf').innerHTML=c.cf.map(([n,v])=>{const w=Math.min(50,Math.abs(v)/70*50);return `<div class="cfr"><span>${n}</span><span class="bw"><i style="${v>=0?`left:50%;width:${w}%;background:#7BD88F`:`left:${50-w}%;width:${w}%;background:#FF8A8A`}"></i></span><b>${v>0?'+':''}${v}</b></div>`}).join('');
+ $('qs').innerHTML=c.q.map((q,i)=>`<button class="q" data-i="${i}" type="button">${q[0]}</button>`).join('');
+ document.querySelectorAll('.q').forEach(b=>b.onclick=()=>{const q=c.q[+b.dataset.i];say(q[0],true);setTimeout(()=>say(q[1],false),350)})}
+function say(t,me){if(!t)return;const m=document.createElement('div');m.className='msg'+(me?' me':'');m.textContent=t;$('chat').appendChild(m);$('chat').scrollTop=1e5}
+function decide(){const all=ORDER.every(k=>S[k].done);$('dqs').textContent=all?'Pick 1. Look at where each return comes from.':'Read all 3 companies first.';
+ $('picks').innerHTML=ORDER.map(k=>`<button class="pick" data-p="${k}" type="button"${all?'':' disabled'}>${C[k].n}</button>`).join('');
+ document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>finish(b.dataset.p))}
+function finish(k){const win=k==='S';$('rBand').textContent=win?'Victory':'Not quite';$('rBand').className='band '+(win?'win':'lose');
+ $('rTitle').textContent=win?'You found the borrowed return.':k==='N'?'That problem was in plain sight.':'Kaveri is the healthy one.';
+ $('rText').textContent=win?'Steelridge shows a 20% return, almost as good as Kaveri. But DuPont shows why: 4.2 times leverage does the work, while the margin is only 6%. One bad year and the debt bites.':
+  k==='N'?'Nimbus is in the distress zone, and everyone can see it. The hidden problem was Steelridge: its 20% return comes from debt, not from the business.':
+  'Kaveri earns its return through margins, with little debt. The hidden problem was Steelridge: its 20% return comes from debt, not from the business.';
+ $('result').classList.add('on')}
+function render(){tabs();cards();agents(S[cur].done?['done','done','done','done']:null);dash();decide()}
+function reset(){init();$('chat').innerHTML='';say('Hello, Director. Load a company\'s 3 statements and I will read them.',false);render()}
+reset();
+$('start').onclick=()=>$('intro').classList.remove('on');
+$('again').onclick=()=>{$('result').classList.remove('on');reset()};
+</script>
+<style id="gwcss">
+[hidden]{display:none!important}
+.walkb{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;padding:6px 12px;border:2.5px solid #14161F;border-radius:12px;background:#B6EFA0;box-shadow:3px 3px 0 #14161F;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex:none}
+.walkb svg{width:18px;height:18px}
+.walkb:hover{transform:translate(-1px,-2px);box-shadow:5px 5px 0 #14161F}
+.walkb.bigw{font-size:18px;padding:10px 18px;border-width:3px;border-radius:14px;box-shadow:5px 5px 0 #14161F}
+.walkb.bigw svg{width:22px;height:22px}
+#gw{position:fixed;inset:0;z-index:100000;pointer-events:none}
+.gw-ring{position:fixed;border:3px dashed #FF9F1C;border-radius:14px;box-shadow:0 0 0 9999px rgba(20,22,31,.5);transition:all .35s ease;animation:gwp 1.4s ease-in-out infinite}
+@keyframes gwp{50%{border-color:#fff}}
+.gw-tip{position:fixed;width:min(340px,calc(100vw - 20px));background:#fff;color:#14161F;border:3px solid #14161F;border-radius:16px;box-shadow:5px 5px 0 #14161F;padding:12px 14px;pointer-events:auto;transition:top .35s,left .35s;font-family:'IBM Plex Sans',system-ui,sans-serif}
+.gw-k{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.1em;color:#2E9E5B}
+.gw-k svg{width:20px;height:20px}
+.gw-tip p{margin:6px 0 10px;font-size:14.5px;line-height:1.4}
+.gw-tip .tap{font-family:'Caveat',cursive;font-weight:700;font-size:19px;color:#2B59C3}
+.gw-b{display:flex;gap:8px;justify-content:flex-end}
+.gw-b button{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;color:#14161F;border:2.5px solid #14161F;border-radius:10px;padding:5px 12px;cursor:pointer;background:#fff}
+.gw-b #gwNext{background:#FF9F1C}
+.gw-tip.gwnudge{animation:gwn .45s ease}
+@keyframes gwn{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.gw-tip .lock{display:block;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:#6B7280}
+@media (max-width:700px){
+ .walkb:not(.bigw){padding:5px 9px;font-size:12px}
+ .gw-tip p{font-size:14px}
+}
+</style>
+<style id="phonecss">
+@media (max-width:999px){
+ .app{padding:8px 10px 120px!important}
+ h1{font-size:24px!important}
+ .tab{font-size:12.5px!important;padding:5px 9px!important}
+ .main{display:flex!important;flex-direction:column}
+ .main>.col:first-child{order:1}.centre{order:2;display:flex!important;flex-direction:column}.main>.col:last-child{order:3}
+ .decide{position:fixed;left:0;right:0;bottom:0;z-index:40;border-radius:16px 16px 0 0!important;border-left:0!important;border-right:0!important;border-bottom:0!important;padding:8px 10px!important;gap:6px!important}
+ .decide .dq{font-size:13px!important;width:100%}.decide .dq small{display:none}
+ .pick{font-size:12.5px!important;padding:6px 10px!important}
+ .zrow{grid-template-columns:1fr!important}
+ .dup{max-height:240px}
+ .chat{max-height:200px}
+}
+</style>
+<div id="gw" hidden><div class="gw-ring" id="gwRing"></div><div class="gw-tip" id="gwTip"><div class="gw-k"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span id="gwK">WALK WITH ME</span> · <span id="gwN"></span></div><p id="gwT"></p><div class="gw-b"><button id="gwStop" type="button">Stop guide</button><button id="gwNext" type="button">Next</button></div></div></div>
+<script>
+
+const GW=(()=>{const S=[];const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));
+const T=k=>'.tab[data-c="'+k+'"]',D=s=>'.sc[data-s="'+s+'"]';
+add('#stmts','You sit on the board of 3 companies. Start with Kaveri Foods. Load its 3 financial statements.');
+add(D('pl'),'Tap the P&L.',{click:true});
+add(D('bs'),'Now the balance sheet.',{click:true});
+add(D('cf'),'And the cash flow.',{click:true});
+add('#agents','Watch the agents work in turn: the Reader pulls the numbers, the Analyst works the ratios, Risk scores the health, the Advisor writes the insight.',{wait:2200});
+add('#zPanel','The Altman Z\'\' score. Kaveri sits well inside the safe zone.');
+add('#dPanel','DuPont splits the return on equity into margin, asset turnover and leverage. Kaveri earns 25% mostly through healthy margins.');
+add('.q[data-i="0"]','Ask Finance Tower why.',{click:true});
+add(T('N'),'Next, Nimbus Apps.',{click:true,wait:900});
+add(D('pl'),'Load its 3 statements.',{click:true});add(D('bs'),'Balance sheet.',{click:true});add(D('cf'),'Cash flow.',{click:true});
+add('#zPanel','Distress zone. Nimbus is growing fast, but losing money. Everyone can see this problem.',{wait:2200});
+add(T('S'),'Now Steelridge Works.',{click:true});
+add(D('pl'),'Load its 3 statements.',{click:true});add(D('bs'),'Balance sheet.',{click:true});add(D('cf'),'Cash flow.',{click:true});
+add('#dPanel','A 20% return, almost as good as Kaveri. But look at the red box: leverage of 4.2 times is doing the heavy lifting, and the margin is only 6%.',{wait:2200});
+add('.pick[data-p="S"]','So the good number hiding a problem is Steelridge\'s return.',{click:true});
+add('#result .card','You found the borrowed return.',{wait:600,last:true});
+return S})();
+function GW_START(){document.getElementById('intro').classList.remove('on');document.getElementById('result').classList.remove('on');reset()}
+
+</script>
+<script>
+(function(){
+const g=id=>document.getElementById(id);
+let I=-1,T=null,E=null,H=null,SEQ=0,LIST=null;const L=()=>LIST||GW;
+function find(st){return typeof st.sel==='function'?st.sel():document.querySelector(st.sel)}
+function vis(el){if(!el)return false;const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&!el.disabled&&!el.closest('[hidden]')}
+function place(){if(I<0||!E)return;if(!E.isConnected){const n=find(L()[I]);if(n)E=n;else return}const r=E.getBoundingClientRect(),pad=6,ring=g('gwRing'),tip=g('gwTip');
+ ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';ring.style.width=(r.width+pad*2)+'px';ring.style.height=(r.height+pad*2)+'px';
+ const tw=tip.offsetWidth,th=tip.offsetHeight,vw=innerWidth,vh=innerHeight;let top=r.bottom+14;if(top+th>vh-8)top=r.top-th-14;if(top<8)top=Math.max(8,Math.min(vh-th-8,r.top+12));
+ let left=r.left+r.width/2-tw/2;left=Math.max(10,Math.min(vw-tw-10,left));tip.style.top=top+'px';tip.style.left=left+'px'}
+function show(i){I=i;const st=L()[i],my=++SEQ;clearInterval(T);g('gw').hidden=true;let pre=false;
+ const t0=Date.now();T=setInterval(()=>{if(my!==SEQ)return;if(Date.now()-t0<(st.wait||0))return;if(st.pre&&!pre){pre=true;try{st.pre()}catch(e){}return}
+  const el=find(st);if(!vis(el))return;clearInterval(T);
+  E=el;g('gw').hidden=false;g('gwN').textContent='step '+(i+1)+' of '+L().length;g('gwT').innerHTML=(typeof st.t==='function'?st.t():st.t)+(st.click?' <span class="tap">tap the glowing spot</span>':'<span class="lock">READ, THEN PRESS NEXT</span>');
+  g('gwNext').style.display=st.click?'none':'';g('gwNext').textContent=st.last?(LIST?"Start playing":'Done'):'Next';
+  el.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(place,420);place();
+  if(st.click){H=ev=>{const cur=E&&E.isConnected?E:find(st);if(!cur||!(cur===ev.target||cur.contains(ev.target)))return;document.removeEventListener('click',H,true);H=null;g('gw').hidden=true;setTimeout(next,250)};document.addEventListener('click',H,true)}},150)}
+setInterval(()=>{if(I>=0&&E&&!E.isConnected)place()},300);
+function next(){if(I>=L().length-1){stop();return}show(I+1)}
+function stop(){LIST=null;const k=g('gwK');if(k)k.textContent='WALK WITH ME';SEQ++;clearInterval(T);if(H)document.removeEventListener('click',H,true);H=null;I=-1;E=null;g('gw').hidden=true}
+window.gwStop=stop;
+function curEl(){if(I<0)return null;const st=L()[I];if(E&&E.isConnected)return E;return find(st)}
+function allowed(t){if(!t||!t.closest)return true;if(t.closest('#gwTip,.walkgo,#homeTab'))return true;
+ const st=L()[I];if(!st||!st.click||g('gw').hidden)return false;const c=curEl();return !!c&&(c===t||c.contains(t))}
+function nudge(){const tip=g('gwTip');if(g('gw').hidden)return;tip.classList.remove('gwnudge');void tip.offsetWidth;tip.classList.add('gwnudge')}
+function block(ev){if(I<0)return;if(allowed(ev.target))return;ev.stopImmediatePropagation();ev.stopPropagation();
+ if(ev.cancelable&&!/^(touch|pointer)/.test(ev.type))ev.preventDefault();if(ev.type==='click')nudge()}
+['click','mousedown','mouseup','pointerdown','pointerup','touchstart','touchend','dblclick','contextmenu','change','input','submit'].forEach(t=>document.addEventListener(t,block,true));
+document.addEventListener('keydown',ev=>{if(I<0)return;if(ev.key==='Escape'){ev.stopImmediatePropagation();stop();return}if((ev.key==='Enter'||ev.key===' ')&&!allowed(ev.target)){ev.stopImmediatePropagation();ev.preventDefault()}},true);window.gwCur=()=>({i:I,click:!!(L()[I]&&L()[I].click),last:!!(L()[I]&&L()[I].last),shown:!g('gw').hidden,n:L().length});window.gwEl=window.__gwEl=()=>(E&&!E.isConnected?find(L()[I]):E);
+window.gwTour=function(){if(typeof TOUR==='undefined')return;stop();document.querySelectorAll('.ov.on,#infoOv').forEach(o=>{if(o.id==='infoOv')o.hidden=true});LIST=TOUR;g('gwK').textContent='QUICK TOUR';setTimeout(()=>show(0),250)};
+window.gwStart=function(){const io=g('infoOv');if(io)io.hidden=true;stop();try{GW_START()}catch(e){console.error(e)}setTimeout(()=>show(0),300)};
+g('gwNext').onclick=()=>{if(L()[I]&&L()[I].last){stop();return}next()};
+g('gwStop').onclick=stop;
+document.querySelectorAll('.walkgo').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();window.gwStart()}));
+addEventListener('resize',place);addEventListener('scroll',place,true);
+})();
+</script>
+<a id="homeTab" href="../" aria-label="Back to Shiva's home page"><svg viewBox="0 0 16 16" fill="none" stroke="#14161F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>Home</a>
+<style id="homecss">
+#homeTab{position:fixed;left:10px;top:10px;z-index:100001;display:inline-flex;align-items:center;gap:5px;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:13px;letter-spacing:0;text-transform:none;line-height:1;color:#14161F;text-decoration:none;background:#FF9F1C;border:2.5px solid #14161F;border-radius:10px;padding:5px 10px 5px 8px;box-shadow:2px 2px 0 #14161F;transform:none;rotate:0deg;writing-mode:horizontal-tb}
+#homeTab:hover,#homeTab:focus-visible{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #14161F}
+#homeTab svg{width:14px;height:14px}
+.homespace{display:inline-block;width:84px;height:24px;vertical-align:middle;flex:none;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;transform:none!important}
+.ov,.overlay{padding-top:56px!important}
+</style>
+
+</html>
