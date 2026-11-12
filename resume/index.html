@@ -105,6 +105,23 @@ ul{margin:0;padding-left:4.5mm}li{margin:.5mm 0}
 .tagrow .ppp{display:inline-block!important;margin:0!important;transform:rotate(1.5deg)!important}
 .top .role{grid-column:1 / -1;white-space:nowrap;margin-top:0!important;font-size:10pt!important}
 @media screen and (max-width:820px){.top{grid-template-columns:1fr!important}.top .sub{white-space:normal}.contact{align-items:flex-start}}
+/* role and quote sit under the name, beside the taller contact column */
+.top{grid-template-columns:minmax(0,1fr) auto!important}
+.top .contact{grid-column:2;grid-row:1 / span 3}
+.top .role,.top .sub{grid-column:1!important}
+/* phone: name, tags and LinkedIn on the left, QR on the right */
+@media screen and (max-width:820px){
+ .top{grid-template-columns:minmax(0,1fr) auto!important;column-gap:4mm!important}
+ .top .contact{display:contents}
+ .top .tl{grid-column:1;grid-row:1}
+ .top .contact>a{grid-column:1;grid-row:2;justify-self:start}
+ .top .qr{grid-column:2;grid-row:1 / span 2;flex-direction:column!important;align-self:start}
+ .top .qr span{text-align:center!important;max-width:24mm}
+ .top .city{grid-column:2;grid-row:3;justify-self:center}
+ .top .role,.top .sub{grid-column:1 / -1!important}
+ .tagrow{flex-wrap:wrap!important;gap:2mm 3mm}
+ .top .role{white-space:normal}
+}
 </style>
 
 <div class="bar"><button type="button" onclick="window.print()">Download PDF</button></div>
