@@ -85,7 +85,7 @@ h1 span{background:var(--sG);padding:0 8px;border:3px solid var(--ink);border-ra
 
 <div class="app">
  <header class="top">
-  <h1><i class="homespace" aria-hidden="true"></i><span>Finance Tower</span></h1>
+  <h1><i class="homespace" aria-hidden="true"></i><span>Finance Tower</span></h1><button class="infob infogo" id="infoTop" type="button" aria-label="How it works">i</button>
   <div class="tabs" id="tabs" role="tablist"></div><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button>
  </header>
  <main class="main">
@@ -121,7 +121,7 @@ h1 span{background:var(--sG);padding:0 8px;border:3px solid var(--ink);border-ra
  <div class="hand">Good morning, Director.</div>
  <h2>3 companies. 1 good number is hiding a problem.</h2>
  <p>Load each company's P&amp;L, balance sheet and cash flow. Finance Tower's agents will read them for you. Then find the problem.</p>
- <div class="rbtns"><button class="big" id="start">Play</button><button class="big walkgo" id="walkIntro" type="button" style="background:#B6EFA0">Walk with me</button></div>
+ <div class="rbtns"><button class="big" id="start">Play</button><button class="big walkgo" id="walkIntro" type="button" style="background:#B6EFA0">Walk with me</button><button class="linkb infogo" id="infoIntro" type="button">How it works</button></div>
 </div></div>
 
 <div class="ov" id="result"><div class="card">
@@ -318,4 +318,26 @@ addEventListener('resize',place);addEventListener('scroll',place,true);
 .ov,.overlay{padding-top:56px!important}
 </style>
 
+<style id="infocss">
+.infob{width:30px;height:30px;flex:none;border:2.5px solid #14161F;border-radius:50%;background:#fff;color:#14161F;font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:16px;cursor:pointer;box-shadow:2px 2px 0 #14161F;padding:0}
+.linkb{background:none;border:0;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:700;font-size:15px;text-decoration:underline;cursor:pointer;color:#14161F}
+#infoOv{position:fixed;inset:0;z-index:99980;background:rgba(20,22,31,.45);display:flex;align-items:center;justify-content:center;padding:56px 12px 12px;overflow:auto}
+#infoOv .icard{background:#fff;border:3px solid #14161F;border-radius:20px;box-shadow:8px 8px 0 #14161F;max-width:760px;width:100%;padding:18px 20px;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#14161F}
+#infoOv h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:26px;margin:0 0 8px}
+#infoOv .ig{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 12px}
+#infoOv .ib{border:2.5px solid #14161F;border-radius:12px;padding:8px 11px;font-size:13.5px;line-height:1.35}
+#infoOv .ib b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;margin-bottom:2px}
+#infoOv .ib:nth-child(4n+1){background:#BDEFEA}#infoOv .ib:nth-child(4n+2){background:#FFE66D}#infoOv .ib:nth-child(4n+3){background:#A9D8FF}#infoOv .ib:nth-child(4n+4){background:#B6EFA0}
+#infoOv .ibtns{display:flex;gap:10px;flex-wrap:wrap}
+#infoOv .ibtns button{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:16px;padding:9px 18px;border:3px solid #14161F;border-radius:14px;background:#FF9F1C;box-shadow:4px 4px 0 #14161F;cursor:pointer;color:#14161F}
+#infoOv .ibtns button.alt{background:#fff}
+@media (max-width:700px){#infoOv .ig{grid-template-columns:1fr}#infoOv{align-items:flex-start}}
+</style>
+<div id="infoOv" hidden><div class="icard"><h2>How it works</h2><div class="ig"><div class="ib"><b>Your goal</b>3 companies look fine. Find the one whose good number is hiding a problem.</div><div class="ib"><b>Read</b>Switch companies with the tabs at the top. Tap the 3 statements to load each one.</div><div class="ib"><b>The agents</b>They read the statements for you and fill in the Z score, DuPont and key numbers. Ask them follow-up questions.</div><div class="ib"><b>Decide</b>Once all 3 companies are read, pick your answer at the bottom.</div></div><div class="ibtns"><button id="infoClose" type="button">Got it</button><button class="alt" id="tourBtn" type="button">Show me around</button></div></div></div>
+<script>const TOUR=(()=>{const S=[];const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));add('#tabs','3 companies. Switch between them here.');add('#stmts','Tap the 3 statements, P&amp;L, balance sheet and cash flow, to load a company.');add('#agents','The agents read the statements for you.');add('#zPanel','The Altman Z score: is the company in distress?');add('#dPanel','DuPont: does the return come from margins, efficiency or debt?');add('.bot','Ask Finance Tower follow-up questions here.');add('#decide','When all 3 companies are read, pick the one whose good number is hiding a problem.');S[S.length-1].last=true;return S})();window.GW_STARTBTN="start";</script>
+<script id="infojs">(function(){const g=id=>document.getElementById(id);const o=g('infoOv');if(!o)return;
+document.querySelectorAll('.infogo').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();o.hidden=false}));
+g('infoClose').onclick=()=>{o.hidden=true};g('tourBtn').onclick=()=>{o.hidden=true;window.gwTour()};
+o.addEventListener('click',e=>{if(e.target===o)o.hidden=true});
+const st=g(window.GW_STARTBTN||'start');let toured=false;if(st)st.addEventListener('click',()=>{if(!toured){toured=true;setTimeout(window.gwTour,700)}});})();</script>
 </html>

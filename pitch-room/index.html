@@ -210,7 +210,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offse
 <div class="wrap">
   <header>
     <h1><i class="homespace" aria-hidden="true"></i><span>The Pitch Room</span></h1>
-    <div class="hbtns"><button type="button" class="hbtn" id="help">Briefing</button><button type="button" class="hbtn" id="restart">Restart</button><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button></div>
+    <div class="hbtns"><button type="button" class="hbtn" id="help">Briefing</button><button type="button" class="hbtn" id="tourTop" onclick="window.gwTour()">Quick tour</button><button type="button" class="hbtn" id="restart">Restart</button><button class="walkb walkgo" id="walkTop" type="button"><svg viewBox="0 0 24 24" fill="#14161F"><ellipse cx="7" cy="14" rx="3" ry="4.5"/><ellipse cx="16" cy="8" rx="3" ry="4.5"/><circle cx="5" cy="20.5" r="1.2"/><circle cx="8.6" cy="20.6" r="1.1"/><circle cx="14" cy="2.6" r="1.1"/><circle cx="17.6" cy="2.5" r="1.2"/></svg><span>Walk with me</span></button></div>
   </header>
 
   <div class="main">
@@ -756,4 +756,5 @@ addEventListener('resize',place);addEventListener('scroll',place,true);
 function wrap(){document.querySelectorAll('.bmc').forEach(function(b){if(b.closest('.cvscroll')||b.closest('#bmcwrap'))return;var w=document.createElement('div');w.className='cvscroll';b.parentNode.insertBefore(w,b);w.appendChild(b);var h=document.createElement('span');h.className='cvhint';h.textContent='swipe to see the whole canvas \u2192';w.parentNode.insertBefore(h,w.nextSibling)})}
 wrap();new MutationObserver(wrap).observe(document.body,{childList:true,subtree:true});})();</script>
 
+<script>const TOUR=(()=>{const C=id=>()=>{const e=document.getElementById(id);return e&&(e.closest(".card")||e)};const S=[];const add=(sel,t,o)=>S.push(Object.assign({sel,t},o||{}));add(C('qrows'),'Your questions: 2 per founder.');add('#ftabs','Switch between the founders here.');add('#stage','The pitch. Tap a sticky to ask for the evidence behind it.');add(C('amap'),'The assumption map fills in as you ask.');add('#advice','Dev, the senior partner, shares his view.');add(C('invest'),'Your decision: who gets the money.');S[S.length-1].last=true;return S})();(function(){const s=document.getElementById("iStart");let t=false;if(s)s.addEventListener("click",()=>{if(!t){t=true;setTimeout(window.gwTour,700)}})})();</script>
 </html>
