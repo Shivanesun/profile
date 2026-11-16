@@ -135,9 +135,9 @@ section{padding:26px 0 30px}
 .lc svg{width:30px;height:30px}
 .kayak{display:block;width:110px;margin:34px auto 0}
 .kayak svg{display:block;width:100%;height:auto;overflow:visible}
-/* only the paddle moves: it sweeps back and forth around the cockpit */
-.kayak .paddle{transform-box:view-box;transform-origin:60px 26px;animation:paddle 1.6s ease-in-out infinite alternate}
-@keyframes paddle{from{transform:rotate(-12deg)}to{transform:rotate(10deg)}}
+/* only the paddle moves: the shaft crosses in front of the paddler and rocks blade to blade, pulling back on each stroke */
+.kayak .paddle{transform-box:view-box;transform-origin:60px 26px;animation:paddle 2s ease-in-out infinite}
+@keyframes paddle{0%,100%{transform:translateX(3px) rotate(-14deg)}50%{transform:translateX(-3px) rotate(14deg)}}
 @media (prefers-reduced-motion:reduce){.kayak .paddle{animation:none}}
 .medal{position:relative}
 .medal .rib{font-family:var(--hand);font-weight:700;font-size:17px;color:#B07A00;transform:rotate(-6deg);margin-left:4px}
@@ -360,7 +360,7 @@ body.playing{overflow:hidden}
    <div class="lc"><svg viewBox="0 0 40 40" fill="none" stroke="#14161F" stroke-width="2.2"><path d="M10 20a10 10 0 0 1 17-7M30 20a10 10 0 0 1-17 7"/><circle cx="10" cy="20" r="3" fill="#FFB8D4"/><circle cx="30" cy="20" r="3" fill="#B6EFA0"/></svg>Systems Practice, Acumen</div>
    <div class="lc"><svg viewBox="0 0 40 40" fill="none" stroke="#14161F" stroke-width="2.2"><rect x="7" y="6" width="26" height="30" rx="3" fill="#FFE66D"/><path d="M13 15h14M13 21h14M13 27h8"/></svg>Project Management, PMI</div>
   </div>
-  <a class="kayak" href="https://chaliyar-river.netlify.app/" target="_blank" rel="noopener" aria-label="Kayaked 68 km on the Chaliyar"><svg class="kay" viewBox="0 0 120 52" fill="none" stroke="#14161F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="paddle"><path d="M33 9L93 41" stroke-width="3"/><ellipse cx="30" cy="7.5" rx="5" ry="2.6" transform="rotate(28 30 7.5)" fill="#FF9F1C"/></g><path d="M3 28Q60 47 117 28Q60 10 3 28z" fill="#FF9F1C"/><ellipse cx="60" cy="26" rx="10" ry="3.2" fill="#14161F"/><g class="paddle"><ellipse cx="96" cy="42.5" rx="5.5" ry="2.8" transform="rotate(28 96 42.5)" fill="#FF9F1C"/></g><path d="M6 45q4-3 8 0t8 0 8 0" stroke="#2F5BFF"/><path d="M78 49q4-3 8 0t8 0 8 0" stroke="#2F5BFF"/></svg></a>
+  <a class="kayak" href="https://chaliyar-river.netlify.app/" target="_blank" rel="noopener" aria-label="Kayaked 68 km on the Chaliyar"><svg class="kay" viewBox="0 0 120 52" fill="none" stroke="#14161F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 28Q60 47 117 28Q60 10 3 28z" fill="#FF9F1C"/><ellipse cx="60" cy="26" rx="10" ry="3.2" fill="#14161F"/><g class="paddle"><path d="M33 9L93 41" stroke-width="3"/><ellipse cx="30" cy="7.5" rx="5" ry="2.6" transform="rotate(28 30 7.5)" fill="#FF9F1C"/><ellipse cx="96" cy="42.5" rx="5.5" ry="2.8" transform="rotate(28 96 42.5)" fill="#FF9F1C"/></g><path d="M6 45q4-3 8 0t8 0 8 0" stroke="#2F5BFF"/><path d="M78 49q4-3 8 0t8 0 8 0" stroke="#2F5BFF"/></svg></a>
  </section>
 
  <p class="trustq" style="text-align:center;margin:26px auto 4px"><span class="qe">Evolving from</span> <span class="q1">&ldquo;I think, therefore I am&rdquo;</span> <span class="qe">to</span> <span class="q2">&ldquo;We trust, therefore there we are.&rdquo;</span></p>
