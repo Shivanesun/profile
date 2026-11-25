@@ -301,6 +301,7 @@ html[data-v="4"] .dot .ring{animation-duration:2s}
 html[data-v="4"] #key,html[data-v="4"] .pick{display:none}
 html[data-v="4"] .vkey4{display:block;font-size:14px}
 html[data-v="4"] .oxf{display:none}
+@media (min-width:901px){html[data-v="4"] .pmap{display:block}html[data-v="4"] .mapw{position:relative}html[data-v="4"] .side{position:absolute;left:4%;top:1%;width:50%}html[data-v="4"] .side h3{font-size:clamp(22px,2.2vw,30px);margin-bottom:8px}html[data-v="4"] .side p{font-size:clamp(15px,1.4vw,18px);margin-bottom:8px}}
 html[data-v="4"] .policy-short{grid-template-columns:1fr 1.2fr 1fr}
 @media (max-width:900px){html[data-v="4"] .policy-short{grid-template-columns:1fr 1fr}}
 @media (max-width:600px){html[data-v="4"] #map{min-width:0;width:100%}html[data-v="4"] .mapw{overflow:visible;margin:0;padding:0}html[data-v="4"] .swipe{display:none}html[data-v="4"] .policy-short{grid-template-columns:1fr!important}}
@@ -324,13 +325,13 @@ html[data-v="4"] .policy-short{grid-template-columns:1fr 1.2fr 1fr}
  <section id="portfolio">
   <div class="sh"><span class="n">01</span><h2>My portfolio</h2><span class="note">2 in Exploit, 6 in Explore</span><span class="note vnote">every bet starts in Explore</span></div>
   <div class="board pmap">
-   <div class="mapw"><svg viewBox="0 0 900 670" id="map" aria-label="Explore and Exploit portfolio map"></svg><div class="swipe">swipe to see the whole map ↔</div></div>
+   <div class="mapw"><svg viewBox="0 0 900 670" id="map" aria-label="Explore and Exploit portfolio map"></svg><div class="swipe">swipe to see the whole map ↔</div>
    <div class="side">
     <h3>Explore and Exploit</h3>
     <p><b>Explore</b> is where new bets search for proof. <b>Exploit</b> is where proven work runs at scale.</p>
     <p class="pick" style="font-family:var(--hand);font-weight:700;font-size:19px;color:var(--blue)">Pick a dot to open the product.</p><p class="vkey4">Tap any app to open it. The glowing ones you can play.</p><p class="vkey"><span class="vplay">▶ play</span> means you can play it as a role. Tap any dot to open it.</p>
     <div class="key" id="key"></div>
-   </div>
+   </div></div>
   </div>
  </section>
 
@@ -559,7 +560,7 @@ let EX={x:40,y:220,w:540,h:400}, XP={x:580,y:30,w:300,h:190};
 function pos(p){const B=p.box==='exploit'?XP:EX;return [B.x+p.x*B.w,B.y+(1-p.y)*B.h]}
 function grid(B){let g='';for(let x=B.x+20;x<B.x+B.w;x+=20)g+=`<path d="M${x} ${B.y}V${B.y+B.h}"/>`;for(let y=B.y+20;y<B.y+B.h;y+=20)g+=`<path d="M${B.x} ${y}H${B.x+B.w}"/>`;return `<g stroke="#E4E7EC" stroke-width="1">${g}</g>`}
 function drawMap(){const V=+(document.documentElement.dataset.v||0);const MOB=V==4&&innerWidth<=600;const K=MOB?.72:1,OFF=MOB?28:38,FS=MOB?14.5:16;
- if(MOB){EX={x:34,y:250,w:350,h:360};XP={x:118,y:28,w:266,h:172};$('map').setAttribute('viewBox','0 0 400 650')}else{EX={x:40,y:220,w:540,h:400};XP={x:580,y:30,w:300,h:190};$('map').setAttribute('viewBox','0 0 900 670')}
+ if(MOB){EX={x:34,y:250,w:350,h:360};XP={x:118,y:28,w:266,h:172};$('map').setAttribute('viewBox','0 0 400 650')}else if(V==4&&innerWidth>900){EX={x:40,y:180,w:600,h:330};XP={x:640,y:20,w:320,h:160};$('map').setAttribute('viewBox','0 0 1000 560')}else{EX={x:40,y:220,w:540,h:400};XP={x:580,y:30,w:300,h:190};$('map').setAttribute('viewBox','0 0 900 670')}
  let s=`<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="#14161F" stroke-width="2"/></marker></defs>`;
  [EX,XP].forEach(B=>s+=`<rect x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" fill="#fff"/>${V==3?'':grid(B)}<rect x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" fill="none" stroke="#14161F" stroke-width="4"/>`);
  if(V!=3)s+=`<text x="${EX.x+EX.w-16}" y="${EX.y+EX.h-16}" text-anchor="end" font-family="Bricolage Grotesque" font-weight="800" font-size="34" fill="#14161F" opacity=".12">EXPLORE</text><text x="${XP.x+XP.w-14}" y="${XP.y+XP.h-14}" text-anchor="end" font-family="Bricolage Grotesque" font-weight="800" font-size="28" fill="#14161F" opacity=".12">EXPLOIT</text>`;
@@ -661,7 +662,7 @@ $('prBtn').onclick=()=>{$('mb').innerHTML=`<div class="mh"><div><h2>The Presiden
  <div class="prk"><span><i class="pd y"></i> dismissed while it had a majority</span><span><i class="pd"></i> dismissed without a majority</span></div>
  <p class="about" style="margin-top:12px"><b>What changed:</b> President's Rule did not disappear. It almost stopped being used against governments that had a majority, and all 3 exceptions trace back to a Chief Minister resigning.</p>`;$('ov').classList.add('on')};
 drawMap();
-let _mw=innerWidth<=600;addEventListener('resize',()=>{const m=innerWidth<=600;if(m!==_mw){_mw=m;drawMap()}});
+const mapSize=()=>innerWidth<=600?0:innerWidth<=900?1:2;let _mw=mapSize();addEventListener('resize',()=>{const m=mapSize();if(m!==_mw){_mw=m;drawMap()}});
 /* ---------- single page game player ---------- */
 function gameDoc(k){const el=document.getElementById('gd-'+k);if(!el)return null;let h=JSON.parse(el.textContent);if(!/^\s*<!doctype/i.test(h))h='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+h+'</body></html>';return h}
 let lastY=0;
