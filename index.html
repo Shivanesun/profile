@@ -300,6 +300,10 @@ html[data-v="4"] .dot .ring{animation-duration:2s}
 html[data-v="4"] #key,html[data-v="4"] .pick{display:none}
 html[data-v="4"] .vkey4{display:block;font-size:14px}
 html[data-v="4"] .oxf{display:none}
+/* hero: green tag up top, yellow tag sits on the portfolio heading line (phones keep yellow in the hero) */
+.shtg{margin-left:auto;margin-right:4px}
+@media (min-width:601px){.doodle .tg1{display:none}.doodle{margin-bottom:38px}}
+@media (max-width:600px){.shtg{display:none}}
 /* raised = opens something, flat = information only */
 div.card,.stk{cursor:default!important;background:#F4F6F9}div.card:hover,.stk:hover{transform:none!important;box-shadow:none!important}
 .pf{box-shadow:none}
@@ -326,7 +330,7 @@ html[data-v="4"] .policy-short{grid-template-columns:1fr 1.2fr 1fr}
  </div>
 
  <section id="portfolio">
-  <div class="sh"><span class="n">01</span><h2>My portfolio</h2><span class="note">2 in Exploit, 6 in Explore</span><span class="note vnote">every bet starts in Explore</span></div>
+  <div class="sh"><span class="n">01</span><h2>My portfolio</h2><span class="note">2 in Exploit, 6 in Explore</span><span class="note vnote">every bet starts in Explore</span><span class="tg1 shtg">A strategist who builds.</span></div>
   <div class="board pmap">
    <div class="mapw"><svg viewBox="0 0 900 670" id="map" aria-label="Explore and Exploit portfolio map"></svg><div class="swipe">swipe to see the whole map ↔</div>
    <div class="side">
