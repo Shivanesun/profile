@@ -10,7 +10,7 @@
 html,body{margin:0;background:#E9EDF2}
 body{color:var(--ink);font-family:var(--body);font-size:10pt;line-height:1.33}
 .bar{position:sticky;top:0;z-index:5;display:flex;justify-content:flex-end;gap:10px;padding:10px 16px;background:rgba(233,237,242,.92)}
-.bar button{font-family:var(--display);font-weight:800;font-size:15px;padding:8px 16px;border:3px solid var(--ink);border-radius:12px;background:var(--acc);box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+.bar .dlb{text-decoration:none;color:var(--ink);display:inline-block;font-family:var(--display);font-weight:800;font-size:15px;padding:8px 16px;border:3px solid var(--ink);border-radius:12px;background:var(--acc);box-shadow:4px 4px 0 var(--ink);cursor:pointer}
 .page{width:210mm;min-height:297mm;margin:0 auto 24px;background:#fff;padding:11mm 12mm 11mm;position:relative;box-shadow:0 2px 14px rgba(20,22,31,.15);
  background-image:radial-gradient(rgba(20,22,31,.09) 1px,transparent 1px);background-size:5mm 5mm}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8mm;border-bottom:3px solid var(--ink);padding-bottom:3mm;margin-bottom:4mm}
@@ -138,7 +138,7 @@ ul{margin:0;padding-left:4.5mm}li{margin:.5mm 0}
 }
 </style>
 
-<div class="bar"><button type="button" onclick="window.print()">Download PDF</button></div>
+<div class="bar"><a class="dlb" id="dlPdf" href="Sivanesan_Selvaraj_Resume.pdf" download="Sivanesan_Selvaraj_Resume.pdf" target="_blank" rel="noopener">Download PDF</a></div>
 
 <div class="page p1"><div class="dood" aria-hidden="true">
 <svg class="d1" viewBox="0 0 100 60"><rect x="1" y="1" width="98" height="58" rx="3"/><path d="M20 1v40M40 1v40M60 1v40M80 1v40M1 41h98M50 41v18M20 21h20M60 21h20"/></svg>

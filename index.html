@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Shiva</title>
+<script>document.documentElement.dataset.v='4'</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Caveat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <style>
@@ -267,6 +268,42 @@ body.playing{overflow:hidden}
 .prl{list-style:none;margin:10px 0 0;padding:0;text-align:left;display:flex;flex-direction:column;gap:6px}.prl li{font-size:12px;line-height:1.3;border-left:4px solid #FFC94D;padding-left:8px;color:var(--muted)}.prl b{display:block;color:var(--ink);font-size:13px}
 .prk{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13px}.prk span{display:inline-flex;align-items:center;gap:6px}.prk .pd{animation:none}
 @media (max-width:700px){.prg{grid-template-columns:1fr}.prj{transform:none}.prj .arr{transform:rotate(90deg)}}
+
+/* variants: html[data-v] 0 current, 1 light, 2 medium, 3 bold */
+.vnote,.vkey,.vppp{display:none}
+html[data-v="1"] .hero .roles,html[data-v="2"] .hero .roles,html[data-v="3"] .hero .roles{display:none}
+html[data-v="1"] #key,html[data-v="2"] #key,html[data-v="3"] #key,html[data-v="1"] .pick,html[data-v="2"] .pick,html[data-v="3"] .pick{display:none}
+html[data-v="1"] .vkey,html[data-v="2"] .vkey,html[data-v="3"] .vkey{display:block;font-size:14px}
+.vplay{font-family:var(--display);font-weight:800;font-size:12px;background:#FFF4D6;border:2px solid var(--ink);border-radius:20px;padding:1px 8px;white-space:nowrap}
+html[data-v="2"] .tg2,html[data-v="3"] .tg2{display:none}
+html[data-v="2"] .vppp,html[data-v="3"] .vppp{display:block;margin-top:18px;font-family:var(--display);font-weight:700;font-size:18px;color:var(--muted);letter-spacing:.01em}
+html[data-v="3"] .doodle{flex-direction:row;align-items:center;justify-content:flex-start;margin-top:-4px}
+html[data-v="3"] .hero{gap:12px}
+html[data-v="3"] .hero{grid-template-columns:1fr}
+html[data-v="3"] .pmap{grid-template-columns:1fr}
+html[data-v="3"] .side{display:none}
+html[data-v="3"] #portfolio .note:not(.vnote){display:none}
+html[data-v="3"] #portfolio .vnote{display:inline}
+@media (max-width:600px){html[data-v="3"] #portfolio .vnote{display:none}}
+html[data-v="3"] #portfolio .board{padding-top:8px}
+html[data-v="3"] #map{max-width:940px;display:block;margin:0 auto}
+
+.vg{display:none}
+html[data-v="4"] .pops{display:none}
+html[data-v="4"] .stk{padding-top:10px}
+html[data-v="4"] .vg{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+html[data-v="4"] .vg a{font-family:var(--display);font-weight:800;font-size:12.5px;color:var(--ink);text-decoration:none;background:var(--acc);border:2px solid var(--ink);border-radius:8px;padding:2px 9px;box-shadow:2px 2px 0 var(--ink)}
+html[data-v="4"] .stk.hasg:after{content:"";position:absolute;inset:-7px;border-radius:19px;border:3px solid var(--acc);opacity:0;animation:halo 2.4s ease-out infinite;pointer-events:none}
+html[data-v="4"] .dot .ring{animation-duration:2s}
+@media (max-width:600px){html[data-v="4"] .stks{gap:22px!important;margin-top:8px}}
+
+.vkey4{display:none}
+html[data-v="4"] #key,html[data-v="4"] .pick{display:none}
+html[data-v="4"] .vkey4{display:block;font-size:14px}
+html[data-v="4"] .oxf{display:none}
+html[data-v="4"] .policy-short{grid-template-columns:1fr 1.2fr 1fr}
+@media (max-width:900px){html[data-v="4"] .policy-short{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){html[data-v="4"] #map{min-width:0;width:100%}html[data-v="4"] .mapw{overflow:visible;margin:0;padding:0}html[data-v="4"] .swipe{display:none}html[data-v="4"] .policy-short{grid-template-columns:1fr!important}}
 </style>
 
 <header class="top"><div class="wrap">
@@ -278,20 +315,20 @@ body.playing{overflow:hidden}
 <main class="wrap">
  <div class="hero">
   <div>
-   <h1>I help institutions make <span class="hl">better decisions</span>, and make them stick.</h1>
+   <h1>I help institutions make <span class="hl">better decisions</span>, and make them stick.</h1><div class="vppp">People &gt; Process &gt; Product</div>
    <div class="roles">Product Manager · Data and AI Strategist · Systems Practitioner · Social Scientist</div>
   </div>
   <div class="doodle"><span class="tg1">A strategist who builds.</span><span class="tg2">People &gt; Process &gt; Product</span></div>
  </div>
 
  <section id="portfolio">
-  <div class="sh"><span class="n">01</span><h2>My portfolio</h2><span class="note">2 in Exploit, 6 in Explore</span></div>
+  <div class="sh"><span class="n">01</span><h2>My portfolio</h2><span class="note">2 in Exploit, 6 in Explore</span><span class="note vnote">every bet starts in Explore</span></div>
   <div class="board pmap">
    <div class="mapw"><svg viewBox="0 0 900 670" id="map" aria-label="Explore and Exploit portfolio map"></svg><div class="swipe">swipe to see the whole map ↔</div></div>
    <div class="side">
     <h3>Explore and Exploit</h3>
     <p><b>Explore</b> is where new bets search for proof. <b>Exploit</b> is where proven work runs at scale.</p>
-    <p style="font-family:var(--hand);font-weight:700;font-size:19px;color:var(--blue)">Pick a dot to open the product.</p>
+    <p class="pick" style="font-family:var(--hand);font-weight:700;font-size:19px;color:var(--blue)">Pick a dot to open the product.</p><p class="vkey4">Tap any app to open it. The glowing ones you can play.</p><p class="vkey"><span class="vplay">▶ play</span> means you can play it as a role. Tap any dot to open it.</p>
     <div class="key" id="key"></div>
    </div>
   </div>
@@ -335,7 +372,7 @@ body.playing{overflow:hidden}
    <button class="stack" id="repBtn"><div class="pile"><span style="left:0;top:6px;transform:rotate(-8deg);background:#E3F2FF"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#14161F" stroke-width="2.2"><circle cx="20" cy="20" r="14" fill="#A9D8FF"/><path d="M6 20h28M20 6q-9 14 0 28M20 6q9 14 0 28"/></svg></span><span style="left:36px;top:2px;transform:rotate(3deg);background:#FFE8F1"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#14161F" stroke-width="2.2"><path d="M20 4l13 5v10c0 9-6 14-13 17C13 33 7 28 7 19V9z" fill="#FFB8D4"/><path d="M14 19l5 5 8-9"/></svg></span><span style="left:72px;top:6px;transform:rotate(10deg);background:#FFF6C4"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#14161F" stroke-width="2.2"><rect x="8" y="16" width="24" height="18" rx="2" fill="#D5C6FF"/><path d="M14 16V6h12v10M16 11h8"/></svg></span></div><b>20+ reports</b><small>Foreign policy, security, economy, elections, education and water. Tap to open the shelf.</small></button>
    <button class="stack" id="prBtn"><div style="position:absolute;top:10px;right:10px;font-family:var(--hand);font-weight:700;font-size:18px;transform:rotate(6deg);color:var(--blue)">my first analysis</div><div id="prMini"></div><b>The President's Rule</b><small>1 judgement, and states with a majority stopped being dismissed.</small></button>
    <div class="card" style="cursor:default;flex-direction:column;align-items:flex-start"><svg viewBox="0 0 64 64" fill="none" stroke="#14161F" stroke-width="3" stroke-linejoin="round"><path d="M8 52h48M14 52V30h36v22M8 30L32 12l24 18z" fill="#A9D8FF"/><path d="M24 38v8M32 38v8M40 38v8"/><path d="M38 20L52 8M44 8h8v8" stroke="#E5383B"/></svg><b>Vision 2031</b><span>A state's long term plan.</span></div>
-   <div class="card" style="cursor:default;flex-direction:column;align-items:flex-start"><svg viewBox="0 0 64 64" fill="none" stroke="#14161F" stroke-width="3" stroke-linejoin="round"><path d="M6 24L32 12l26 12-26 12z" fill="#D5C6FF"/><path d="M16 29v12c8 7 24 7 32 0V29"/><path d="M58 24v14"/></svg><b>Oxford, online</b><span>From Poverty to Prosperity.</span></div>
+   <div class="card oxf" style="cursor:default;flex-direction:column;align-items:flex-start"><svg viewBox="0 0 64 64" fill="none" stroke="#14161F" stroke-width="3" stroke-linejoin="round"><path d="M6 24L32 12l26 12-26 12z" fill="#D5C6FF"/><path d="M16 29v12c8 7 24 7 32 0V29"/><path d="M58 24v14"/></svg><b>Oxford, online</b><span>From Poverty to Prosperity.</span></div>
   </div>
  </section>
 
@@ -363,7 +400,7 @@ body.playing{overflow:hidden}
   <a class="kayak" href="https://chaliyar-river.netlify.app/" target="_blank" rel="noopener" aria-label="Kayaked 68 km on the Chaliyar"><svg class="kay" viewBox="0 0 120 52" fill="none" stroke="#14161F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 28Q60 47 117 28Q60 10 3 28z" fill="#FF9F1C"/><ellipse cx="60" cy="26" rx="10" ry="3.2" fill="#14161F"/><g class="paddle"><path d="M33 9L93 41" stroke-width="3"/><ellipse cx="30" cy="7.5" rx="5" ry="2.6" transform="rotate(28 30 7.5)" fill="#FF9F1C"/><ellipse cx="96" cy="42.5" rx="5.5" ry="2.8" transform="rotate(28 96 42.5)" fill="#FF9F1C"/></g><path d="M6 45q4-3 8 0t8 0 8 0" stroke="#2F5BFF"/><path d="M78 49q4-3 8 0t8 0 8 0" stroke="#2F5BFF"/></svg></a>
  </section>
 
- <p class="trustq" style="text-align:center;margin:26px auto 4px"><span class="qe">Evolving from</span> <span class="q1">&ldquo;I think, therefore I am&rdquo;</span> <span class="qe">to</span> <span class="q2">&ldquo;We trust, therefore there we are.&rdquo;</span></p>
+<p class="trustq" style="text-align:center;margin:26px auto 4px"><span class="qe">Evolving from</span> <span class="q1">&ldquo;I think, therefore I am&rdquo;</span> <span class="qe">to</span> <span class="q2">&ldquo;We trust, therefore there we are.&rdquo;</span></p>
 <div class="talk"><h2>Let's talk.</h2><a class="btn o" href="https://www.linkedin.com/in/shivanesun" target="_blank" rel="noopener"><span class="liico">in</span>LinkedIn</a><a class="btn" href="resume/">Résumé</a><span class="note">bring me a decision that needs to stick</span></div>
 </main>
 
@@ -518,19 +555,24 @@ const DAMA=[['Architecture','<path d="M2 14L9 4l7 10z"/>'],['Modelling','<rect x
 V.dama=`<svg viewBox="0 0 320 300">${DAMA.map((t,i,a)=>{const a0=i/a.length*2*Math.PI-Math.PI/2,a1=(i+1)/a.length*2*Math.PI-Math.PI/2,r=136,cx=160,cy=148;const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);const am=(a0+a1)/2;const cols=['#A9D8FF','#B6EFA0','#FFE66D','#FFB8D4','#D5C6FF'];const ix=cx+98*Math.cos(am),iy=cy+98*Math.sin(am);return `<path d="M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1}Z" fill="${cols[i%5]}" stroke="#14161F" stroke-width="2"/><g transform="translate(${ix-9},${iy-19})" fill="#fff" stroke="#14161F" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">${t[1]}</g><text x="${ix}" y="${iy+14}" text-anchor="middle" font-size="9.5" font-weight="700" font-family="IBM Plex Sans">${t[0]}</text>`}).join('')}<circle cx="160" cy="148" r="52" fill="#fff" stroke="#14161F" stroke-width="3"/><text x="160" y="144" text-anchor="middle" font-size="14" font-weight="800" font-family="Bricolage Grotesque">Data</text><text x="160" y="162" text-anchor="middle" font-size="14" font-weight="800" font-family="Bricolage Grotesque">Governance</text></svg>`;
 
 /* ---------- portfolio map ---------- */
-const EX={x:40,y:220,w:540,h:400}, XP={x:580,y:30,w:300,h:190};
+let EX={x:40,y:220,w:540,h:400}, XP={x:580,y:30,w:300,h:190};
 function pos(p){const B=p.box==='exploit'?XP:EX;return [B.x+p.x*B.w,B.y+(1-p.y)*B.h]}
 function grid(B){let g='';for(let x=B.x+20;x<B.x+B.w;x+=20)g+=`<path d="M${x} ${B.y}V${B.y+B.h}"/>`;for(let y=B.y+20;y<B.y+B.h;y+=20)g+=`<path d="M${B.x} ${y}H${B.x+B.w}"/>`;return `<g stroke="#E4E7EC" stroke-width="1">${g}</g>`}
-function drawMap(){let s=`<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="#14161F" stroke-width="2"/></marker></defs>`;
- [EX,XP].forEach(B=>s+=`<rect x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" fill="#fff"/>${grid(B)}<rect x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" fill="none" stroke="#14161F" stroke-width="4"/>`);
- s+=`<text x="${EX.x+EX.w-16}" y="${EX.y+EX.h-16}" text-anchor="end" font-family="Bricolage Grotesque" font-weight="800" font-size="34" fill="#14161F" opacity=".12">EXPLORE</text><text x="${XP.x+XP.w-14}" y="${XP.y+XP.h-14}" text-anchor="end" font-family="Bricolage Grotesque" font-weight="800" font-size="28" fill="#14161F" opacity=".12">EXPLOIT</text>`;
+function drawMap(){const V=+(document.documentElement.dataset.v||0);const MOB=V==4&&innerWidth<=600;const K=MOB?.72:1,OFF=MOB?28:38,FS=MOB?14.5:16;
+ if(MOB){EX={x:34,y:250,w:350,h:360};XP={x:118,y:28,w:266,h:172};$('map').setAttribute('viewBox','0 0 400 650')}else{EX={x:40,y:220,w:540,h:400};XP={x:580,y:30,w:300,h:190};$('map').setAttribute('viewBox','0 0 900 670')}
+ let s=`<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="#14161F" stroke-width="2"/></marker></defs>`;
+ [EX,XP].forEach(B=>s+=`<rect x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" fill="#fff"/>${V==3?'':grid(B)}<rect x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" fill="none" stroke="#14161F" stroke-width="4"/>`);
+ if(V!=3)s+=`<text x="${EX.x+EX.w-16}" y="${EX.y+EX.h-16}" text-anchor="end" font-family="Bricolage Grotesque" font-weight="800" font-size="34" fill="#14161F" opacity=".12">EXPLORE</text><text x="${XP.x+XP.w-14}" y="${XP.y+XP.h-14}" text-anchor="end" font-family="Bricolage Grotesque" font-weight="800" font-size="28" fill="#14161F" opacity=".12">EXPLOIT</text>`;
  s+=`<g font-family="IBM Plex Sans" font-size="13" font-weight="600" fill="#575E6E"><text x="${EX.x+EX.w/2}" y="${EX.y+EX.h+26}" text-anchor="middle">Innovation risk →</text><text transform="translate(${EX.x-14},${EX.y+EX.h/2}) rotate(-90)" text-anchor="middle">Expected return →</text><text x="${XP.x+XP.w/2}" y="${XP.y+XP.h+22}" text-anchor="middle">Death and disruption risk →</text><text transform="translate(${XP.x-12},${XP.y+XP.h/2}) rotate(-90)" text-anchor="middle">Return →</text></g>`;
- const [ax,ay]=pos(P.find(q=>q.id==='narr'));s+=`<path d="M${ax+30} ${ay+4} C${ax+90} ${ay-10} ${XP.x+40} ${XP.y+XP.h+50} ${XP.x+60} ${XP.y+XP.h-8}" fill="none" stroke="#14161F" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#ah)"/><text x="${ax+40}" y="${ay+40}" font-family="Caveat" font-weight="700" font-size="21" fill="#2F5BFF" transform="rotate(-8 ${ax+40} ${ay+40})">on its way to Exploit</text>`;
- s+=`<g transform="translate(60,52) rotate(-4)"><rect width="330" height="96" rx="6" fill="#FFE66D" stroke="#14161F" stroke-width="2.5"/><text x="16" y="34" font-family="Bricolage Grotesque" font-weight="800" font-size="18">Every bet starts in Explore.</text><text x="16" y="58" font-family="IBM Plex Sans" font-size="13.5">Only the ones with evidence earn a place</text><text x="16" y="77" font-family="IBM Plex Sans" font-size="13.5">in Exploit. Mine are no different.</text></g>`;
+ const [ax,ay]=pos(P.find(q=>q.id==='narr'));if(MOB)s+=`<path d="M${ax+14} ${ay-26} C${ax+22} ${ay-50} ${ax+30} ${XP.y+XP.h+40} ${ax+30} ${XP.y+XP.h+6}" fill="none" stroke="#14161F" stroke-width="2.2" stroke-dasharray="5 5" marker-end="url(#ah)"/><text x="${ax+2}" y="${XP.y+XP.h+46}" text-anchor="end" font-family="Caveat" font-weight="700" font-size="18" fill="#2F5BFF">on its way to Exploit</text>`;else s+=`<path d="M${ax+30} ${ay+4} C${ax+90} ${ay-10} ${XP.x+40} ${XP.y+XP.h+50} ${XP.x+60} ${XP.y+XP.h-8}" fill="none" stroke="#14161F" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#ah)"/><text x="${ax+(V>=2?78:40)}" y="${ay+(V>=2?58:40)}" font-family="Caveat" font-weight="700" font-size="21" fill="#2F5BFF" transform="rotate(-8 ${ax+(V>=2?78:40)} ${ay+(V>=2?58:40)})">on its way to Exploit</text>`;
+ if(V==3)s+=`<g transform="translate(44,70)" font-family="IBM Plex Sans" font-size="15" fill="#14161F"><text font-family="Bricolage Grotesque" font-weight="800" font-size="22">Explore and Exploit</text><text y="32"><tspan font-weight="700">Explore</tspan> is where new bets search for proof.</text><text y="54"><tspan font-weight="700">Exploit</tspan> is where proven work runs at scale.</text><text y="86" fill="#575E6E">Tap any dot to open it. <tspan font-weight="700" fill="#14161F">play ▶</tspan> means you can play it.</text></g>`;
+ if(V==0)s+=`<g transform="translate(60,52) rotate(-4)"><rect width="330" height="96" rx="6" fill="#FFE66D" stroke="#14161F" stroke-width="2.5"/><text x="16" y="34" font-family="Bricolage Grotesque" font-weight="800" font-size="18">Every bet starts in Explore.</text><text x="16" y="58" font-family="IBM Plex Sans" font-size="13.5">Only the ones with evidence earn a place</text><text x="16" y="77" font-family="IBM Plex Sans" font-size="13.5">in Exploit. Mine are no different.</text></g>`;
  P.forEach((p,i)=>{const [x,y]=pos(p);const lw=p.n.length*8.6+24;const L=p.side==='L';const icon=p.id==='law'?`<image href="${LAW}" x="${x-26}" y="${y-26}" width="52" height="52" clip-path="inset(0 round 12px)"/>`:`<g transform="translate(${x-24},${y-24}) scale(.857)" fill="none" stroke="#14161F" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">${PI[p.id]}</g>`;
-  s+=`<g class="dot" tabindex="0" role="button" data-i="${i}" aria-label="${p.n}">${p.games.length?`<rect class="ring" x="${x-30}" y="${y-30}" width="60" height="60" rx="14" fill="${p.c}" style="animation-delay:${i*.3}s"/>`:''}<rect x="${x-26}" y="${y-26}" width="56" height="56" rx="14" fill="#14161F"/><rect class="face" x="${x-30}" y="${y-30}" width="56" height="56" rx="14" fill="${p.c}" stroke="#14161F" stroke-width="3"/>${icon}
-  <g transform="translate(${L?x-36-lw:x+34},${y-16})"><rect width="${lw}" height="32" rx="9" fill="#fff" stroke="#14161F" stroke-width="2.5"/><text x="12" y="21.5" font-family="Bricolage Grotesque" font-weight="800" font-size="15.5">${p.n}</text></g>`;
-  if(p.games.length){const rs=p.roles?['board','fit','burn']:p.games.flatMap(k=>GR[k]||[k]).slice(0,2);const gname=p.roles?'5 role plays':p.games.length>1?p.games.length+' role plays':GAME[p.games[0]][0];const W=Math.max(150,gname.length*8+rs.length*40+40);const DN=p.box==='exploit',bx=DN?x-W+40:L?x-20:x+6,by=DN?y+78:y-96;
+  s+=`<g class="dot" tabindex="0" role="button" data-i="${i}" aria-label="${p.n}"><g transform="translate(${x},${y}) scale(${K}) translate(${-x},${-y})">${p.games.length?`<rect class="ring" x="${x-30}" y="${y-30}" width="60" height="60" rx="14" fill="${p.c}" style="animation-delay:${i*.3}s"/>`:''}<rect x="${x-26}" y="${y-26}" width="56" height="56" rx="14" fill="#14161F"/><rect class="face" x="${x-30}" y="${y-30}" width="56" height="56" rx="14" fill="${p.c}" stroke="#14161F" stroke-width="3"/>${icon}</g>
+  ${V>=2?`<text x="${L?x-OFF:x+OFF}" y="${y+6}" text-anchor="${L?'end':'start'}" font-family="Bricolage Grotesque" font-weight="800" font-size="${FS}" fill="#14161F" stroke="#fff" stroke-width="5" paint-order="stroke" stroke-linejoin="round">${p.n}</text>`:`<g transform="translate(${L?x-36-lw:x+34},${y-16})"><rect width="${lw}" height="32" rx="9" fill="#fff" stroke="#14161F" stroke-width="2.5"/><text x="12" y="21.5" font-family="Bricolage Grotesque" font-weight="800" font-size="15.5">${p.n}</text></g>`}`;
+  if(V==4){}
+  else if(p.games.length&&V>=2){const r0=p.roles?'board':(GR[p.games[0]]||[p.games[0]])[0];const tw=78,bx=x-tw/2+2,by=p.box==='exploit'?y-68:y+36;s+=`<g class="ptag" transform="translate(${bx},${by})"><rect width="${tw}" height="30" rx="15" fill="#FFF4D6" stroke="#14161F" stroke-width="2.2"/><g transform="translate(2,2)"><circle cx="13" cy="13" r="13" fill="${RCOL[r0]}" stroke="#14161F" stroke-width="2"/><svg x="1" y="1" width="24" height="24">${badge(r0).replace('<svg','<svg width="24" height="24"')}</svg></g><text x="34" y="20" font-family="Bricolage Grotesque" font-weight="800" font-size="13">play ▶</text></g>`}
+  else if(p.games.length){const rs=p.roles?['board','fit','burn']:p.games.flatMap(k=>GR[k]||[k]).slice(0,2);const gname=p.roles?'5 role plays':p.games.length>1?p.games.length+' role plays':GAME[p.games[0]][0];const W=Math.max(150,gname.length*8+rs.length*40+40);const DN=p.box==='exploit',bx=DN?x-W+40:L?x-20:x+6,by=DN?y+78:y-96;
    s+=`<g class="bub" style="animation-delay:${i*.25}s"><g transform="translate(${bx},${by})">${DN?`<path d="M${W-56} 4 L${W-30} -40 L${W-30} 2" fill="#FFF4D6" stroke="#14161F" stroke-width="2.5" stroke-linejoin="round"/>`:`<path d="M14 58 L8 72 L30 60" fill="#FFF4D6" stroke="#14161F" stroke-width="2.5" stroke-linejoin="round"/>`}<rect x="0" y="0" width="${W}" height="62" rx="31" fill="#FFF4D6" stroke="#14161F" stroke-width="2.5"/>${rs.map((r,j)=>`<g transform="translate(${6+j*30},5)"><circle cx="26" cy="26" r="25" fill="${RCOL[r]}" stroke="#14161F" stroke-width="2.5"/><svg x="2" y="2" width="48" height="48">${badge(r).replace('<svg','<svg width="48" height="48"')}</svg><circle cx="26" cy="26" r="24" fill="none" stroke="#14161F" stroke-width="2.5"/></g>`).join('')}<text x="${18+rs.length*30+30}" y="25" font-family="Caveat" font-weight="700" font-size="17" fill="#2F5BFF">play</text><text x="${18+rs.length*30+30}" y="44" font-family="Bricolage Grotesque" font-weight="800" font-size="14">${gname} ▶</text></g></g>`}
   s+='</g>'});
  $('map').innerHTML=s;
@@ -556,7 +598,7 @@ $('x').onclick=()=>$('ov').classList.remove('on');$('ov').onclick=e=>{if(e.targe
 /* ---------- intrapreneurship ---------- */
 const STK=[['bmc','Business Model Canvas',[['turnaround','canvas']]],['vp','Value Proposition Canvas',[['pm','fit']]],['test','Test card',[['investor','pitch'],['founder','burn']]],['portfolio','Explore and Exploit',[['chair','board']]]];
 const SR={turnaround:'canvas',pm:'fit',investor:'pitch',founder:'burn',chair:'board'};
-$('stks').innerHTML=STK.map(st=>`<div class="stk"><div class="pops">${st[2].map(([r,g])=>chip(g,g)).join('')}</div>${V[st[0]]}<b>${st[1]}</b></div>`).join('');
+$('stks').innerHTML=STK.map(st=>`<div class="stk${st[2].length?' hasg':''}"><div class="pops">${st[2].map(([r,g])=>chip(g,g)).join('')}</div>${V[st[0]]}<b>${st[1]}</b><div class="vg">${st[2].map(([r,g])=>`<a href="${GAME[g][1]}">${GAME[g][0]} ▶</a>`).join('')}</div></div>`).join('');
 const TEN=[['C','Profit model','How you make money.','Who pays, for what, and when? Changing the answer can reshape a whole industry.','Moving from a one off sale to a subscription.'],
  ['C','Network','Connections with others to create value.','Which partners, even rivals, could make your offer stronger than you can alone?','Launching your product on a competitor\'s platform.'],
  ['C','Structure','Alignment of your talent and assets.','How are people, skills and assets organised, and does that help or slow you?','A shared feedback system that every internal team draws on.'],
@@ -619,6 +661,7 @@ $('prBtn').onclick=()=>{$('mb').innerHTML=`<div class="mh"><div><h2>The Presiden
  <div class="prk"><span><i class="pd y"></i> dismissed while it had a majority</span><span><i class="pd"></i> dismissed without a majority</span></div>
  <p class="about" style="margin-top:12px"><b>What changed:</b> President's Rule did not disappear. It almost stopped being used against governments that had a majority, and all 3 exceptions trace back to a Chief Minister resigning.</p>`;$('ov').classList.add('on')};
 drawMap();
+let _mw=innerWidth<=600;addEventListener('resize',()=>{const m=innerWidth<=600;if(m!==_mw){_mw=m;drawMap()}});
 /* ---------- single page game player ---------- */
 function gameDoc(k){const el=document.getElementById('gd-'+k);if(!el)return null;let h=JSON.parse(el.textContent);if(!/^\s*<!doctype/i.test(h))h='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+h+'</body></html>';return h}
 let lastY=0;
